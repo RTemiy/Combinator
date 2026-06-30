@@ -89,7 +89,7 @@
             gap: 4px;
             min-width: 120px;
         }
-        .energy-text { font-size: 0.95rem; }
+        .energy-text { font-size: 0.95rem; font-weight: bold; }
         .energy-text span { color: var(--energy-color); font-weight: bold; }
         .energy-bar-bg {
             width: 100%;
@@ -275,7 +275,7 @@
             min-height: 26px;
             box-sizing: border-box;
         }
-        
+
         .story-card .order-target {
             background: #4a287a;
             border: 1px solid rgba(255, 183, 3, 0.3);
@@ -367,8 +367,29 @@
         }
 
         .cell.generator-slot {
-            background: var(--box-bg-color);
-            border: 1px dashed #8c6d53;
+          /* Устанавливаем положение для псевдоэлемента */
+          position: relative;
+          background: var(--box-bg-color);
+
+          /* Создаем рамку */
+          border: 2px dashed transparent;
+
+          /* Используем градиент для фона, который будет "двигаться" */
+          background-image:
+                  linear-gradient(var(--box-bg-color), var(--box-bg-color)),
+                  linear-gradient(90deg, #8c6d53, #ffcc00, #8c6d53);
+
+          background-origin: border-box;
+          background-clip: padding-box, border-box;
+
+          /* Анимация */
+          background-size: 200% 100%;
+          animation: border-dance 3s linear infinite;
+        }
+
+        @keyframes border-dance {
+          0% { background-position: 0% 0%, 0% 0%; }
+          100% { background-position: 0% 0%, 200% 0%; }
         }
 
         .cell.trash-blocked {
