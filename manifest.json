@@ -1,0 +1,24 @@
+{
+  "name": "Комбинатор",
+  "short_name": "Комбинатор",
+  "description": "Увлекательная игра-головоломка: объединяйте предметы, выполняйте заказы и прокачивайте свой уровень!",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#121212",
+  "theme_color": "#ffb703",
+  "icons": [
+    {
+      "src": "/faicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Продолжить игру",
+      "url": "/",
+      "icons": [{ "src": "/faicon.png", "sizes": "64x64" }]
+    }
+  ]
+}
