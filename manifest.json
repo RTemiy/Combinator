@@ -9,8 +9,8 @@
   "theme_color": "#ffb703",
   "icons": [
     {
-      "src": "/faicon.png",
-      "sizes": "64x64",
+      "src": "/icon.png",
+      "sizes": "256x256",
       "type": "image/png"
     }
   ],
@@ -18,7 +18,7 @@
     {
       "name": "Продолжить игру",
       "url": "/",
-      "icons": [{ "src": "/faicon.png", "sizes": "64x64" }]
+      "icons": [{ "src": "/icon.png", "sizes": "256x256" }]
     }
   ]
 }
