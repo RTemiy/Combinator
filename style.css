@@ -380,6 +380,20 @@ body {
   animation: border-dance 3s linear infinite;
 }
 
+.cell.generator-slot-no-energy {
+    border: 2px dashed transparent;
+
+  /* Используем градиент для фона, который будет "двигаться" */
+  background-image: none;
+
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+
+  /* Анимация */
+  background-size: 200% 100%;
+  animation: none;
+}
+
 @keyframes border-dance {
   0% { background-position: 0% 0%, 0% 0%; }
   100% { background-position: 0% 0%, 200% 0%; }
@@ -476,6 +490,11 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.15);
   text-shadow: 0 0 1px rgba(255,255,255,0.5);
   line-height: 1;
+}
+
+.gen-energy-badge-no-energy {
+  background: linear-gradient(135deg, #805c01, #7a3d00);
+  color: darkred;
 }
 
 .gen-level-badge {
