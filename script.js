@@ -454,12 +454,17 @@ function renderGrid() {
         energyBadge.innerText = `⚡${item.genEnergy}`;
         cell.appendChild(energyBadge);
 
-        if (item.genEnergy === 0) {
+
+        if (item.genEnergy <= 5 && item.genEnergy > 0) {
+          cell.classList.add('generator-slot-low-energy');
+          energyBadge.classList.add('gen-energy-badge-no-energy')
+        } else if (item.genEnergy === 0) {
           cell.classList.add('generator-slot-no-energy');
           energyBadge.classList.add('gen-energy-badge-no-energy')
         } else {
           cell.classList.remove('generator-slot-no-energy');
           energyBadge.classList.remove('gen-energy-badge-no-energy')
+          cell.classList.remove('generator-slot-low-energy');
         }
 
         const levelBadge = document.createElement('span');

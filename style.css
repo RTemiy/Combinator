@@ -381,17 +381,13 @@ body {
 }
 
 .cell.generator-slot-no-energy {
-    border: 2px dashed transparent;
+    border: 2px dashed darkred;
+    background-image: none;
+    animation: none;
+}
 
-  /* Используем градиент для фона, который будет "двигаться" */
-  background-image: none;
-
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-
-  /* Анимация */
-  background-size: 200% 100%;
-  animation: none;
+.cell.generator-slot-low-energy {
+  border: 2px dashed transparent;
 }
 
 @keyframes border-dance {
