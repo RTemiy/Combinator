@@ -10,64 +10,67 @@
 </head>
 <body>
 
-    <div id="game-toast"></div>
-    
-    <div class="modal-overlay" id="info-modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">&times;</span>
+<div id="toast-container"></div>
+
+<div class="modal-overlay" id="info-modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div class="modal-icon-container">
             <div class="modal-icon" id="m-icon">✏️</div>
-            <div class="modal-text-side">
-                <div class="modal-subtitle" id="m-subtitle">Уровень 1</div>
-                <h3 class="modal-title" id="m-title">Название</h3>
-                <p class="modal-desc" id="m-desc">Описание.</p>
+            <span id="m-info-btn" class="modal-info-btn" style="display: none;" title="Посмотреть цепочку предметов">ℹ️</span>
+        </div>
+        <div class="modal-text-side">
+            <div class="modal-subtitle" id="m-subtitle">Уровень 1</div>
+            <h3 class="modal-title" id="m-title">Название</h3>
+            <p class="modal-desc" id="m-desc">Описание.</p>
+        </div>
+        <button class="modal-action-btn" id="m-action-btn" style="display: none;"></button>
+        <div class="modal-button-group" id="m-danger-group" style="display: none;">
+            <button class="modal-btn-confirm" id="m-confirm-btn">Да</button>
+            <button class="modal-btn-cancel">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<div class="header-controls">
+    <div class="stats-container">
+        <div class="level-container">
+            <div class="level-text">Ур. <span id="player-level">1</span> • Очки: <span id="score-text">0</span></div>
+            <div class="level-bar-bg">
+                <div class="level-bar-fill" id="level-bar"></div>
             </div>
-            <button class="modal-action-btn" id="m-action-btn" style="display: none;"></button>
-            <div class="modal-button-group" id="m-danger-group" style="display: none;">
-                <button class="modal-btn-confirm" id="m-confirm-btn">Да, сбросить</button>
-                <button class="modal-btn-cancel" onclick="closeModal()">Отмена</button>
+        </div>
+
+        <div class="energy-container">
+            <div class="energy-text">⚡ Энергия: <span id="energy-val">100/100</span></div>
+            <div class="energy-bar-bg">
+                <div class="energy-bar-fill" id="energy-bar"></div>
             </div>
         </div>
     </div>
-    
-    <div class="header-controls">
-        <div class="stats-container">
-            <div class="level-container">
-                <div class="level-text">Ур. <span id="player-level">1</span> • Очки: <span id="score-text">0</span></div>
-                <div class="level-bar-bg">
-                    <div class="level-bar-fill" id="level-bar"></div>
-                </div>
-            </div>
-            
-            <div class="energy-container">
-                <div class="energy-text">⚡ Энергия: <span id="energy-val">100</span>/100</div>
-                <div class="energy-bar-bg">
-                    <div class="energy-bar-fill" id="energy-bar"></div>
-                </div>
-            </div>
-        </div>
-        <button class="reset-btn" onclick="confirmReset()" title="Начать заново">🚫</button>
+    <button class="reset-btn" title="Начать заново">🚫</button>
+</div>
+
+<div class="game-container">
+    <div class="orders-panel">
+        <div class="panel-title">Заказы клиентов</div>
+        <div id="orders-list"></div>
     </div>
 
-    <div class="game-container">
-        <div class="orders-panel">
-            <div class="panel-title">Заказы клиентов</div>
-            <div id="orders-list"></div>
-        </div>
-
-        <div class="main-game">
-            <div class="grid" id="grid"></div>
-        </div>
+    <div class="main-game">
+        <div class="grid" id="grid"></div>
     </div>
+</div>
 
-    <script src="script.js"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .then(reg => {})
-            .catch(err => {});
-        });
-      }
-    </script>
+<script src="script.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => {})
+        .catch(err => {});
+    });
+  }
+</script>
 </body>
 </html>
