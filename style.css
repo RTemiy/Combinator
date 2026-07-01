@@ -490,7 +490,7 @@ body {
 
 .gen-energy-badge-no-energy {
   background: linear-gradient(135deg, #805c01, #7a3d00);
-  color: darkred;
+  color: black;
 }
 
 .gen-level-badge {
