@@ -63,9 +63,10 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            min-width: 130px;
+            min-width: 145px;
+            cursor: pointer;
         }
-        .level-text { font-size: 0.95rem; font-weight: bold; }
+        .level-text { font-size: 0.85rem; font-weight: bold; }
         .level-text span { color: var(--accent-color); }
         .level-bar-bg {
             width: 100%;
@@ -87,9 +88,10 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            min-width: 120px;
+            min-width: 145px;
+            cursor: pointer;
         }
-        .energy-text { font-size: 0.95rem; font-weight: bold; }
+        .energy-text { font-size: 0.85rem; font-weight: bold; }
         .energy-text span { color: var(--energy-color); font-weight: bold; }
         .energy-bar-bg {
             width: 100%;
@@ -914,16 +916,39 @@
                 updateUI();
             }, 10000);
 
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
-	        window.addEventListener('blur', cleanDragState);
-            window.addEventListener('touchmove', handleTouchMove, { passive: false });
-            window.addEventListener('touchend', handleTouchEnd);
-            window.addEventListener('beforeunload', () => {
-                // Сохраняем метку времени выхода
-                localStorage.setItem('last_login_time', Date.now());
-                saveGame();
+          addListeners()
+
+        }
+
+        function addListeners() {
+          window.addEventListener('mousemove', handleMouseMove);
+          window.addEventListener('mouseup', handleMouseUp);
+          window.addEventListener('blur', cleanDragState);
+          window.addEventListener('touchmove', handleTouchMove, { passive: false });
+          window.addEventListener('touchend', handleTouchEnd);
+          window.addEventListener('beforeunload', () => {
+            // Сохраняем метку времени выхода
+            localStorage.setItem('last_login_time', Date.now());
+            saveGame();
           });
+
+          document.querySelector('.energy-container').addEventListener('click', () => {
+            showInfoModal({
+              icon: '⚡️',
+              name: 'Энергия',
+              subtitle: 'Вечный движитель',
+              desc: 'За каждое использование генератора тратится 1 ед. энергии. Каждые 10 сек. восстанавливается 1 ед. энергии. За каждый готовый заказ восстанавливается 3 ед. энергии.'
+            })
+          })
+
+          document.querySelector('.level-container').addEventListener('click', () => {
+            showInfoModal({
+              icon: '🚥',
+              name: 'Уровень',
+              subtitle: 'Главный показатель эффективности',
+              desc: 'За сдачу заказов выдаются очки. Чем сложнее заказ, тем больше очков получается. При получении определенного количества очков, уровень повышается.'
+            })
+          })
 
         }
 
@@ -1485,6 +1510,24 @@
             overlay.className = 'modal-overlay active';
         }
 
+        function showInfoModal(info) {
+          const overlay = document.getElementById('info-modal');
+          const mIcon = document.getElementById('m-icon');
+          const mTitle = document.getElementById('m-title');
+          const mSubtitle = document.getElementById('m-subtitle');
+          const mDesc = document.getElementById('m-desc');
+          const actionBtn = document.getElementById('m-action-btn');
+          document.getElementById('m-danger-group').style.display = 'none';
+          actionBtn.style.display = 'none';
+
+          mIcon.innerHTML = info.icon;
+          mTitle.innerText = info.name;
+          mSubtitle.innerText = info.subtitle;
+          mDesc.innerText = info.desc;
+
+          overlay.className = 'modal-overlay active';
+        }
+
         function closeModal() {
             document.getElementById('info-modal').className = 'modal-overlay';
         }
@@ -1896,6 +1939,7 @@
                             checkProgressiveUnlocks(); 
 
                             if (wasStory) {
+                              energy += 3
                                 if (currentStep < 3) {
                                     generateStoryOrder(currentStep + 1, storyChar);
                                     showToast(`🔮 Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
