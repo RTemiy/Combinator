@@ -820,3 +820,45 @@ body {
 .particle.p4 { animation-delay: 0.9s; }
 .particle.p5 { animation-delay: 1.2s; }
 .particle.p6 { animation-delay: 1.5s; }
+
+.cell.booster-cell {
+  position: relative;
+  overflow: hidden; /* Важно, чтобы рамка не вылезала за пределы */
+  background: #2d2d2d; /* Немного другой фон для контраста */
+}
+
+.cell.booster-cell::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%; /* Больше ячейки, чтобы вращение было видно */
+  height: 150%;
+  background: conic-gradient(
+          from 0deg,
+          #ffb703,
+          #ff5cf1,
+          #4cc9f0,
+          #06d6a0,
+          #ffb703
+  );
+  animation: spin-border 4s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
+.cell.booster-cell::after {
+  content: '';
+  position: absolute;
+  inset: 2px; /* Отступ для создания рамки */
+  background: var(--cell-color);
+  border-radius: 4px;
+}
+
+@keyframes spin-border {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

@@ -522,6 +522,11 @@ function renderGrid() {
     cell.className = 'cell';
 
     if (item) {
+      // Добавляем класс для ячеек с бустерами
+      if (item.isUpgradePart || item.isMagicTool) {
+        cell.classList.add('booster-cell');
+      }
+
       if (item.isTrash) {
         cell.classList.add('trash-blocked');
         const trashSpan = document.createElement('span');
