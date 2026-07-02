@@ -148,6 +148,7 @@ const CONFIG = {
   TRASH_CLEAR_COST: 25,
   TRASH_AT_START: 23,
   MAX_ITEM_LEVEL: 7,
+  MAX_ORDERS: 4,
   MAX_GENERATOR_LEVEL: 5,
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
@@ -343,9 +344,9 @@ function startNewGame() {
   }
 
   orders = [];
-  generateOrder();
-  generateOrder();
-  generateOrder();
+  for (let i = 0; i < CONFIG.MAX_ORDERS; i++) {
+    generateOrder();
+  }
 
   saveGame();
 }
@@ -500,6 +501,19 @@ function updateUI() {
   else barFill.classList.remove('low');
 }
 
+function createParticleEffectHTML() {
+  let html = '<div class="particle-container">';
+  const directions = [
+    {x: '30px', y: '0px'}, {x: '-25px', y: '15px'}, {x: '20px', y: '-25px'},
+    {x: '-15px', y: '-30px'}, {x: '10px', y: '28px'}, {x: '-28px', y: '-5px'}
+  ];
+  for (let i = 1; i <= 6; i++) {
+    const dir = directions[i-1];
+    html += `<div class="particle p${i}" style="--x: ${dir.x}; --y: ${dir.y};"></div>`;
+  }
+  return html + '</div>';
+}
+
 function renderGrid() {
   const cells = document.querySelectorAll('.cell');
   cells.forEach((cell, idx) => {
@@ -562,11 +576,24 @@ function renderGrid() {
         levelBadge.classList.add('gen-level-badge');
         levelBadge.innerText = CONFIG.ROMAN_NUMERALS[lvl];
         cell.appendChild(levelBadge);
+      } else if (item.isUpgradePart) {
+        cell.innerHTML += createParticleEffectHTML();
+        wrapper.innerHTML = '🔩';
+      } else if (item.isMagicTool) {
+        cell.innerHTML += createParticleEffectHTML();
+        wrapper.innerHTML = '⚒️';
       } else {
         wrapper.innerHTML = ITEM_CATEGORIES[item.category].items[item.level - 1].icon;
         const levelBadge = document.createElement('span');
         levelBadge.classList.add('item-level');
         levelBadge.innerText = item.level;
+
+        // Добавляем эффект частиц для предметов максимального уровня
+        if (item.level === CONFIG.MAX_ITEM_LEVEL) {
+          levelBadge.style.background = 'linear-gradient(45deg, #ffb703, #ff8500)';
+          levelBadge.style.color = '#000';
+          cell.innerHTML += createParticleEffectHTML();
+        }
         cell.appendChild(levelBadge);
       }
       cell.appendChild(wrapper);
@@ -666,7 +693,7 @@ function endDrag(clientX, clientY) {
           // Record this click for double-click detection
           lastClick = { index: dragStartIndex, time: now };
         }
-      } else { // Click on regular item
+      } else { // Click on regular item or upgrade part
         showItemInfoModal(item, dragStartIndex);
       }
     }
@@ -711,14 +738,51 @@ function executeMergeOrSwap(fromIdx, toIdx) {
   const source = gridData[fromIdx];
   const target = gridData[toIdx];
 
-  if (target && !source.isGenerator && !target.isGenerator && source.category === target.category && source.level === target.level) {
+  // Определяем, какой из предметов - деталь, а какой - генератор
+  const upgradePart = source.isUpgradePart ? source : (target && target.isUpgradePart ? target : null);
+  const generator = source.isGenerator ? source : (target && target.isGenerator ? target : null);
+  const partIdx = source.isUpgradePart ? fromIdx : (target && target.isUpgradePart ? toIdx : -1);
+  const genIdx = source.isGenerator ? fromIdx : (target && target.isGenerator ? toIdx : -1);
+
+  // Определяем, какой из предметов - магический инструмент, а какой - обычный предмет
+  const magicTool = source.isMagicTool ? source : (target && target.isMagicTool ? target : null);
+  const regularItem = (source && !source.isGenerator && !source.isTrash && !source.isUpgradePart && !source.isMagicTool) ? source :
+    (target && !target.isGenerator && !target.isTrash && !target.isUpgradePart && !target.isMagicTool) ? target : null;
+  const toolIdx = source.isMagicTool ? fromIdx : (target && target.isMagicTool ? toIdx : -1);
+  const itemIdx = (source && !source.isGenerator && !source.isTrash && !source.isUpgradePart && !source.isMagicTool) ? fromIdx :
+    (target && !target.isGenerator && !target.isTrash && !target.isUpgradePart && !target.isMagicTool) ? toIdx : -1;
+
+  // 1. Логика улучшения генератора деталью
+  if (upgradePart && generator && partIdx !== -1 && genIdx !== -1) {
+    if (generator.genLevel < CONFIG.MAX_GENERATOR_LEVEL) {
+      const nextLvl = generator.genLevel + 1;
+      gridData[partIdx] = null; // Удаляем деталь
+      gridData[genIdx] = { // Улучшаем генератор
+        ...generator,
+        genLevel: nextLvl,
+        genEnergy: GEN_ENERGY_CONFIG[nextLvl].max,
+        lastRegenTime: Date.now()
+      };
+      triggerMergeEffects(genIdx, generator.category);
+      showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
+    }
+    // 2. Логика улучшения предмета магическим инструментом
+  } else if (magicTool && regularItem && toolIdx !== -1 && itemIdx !== -1) {
+    if (regularItem.level < CONFIG.MAX_ITEM_LEVEL) {
+      const nextLvl = regularItem.level + 1;
+      gridData[toolIdx] = null; // Удаляем инструмент
+      gridData[itemIdx] = { ...regularItem, level: nextLvl }; // Улучшаем предмет
+      triggerMergeEffects(itemIdx, regularItem.category);
+      showToast(`✨ Предмет улучшен до уровня ${nextLvl}!`, "success");
+    }
+    // 2. Логика слияния обычных предметов
+  } else if (target && !source.isGenerator && !target.isGenerator && !source.isUpgradePart && !target.isUpgradePart && source.category === target.category && source.level === target.level) {
     if (source.level < CONFIG.MAX_ITEM_LEVEL) {
       gridData[fromIdx] = null;
       gridData[toIdx] = { category: source.category, level: source.level + 1 };
-      saveGame();
-      updateUI();
       triggerMergeEffects(toIdx, source.category);
     }
+    // 3. Логика слияния генераторов
   } else if (target && source.isGenerator && target.isGenerator && source.category === target.category && source.genLevel === target.genLevel) {
     if (source.genLevel < CONFIG.MAX_GENERATOR_LEVEL) {
       const nextLvl = source.genLevel + 1;
@@ -730,17 +794,16 @@ function executeMergeOrSwap(fromIdx, toIdx) {
         genEnergy: GEN_ENERGY_CONFIG[nextLvl].max,
         lastRegenTime: Date.now()
       };
-      saveGame();
-      updateUI();
       triggerMergeEffects(toIdx, source.category);
       showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
     }
+    // 4. Стандартная логика перемещения
   } else {
-    gridData[fromIdx] = target;
-    gridData[toIdx] = source;
-    saveGame();
-    updateUI();
+    [gridData[fromIdx], gridData[toIdx]] = [target, source];
   }
+
+  saveGame();
+  updateUI();
 }
 
 function animateCellPop(index) {
@@ -851,6 +914,22 @@ function showItemInfoModal(item, index = -1) {
       desc: desc,
       infoButton: { onClick: () => showCategoryProgressionModal(item.category) }
     };
+  } else if (item.isUpgradePart) {
+    modalOptions = {
+      icon: '🔩',
+      title: 'Новая деталь',
+      subtitle: 'Универсальный улучшитель',
+      desc: 'Редкая деталь, полученная за выполнение особого заказа. Перетащите ее на любой генератор, чтобы повысить его уровень.',
+      isBlocking: false
+    };
+  } else if (item.isMagicTool) {
+    modalOptions = {
+      icon: '⚒️',
+      title: 'Магические инструменты',
+      subtitle: 'Универсальный улучшитель',
+      desc: 'Волшебные инструменты, способные улучшить любой предмет на один уровень. Перетащите их на предмет, который хотите улучшить.',
+      isBlocking: false
+    };
   } else {
     const info = ITEM_CATEGORIES[item.category].items[item.level - 1];
     modalOptions = {
@@ -908,7 +987,7 @@ function showCategoryProgressionModal(categoryKey) {
       </div>
     `;
     if (index < category.items.length - 1) {
-        progressionHTML += '<div class="progression-arrow-h">→</div>';
+      progressionHTML += '<div class="progression-arrow-h">→</div>';
     }
   });
   progressionHTML += '</div>';
@@ -1101,8 +1180,8 @@ function checkProgressiveUnlocks() {
         }
         showToast(`🎉 Уровень ${threshold.level}! Новый генератор: ${GENERATOR_BOXES[newCat].name}!`, "success");
       } else {
-        spawnBonusGenerator();
-        showToast(`🎉 Уровень ${threshold.level}! Бонус: Новый генератор [I] уровня!`, "success");
+        spawnUpgradePart();
+        showToast(`🎉 Уровень ${threshold.level}! Бонус: получена Новая деталь 🔩!`, "success");
       }
     }
   });
@@ -1119,6 +1198,32 @@ function spawnBonusGenerator() {
       genLevel: 1,
       genEnergy: GEN_ENERGY_CONFIG[1].max,
       lastRegenTime: Date.now()
+    };
+    setTimeout(() => animateCellPop(targetCell), 50);
+  }
+}
+
+function spawnUpgradePart() {
+  let emptyCells = getEmptyGridCells();
+  if (emptyCells.length > 0) {
+    const targetCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    gridData[targetCell] = {
+      isUpgradePart: true,
+      icon: '🔩',
+      name: 'Новая деталь'
+    };
+    setTimeout(() => animateCellPop(targetCell), 50);
+  }
+}
+
+function spawnMagicTool() {
+  let emptyCells = getEmptyGridCells();
+  if (emptyCells.length > 0) {
+    const targetCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    gridData[targetCell] = {
+      isMagicTool: true,
+      icon: '⚒️',
+      name: 'Магические инструменты'
     };
     setTimeout(() => animateCellPop(targetCell), 50);
   }
@@ -1222,7 +1327,7 @@ function checkOrdersAvailability() {
 
     order.items.forEach(reqItem => {
       const foundIdx = tempGrid.findIndex((item, idx) =>
-        item && !item.isGenerator && !item.isTrash &&
+        item && !item.isGenerator && !item.isTrash && !item.isUpgradePart &&
         item.category === reqItem.category && item.level === reqItem.level &&
         !lockedCells.includes(idx)
       );
@@ -1362,7 +1467,7 @@ function completeOrder(id) {
 
   order.items.forEach(reqItem => {
     const foundIdx = tempGrid.findIndex((item, idx) =>
-      item && !item.isGenerator && !item.isTrash &&
+      item && !item.isGenerator && !item.isTrash && !item.isUpgradePart &&
       item.category === reqItem.category && item.level === reqItem.level &&
       !lockedCells.includes(idx)
     );
@@ -1406,9 +1511,18 @@ function completeOrder(id) {
           generateStoryOrder(currentStep + 1, storyChar);
           showToast(`🔮 Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
         } else {
-          spawnBonusGenerator();
+          const rand = Math.random();
+          if (rand < 0.33) {
+            spawnBonusGenerator();
+            showToast(`🎁 Сюжет завершен! Вы получили новый генератор I уровня!`, "story");
+          } else if (rand < 0.66) {
+            spawnUpgradePart();
+            showToast(`🎁 Сюжет завершен! Вы получили Новую деталь 🔩!`, "story");
+          } else {
+            spawnMagicTool();
+            showToast(`🎁 Сюжет завершен! Вы получили Магические инструменты ⚒️!`, "story");
+          }
           generateOrder();
-          showToast(`🎁 Сюжет завершен! Получен новый генератор 1-го уровня!`, "story");
         }
       } else {
         generateOrder();
