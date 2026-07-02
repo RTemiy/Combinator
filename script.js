@@ -905,11 +905,15 @@ function showItemInfoModal(item, index = -1) {
     const cdSec = config.cooldown / 1000;
 
     if (lvl === 1) {
-      desc += `Базовый уровень. Создаёт предметы Ур.1. Восстанавливает 1 заряд каждые ${cdSec} сек.`;
+      desc += `Базовый уровень. Создаёт предметы 1-го уровня. Восстанавливает 1 заряд каждые ${cdSec} сек.`;
     } else if (lvl === 2) {
-      desc += `Улучшенный ранг. Шансы дропа: Ур.1 — 80%, Ур.2 — 20%. Заряд каждые ${cdSec} сек.`;
+      desc += `Продвинутый ранг. Шансы получения: 80% (ур. 1), 20% (ур. 2). Заряд каждые ${cdSec} сек.`;
     } else if (lvl === 3) {
-      desc += `Максимальный ранг! Дропает предметы вплоть до Ур.3. Регенерация заряда всего за ${cdSec} сек.`;
+      desc += `Профессиональный ранг. Шансы получения: 65% (ур. 1), 25% (ур. 2), 10% (ур. 3). Заряд каждые ${cdSec} сек.`;
+    } else if (lvl === 4) {
+      desc += `Элитный ранг. Шансы получения: 50% (ур. 1), 30% (ур. 2), 15% (ур. 3), 5% (ур. 4). Заряд каждые ${cdSec} сек.`;
+    } else if (lvl === 5) {
+      desc += `Легендарный ранг! Шансы: 30% (ур. 1), 30% (ур. 2), 25% (ур. 3), 10% (ур. 4), 5% (ур. 5). Самая быстрая перезарядка: ${cdSec} сек.`;
     }
 
     modalOptions = {
@@ -1093,6 +1097,15 @@ function triggerGenerator(generator, fromIndex) {
   } else if (lvl === 3) {
     if (rand < 10) spawnLevel = 3;
     else if (rand < 35) spawnLevel = 2;
+  } else if (lvl === 4) {
+    if (rand < 5) spawnLevel = 4;
+    else if (rand < 20) spawnLevel = 3;
+    else if (rand < 50) spawnLevel = 2;
+  } else if (lvl === 5) {
+    if (rand < 5) spawnLevel = 5;
+    else if (rand < 15) spawnLevel = 4;
+    else if (rand < 40) spawnLevel = 3;
+    else if (rand < 70) spawnLevel = 2;
   }
 
   const cellElements = document.querySelectorAll('.cell');
