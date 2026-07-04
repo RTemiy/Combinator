@@ -953,6 +953,7 @@ body {
   50% { transform: scale(1.15); }
 }
 
+
 @media (max-width: 380px) {
   .stats-container {
     gap: 15px;
@@ -968,6 +969,9 @@ body {
 
 /* Дополнительная адаптация для очень маленьких экранов по высоте */
 @media (max-height: 670px) {
+  body {
+    padding: 5px;
+  }
   .game-container {
     gap: 10px;
   }
@@ -981,7 +985,10 @@ body {
     height: 100px;
   }
   .grid {
-    padding: 8px;
+    /* Вот ключевое изменение: уменьшаем максимальную ширину и высоту */
+    max-width: min(320px, 85vw);
+    max-height: 70vh;
     gap: 5px;
+    padding: 8px;
   }
 }
