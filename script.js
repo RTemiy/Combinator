@@ -1023,7 +1023,7 @@ function handleCellClick(index) {
         if (gameState.lastClick.index === index) {
             triggerGenerator(item, index);
         } else {
-            showItemInfoModal(item);
+            showItemInfoModal(item, index);
             gameState.lastClick = { index: index };
         }
     } else {
@@ -1043,8 +1043,9 @@ function handleUnblockMerge(fromIdx, toIdx, source) {
 }
 
 function handleGeneratorUpgrade(partIdx, genIdx, generator) {
-    if (generator.genLevel >= CONFIG.MAX_GENERATOR_LEVEL) return false;
-    const nextLvl = generator.genLevel + 1;
+    const lvl = generator.genLevel || 1;
+    if (lvl >= CONFIG.MAX_GENERATOR_LEVEL) return false;
+    const nextLvl = lvl + 1;
     gameState.gridData[partIdx] = null;
     gameState.gridData[genIdx] = {
         ...generator,
@@ -1090,8 +1091,9 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
         return true;
     }
 
-    if (source.genLevel >= CONFIG.MAX_GENERATOR_LEVEL) return false;
-    const nextLvl = source.genLevel + 1;
+    const lvl = source.genLevel || 1;
+    if (lvl >= CONFIG.MAX_GENERATOR_LEVEL) return false;
+    const nextLvl = lvl + 1;
     gameState.gridData[fromIdx] = null;
     gameState.gridData[toIdx] = {
         isGenerator: true,
@@ -1774,6 +1776,34 @@ function spawnBonusGenerator() {
   }
 }
 
+function spawnRandomExistingGenerator() {
+  // 1. Получаем все уникальные ключи генераторов из активных категорий.
+  const activeGeneratorKeys = [...new Set(gameState.activeCategories.map(cat => CATEGORIES_CONFIG[cat].generatorKey))];
+
+  // 2. Фильтруем специальные генераторы, такие как bonus_chest.
+  const regularGeneratorKeys = activeGeneratorKeys.filter(key => !GENERATORS_DATA[key].isSpecial);
+
+  if (regularGeneratorKeys.length > 0) {
+    // 3. Выбираем один случайным образом.
+    const randomGenKey = regularGeneratorKeys[Math.floor(Math.random() * regularGeneratorKeys.length)];
+    const generatorData = GENERATORS_DATA[randomGenKey];
+
+    // 4. Добавляем его в очередь наград.
+    gameState.rewardQueue.push({
+      isGenerator: true,
+      generatorKey: randomGenKey,
+      genLevel: 1,
+      genEnergy: GEN_ENERGY_CONFIG[1].max,
+      lastRegenTime: Date.now()
+    });
+    showToast(`🎁 Сюжет завершен! Бонус: получен генератор "${generatorData.name}"!`, "story");
+  } else {
+    // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
+    spawnUpgradePart();
+    showToast(`🎁 Сюжет завершен! Бонус: получена Новая деталь 🔩!`, "story");
+  }
+}
+
 function spawnUpgradePart() {
   gameState.rewardQueue.push({
     isUpgradePart: true,
@@ -2139,17 +2169,21 @@ function completeOrder(id) {
           generateStoryOrder(currentStep + 1, storyChar);
           showToast(`🔮 Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
         } else {
-          if (Math.random() < 0.5) {
-            // 50% шанс на подарочную коробку
+          const rand = Math.random();
+          if (rand < 0.3) {
+            // 30% шанс на подарочную коробку
             gameState.rewardQueue.push({
               isGenerator: true,
               generatorKey: 'bonus_chest',
               genLevel: 1, genCharges: 1
             });
             showToast(`🎁 Сюжет завершен! Вы получили Подарочную коробку!`, "story");
-          } else {
-            // 50% шанс на обычный бонусный генератор
+          } else if (rand < 0.6) {
+            // 30% шанс на новый генератор (или деталь, если все открыто)
             spawnBonusGenerator();
+          } else {
+            // 40% шанс на случайный уже открытый генератор
+            spawnRandomExistingGenerator();
           }
           generateOrder();
         }
