@@ -382,6 +382,11 @@ function addListeners() {
   DOMElements.infoModal.closeBtn.addEventListener('click', closeModal);
   DOMElements.infoModal.cancelBtn.addEventListener('click', closeModal);
   DOMElements.resetBtn.addEventListener('click', confirmReset);
+  // Если основной скрипт загрузился, он должен перехватить управление у аварийного сброса.
+  // Сначала удаляем старый обработчик, чтобы избежать двойного срабатывания.
+  // `fallbackResetHandler` должен быть доступен в глобальной области видимости из index.html.
+  if (typeof fallbackResetHandler === 'function') DOMElements.resetBtn.removeEventListener('click', fallbackResetHandler);
+  DOMElements.resetBtn.addEventListener('click', confirmReset);
 
   // Event delegation for dynamic order cards
   DOMElements.ordersList.addEventListener('click', (e) => {

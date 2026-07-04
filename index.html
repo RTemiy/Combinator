@@ -68,6 +68,22 @@
 <script src="font-loader.js"></script>
 <script src="script.js"></script>
 <script>
+  // --- Аварийный сброс ---
+  // Этот скрипт гарантирует, что кнопка сброса будет работать,
+  // даже если основной файл script.js сломается.
+  const fallbackResetHandler = () => {
+    const isConfirmed = confirm('Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.');
+    if (isConfirmed) {
+      localStorage.removeItem('merge_game_save');
+      alert('Прогресс сброшен. Страница будет перезагружена.');
+      window.location.reload();
+    }
+  };
+
+  const resetButton = document.querySelector('.reset-btn');
+  if (resetButton) resetButton.addEventListener('click', fallbackResetHandler);
+</script>
+<script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
