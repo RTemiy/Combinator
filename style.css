@@ -98,6 +98,7 @@ body {
   align-items: center;
   gap: 6px;
   padding: 0 5px;
+  font-size: 1.1rem; /* Устанавливаем одинаковый базовый размер шрифта */
   cursor: pointer;
 }
 .energy-text {
@@ -135,12 +136,16 @@ body {
   align-items: center;
   gap: 8px;
   pointer-events: none;
+  width: 90%; /* Задаем адаптивную ширину */
+  max-width: 500px; /* Ограничиваем максимальную ширину на больших экранах */
 }
 
 .game-toast {
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
+  width: 90%; /* Растягиваем уведомление на всю ширину контейнера */
+  box-sizing: border-box; /* Чтобы padding не влиял на общую ширину */
   font-weight: bold;
   box-shadow: 0 4px 15px rgba(0,0,0,0.4);
   opacity: 0;
@@ -155,11 +160,19 @@ body {
 .game-toast.show { opacity: 1; transform: translateY(0) scale(1); }
 .game-toast.hide { opacity: 0; transform: translateY(-20px) scale(0.9); }
 
+.top-game-panel {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: min(400px, 90vw);
+  align-items: flex-start;
+}
+
 .game-container {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: 100%;
+  width: 100%; /* Убрано, так как ширина теперь у top-game-panel */
   align-items: center;
   padding-bottom: 10px;
   /* Добавляем гибкость, чтобы контейнер занимал оставшееся место */
@@ -170,15 +183,62 @@ body {
 .orders-panel {
   background: var(--panel-color);
   border-radius: 12px;
-  padding: 10px;
-  max-width: min(400px, 90vw); /* Ограничиваем ширину, как у игрового поля */
+  padding: 8px;
   width: 100%;
   box-sizing: border-box;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: flex-start; /* Выравниваем по верху */
+  gap: 15px; /* Увеличиваем отступ, чтобы тень от награды не заходила на заказы */
 }
+
+.reward-queue-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  width: 55px; /* Фиксированная ширина для контейнера стопки */
+  min-height: 106px; /* Высота как у карточки заказа + паддинги */
+  justify-content: center;
+  top: 135px;
+  flex-shrink: 0; /* Запрещаем контейнеру сжиматься */
+}
+
+.reward-item {
+  width: 55px; /* Немного увеличим размер */
+  height: 55px;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  position: absolute; /* Делаем элементы абсолютно позиционированными */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  pointer-events: none; /* По умолчанию нельзя нажать */
+  opacity: 0.7;
+}
+
+.reward-item.claimable {
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 1;
+  box-shadow: 0 0 12px #ffb703, 0 0 20px rgba(255, 183, 3, 0.5);
+  border-color: #ffb703;
+  transform: scale(1.05);
+}
+
+.reward-item.claimable:hover {
+  transform: scale(1.05);
+}
+
+.reward-item.generator .generator-box-bg { font-size: 1.8rem; }
+.reward-item.generator .generator-item-fg { font-size: 1.1rem; }
+
+.reward-item .max-level-star { font-size: 0.7rem; bottom: 2px; right: 2px; }
+
 
 .panel-title {
   font-size: 0.9rem;
@@ -197,6 +257,7 @@ body {
   overflow-x: auto;
   padding-bottom: 5px;
   scroll-behavior: smooth;
+  flex: 1; /* Занимает оставшееся место */
   position: relative;
 }
 
@@ -552,6 +613,10 @@ body {
   line-height: 1;
 }
 
+.gen-energy-badge.charges {
+  background: linear-gradient(135deg, #4cc9f0, #4361ee);
+}
+
 .gen-energy-badge-no-energy {
   background: linear-gradient(135deg, #805c01, #7a3d00);
   color: black;
@@ -578,8 +643,8 @@ body {
 .max-level-star {
   display: block;
   position: absolute;
-  bottom: 3px;
-  right: 4px;
+  bottom: 7px;
+  right: 7px;
   font-size: 0.8rem;
   color: #ffd700;
   pointer-events: none;
