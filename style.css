@@ -197,11 +197,11 @@ body {
   flex-direction: column;
   align-items: center;
   position: absolute;
-  width: 55px; /* Фиксированная ширина для контейнера стопки */
-  min-height: 106px; /* Высота как у карточки заказа + паддинги */
+  width: 55px;
+  min-height: 106px;
   justify-content: center;
   top: 135px;
-  flex-shrink: 0; /* Запрещаем контейнеру сжиматься */
+  flex-shrink: 0; /
 }
 
 .reward-item {
