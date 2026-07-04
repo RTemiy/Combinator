@@ -216,6 +216,7 @@ const CONFIG = {
   ENERGY_REGEN_INTERVAL: 10000,
   ENERGY_REGEN_AMOUNT: 1,
   STORY_ORDER_ENERGY_REWARD: 3,
+  ORDER_ENERGY_REWARD: 1, // Награда за обычный заказ
   ITEM_DELETE_COST: 15,
   OFFLINE_ENERGY_REGEN_RATE: 10000 / 1, // ms per 1 energy unit (Interval / Amount)
 
@@ -1398,15 +1399,18 @@ function moveItem3D(fromElem, toElem, icon) {
 function animateRewardFly(startElement, endElement, icon, count = 5, className = 'coin') {
   if (!startElement || !endElement) return;
 
+  // Получаем координаты ОДИН РАЗ в самом начале
+  const startRect = startElement.getBoundingClientRect();
   const endRect = endElement.getBoundingClientRect();
+  const startXInitial = startRect.left + startRect.width / 2;
+  const startYInitial = startRect.top + startRect.height / 2;
   const endX = endRect.left + endRect.width / 2;
   const endY = endRect.top + endRect.height / 2;
 
   for (let i = 0; i < count; i++) {
     setTimeout(() => {
-      const startRect = startElement.getBoundingClientRect();
-      const startX = startRect.left + startRect.width / 2 + (Math.random() - 0.5) * 40;
-      const startY = startRect.top + startRect.height / 2 + (Math.random() - 0.5) * 20;
+      const startX = startXInitial + (Math.random() - 0.5) * 40;
+      const startY = startYInitial + (Math.random() - 0.5) * 20;
 
       const flyer = document.createElement('div');
       flyer.classList.add('flying-reward', className);
@@ -1855,24 +1859,23 @@ function completeOrder(id) {
 
   // After all items have flown to the card
   Promise.all(animationPromises).then(() => {
-    // Animate coins and energy flying to the top panel
     const coinsEarned = elementsToAnimate.reduce((sum, el) => sum + el.level * CONFIG.COIN_MULTIPLIER, 0);
+    const energyReward = order.isStory ? CONFIG.STORY_ORDER_ENERGY_REWARD : CONFIG.ORDER_ENERGY_REWARD;
+
+    // Анимация полета наград
     animateRewardFly(targetAvatarElement, DOMElements.coins.value, '🪙', Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
-    if (order.isStory) {
-      animateRewardFly(targetAvatarElement, DOMElements.energy.value, '⚡', CONFIG.STORY_ORDER_ENERGY_REWARD, 'energy');
-    }
+    if (energyReward > 0) animateRewardFly(targetAvatarElement, DOMElements.energy.value, '⚡', energyReward, 'energy');
 
     // Wait for the card fade-out animation to complete
     setTimeout(() => {
       const wasStory = order.isStory;
       const currentStep = order.storyStep;
       const storyChar = order.character;
-
       gameState.orders.splice(orderIndex, 1);
       checkProgressiveUnlocks();
+      gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyReward);
 
       if (wasStory) {
-        gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + CONFIG.STORY_ORDER_ENERGY_REWARD);
         if (currentStep < 3) {
           generateStoryOrder(currentStep + 1, storyChar);
           showToast(`🔮 Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
