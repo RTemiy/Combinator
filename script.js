@@ -217,14 +217,15 @@ const CONFIG = {
   ENERGY_REGEN_INTERVAL: 10000,
   ENERGY_REGEN_AMOUNT: 1,
   STORY_ORDER_ENERGY_REWARD: 3,
-  ORDER_ENERGY_REWARD: 1, // Награда за обычный заказ
+  ORDER_ENERGY_REWARD: 1,
   ITEM_DELETE_COST: 15,
-  OFFLINE_ENERGY_REGEN_RATE: 10000 / 1, // ms per 1 energy unit (Interval / Amount)
+  OFFLINE_ENERGY_REGEN_RATE: 10000, 
 
   // Coins
   COIN_MULTIPLIER: 5,
-  COINS_PER_ORDER_CANCEL: 100,
-  BLOCKED_CLEAR_COST_COINS: 75,
+  COINS_PER_ORDER_CANCEL: 50,
+  BLOCKED_CLEAR_COST_COINS: 25,
+  GENERATOR_RECHARGE_COST: 75,
 
   // Orders
   MAX_ORDERS: 3,
@@ -240,12 +241,11 @@ const CONFIG = {
     PARTICLE_DURATION: 500,
     PARTICLE_COUNT: 12,
   },
-  DOUBLE_CLICK_DELAY: 300, // ms
   DRAG_THRESHOLD: 5,
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.1.1', // Увеличивайте это значение при несовместимых изменениях
+  GAME_VERSION: '1.1.1',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },
@@ -257,6 +257,13 @@ const GEN_ENERGY_CONFIG = {
   3: { max: 25, cooldown: 20000 },
   4: { max: 30, cooldown: 20000 },
   5: { max: 30, cooldown: 15000 }
+};
+
+const SPAWN_CHANCES = {
+  2: [{ level: 2, chance: 20 }],
+  3: [{ level: 3, chance: 10 }, { level: 2, chance: 35 }],
+  4: [{ level: 4, chance: 5 }, { level: 3, chance: 20 }, { level: 2, chance: 50 }],
+  5: [{ level: 5, chance: 5 }, { level: 4, chance: 15 }, { level: 3, chance: 40 }, { level: 2, chance: 70 }]
 };
 
 const UNLOCK_THRESHOLDS = [
@@ -277,8 +284,9 @@ const gameState = {
   orders: [],
   orderIdCounter: 1,
   lockedCells: [],
+  newlyUnlockedCategories: [],
   activeCategories: [],
-  rewardQueue: [], // Новая очередь для наград
+  rewardQueue: [],
   lockedCategories: [],
   dragState: {
     element: null,
@@ -290,7 +298,6 @@ const gameState = {
   },
   lastClick: {
     index: null,
-    time: 0,
   }
 };
 
@@ -476,6 +483,7 @@ function startNewGame() {
   gameState.energy = CONFIG.MAX_ENERGY;
   UNLOCK_THRESHOLDS.forEach(t => t.unlocked = false);
   gameState.rewardQueue = [];
+  gameState.newlyUnlockedCategories = [];
 
   // --- Новая логика генерации стартовых генераторов ---
   const allGeneratorKeys = Object.keys(GENERATORS_DATA).filter(k => k !== 'bonus_chest');
@@ -545,6 +553,7 @@ function saveGame() {
     orderIdCounter: gameState.orderIdCounter,
     rewardQueue: gameState.rewardQueue,
     activeCategories: gameState.activeCategories,
+    newlyUnlockedCategories: gameState.newlyUnlockedCategories,
     lockedCategories: gameState.lockedCategories,
     thresholds: UNLOCK_THRESHOLDS.map(t => ({ score: t.score, unlocked: t.unlocked, level: t.level }))
   };
@@ -574,6 +583,7 @@ function loadGame() {
     gameState.rewardQueue = loaded.rewardQueue || [];
     gameState.activeCategories = loaded.activeCategories;
     gameState.lockedCategories = loaded.lockedCategories;
+    gameState.newlyUnlockedCategories = loaded.newlyUnlockedCategories || [];
 
     if (energyToRestore > 0) {
       gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
@@ -1014,12 +1024,12 @@ function handleCellClick(index) {
             triggerGenerator(item, index);
         } else {
             showItemInfoModal(item);
-            gameState.lastClick = { index: index, time: Date.now() };
+            gameState.lastClick = { index: index };
         }
     } else {
         // Одиночный клик для любого другого предмета показывает информацию
         showItemInfoModal(item, index);
-        gameState.lastClick = { index: null, time: 0 }; // Сбрасываем состояние двойного клика
+        gameState.lastClick = { index: null }; // Сбрасываем состояние двойного клика
     }
 }
 
@@ -1204,7 +1214,31 @@ function clearBlockedItemWithCoins(index) {
   showToast("Завал успешно расчищен!", "success");
   setTimeout(() => animateCellPop(index), 50);
 }
+function rechargeGeneratorWithCoins(index) {
+  const item = gameState.gridData[index];
+  if (!item || !item.isGenerator || item.generatorKey === 'bonus_chest') {
+    closeModal();
+    return;
+  }
 
+  if (gameState.coins < CONFIG.GENERATOR_RECHARGE_COST) {
+    showToast(`🪙 Недостаточно монет (нужно ${CONFIG.GENERATOR_RECHARGE_COST})!`, "error");
+    closeModal();
+    return;
+  }
+
+  const lvl = item.genLevel || 1;
+  const config = GEN_ENERGY_CONFIG[lvl];
+
+  gameState.coins -= CONFIG.GENERATOR_RECHARGE_COST;
+  item.genEnergy = config.max;
+  item.lastRegenTime = Date.now();
+
+  closeModal();
+  saveGame();
+  updateUI();
+  showToast("📦 Энергия генератора полностью восстановлена!", "success");
+}
 function getBlockedItemModalOptions(item, index) {
     const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
     return {
@@ -1220,7 +1254,7 @@ function getBlockedItemModalOptions(item, index) {
     };
 }
 
-function getGeneratorModalOptions(item) {
+function getGeneratorModalOptions(item, index) {
     const genInfo = GENERATORS_DATA[item.generatorKey];
     const lvl = item.genLevel || 1;
 
@@ -1249,13 +1283,22 @@ function getGeneratorModalOptions(item) {
     };
     desc += levelDescriptions[lvl];
 
-    return {
+    const modalOptions = {
         icon: `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`,
         title: `${genInfo.name} [${CONFIG.ROMAN_NUMERALS[lvl]}]`,
         subtitle: `Генератор • Уровень ${CONFIG.ROMAN_NUMERALS[lvl]}`,
         desc: desc,
         infoButton: { onClick: () => showCategoryProgressionModal(genInfo.categories) }
     };
+
+    if (item.genEnergy < config.max) {
+        modalOptions.actionButton = {
+            text: `Восстановить (-${CONFIG.GENERATOR_RECHARGE_COST}🪙)`,
+            onClick: () => rechargeGeneratorWithCoins(index)
+        };
+    }
+
+    return modalOptions;
 }
 
 function getBoosterModalOptions(item) {
@@ -1304,7 +1347,7 @@ function showItemInfoModal(item, index = -1) {
     if (item.isBlocked) {
         modalOptions = getBlockedItemModalOptions(item, index);
     } else if (item.isGenerator) {
-        modalOptions = getGeneratorModalOptions(item);
+        modalOptions = getGeneratorModalOptions(item, index);
     } else if (item.isUpgradePart || item.isMagicTool) {
         modalOptions = getBoosterModalOptions(item);
     } else {
@@ -1525,12 +1568,15 @@ function triggerRegularGenerator(generator, fromIndex) {
     const genData = GENERATORS_DATA[generator.generatorKey];
     const spawnCategory = genData.isHybrid ? genData.categories[Math.random() < 0.5 ? 0 : 1] : genData.categories[0];
 
-    let spawnLevel = 1;
-    const rand = Math.random() * 100;
-    if (lvl === 2) { if (rand < 20) spawnLevel = 2; }
-    else if (lvl === 3) { if (rand < 10) spawnLevel = 3; else if (rand < 35) spawnLevel = 2; }
-    else if (lvl === 4) { if (rand < 5) spawnLevel = 4; else if (rand < 20) spawnLevel = 3; else if (rand < 50) spawnLevel = 2; }
-    else if (lvl === 5) { if (rand < 5) spawnLevel = 5; else if (rand < 15) spawnLevel = 4; else if (rand < 40) spawnLevel = 3; else if (rand < 70) spawnLevel = 2; }
+    const determineSpawnLevel = (generatorLevel, randomPercent) => {
+      const chances = SPAWN_CHANCES[generatorLevel];
+      if (!chances) return 1;
+      for (const tier of chances) {
+        if (randomPercent < tier.chance) return tier.level;
+      }
+      return 1;
+    };
+    const spawnLevel = determineSpawnLevel(lvl, Math.random() * 100);
 
     const itemInfo = CATEGORIES_CONFIG[spawnCategory].items[spawnLevel - 1];
 
@@ -1665,6 +1711,7 @@ function checkProgressiveUnlocks() {
           }
           if (!gameState.activeCategories.includes(catToUnlock)) {
             gameState.activeCategories.push(catToUnlock);
+            gameState.newlyUnlockedCategories.push(catToUnlock);
           }
         });
 
@@ -1707,6 +1754,7 @@ function spawnBonusGenerator() {
       }
       if (!gameState.activeCategories.includes(catToUnlock)) {
         gameState.activeCategories.push(catToUnlock);
+        gameState.newlyUnlockedCategories.push(catToUnlock);
       }
     });
 
@@ -1771,6 +1819,11 @@ function generateOrder() {
   }
 
   const char = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+  let baseCategory;
+  if (gameState.newlyUnlockedCategories && gameState.newlyUnlockedCategories.length > 0) {
+    baseCategory = gameState.newlyUnlockedCategories.shift();
+  }
+
   const itemsCount = Math.floor(Math.random() * 3) + 1;
   const requestedItems = [];
 
@@ -1788,7 +1841,9 @@ function generateOrder() {
   const { min: minLevel, max: maxLevel } = orderLevelConfig;
 
   for (let i = 0; i < itemsCount; i++) {
-    const randomCat = gameState.activeCategories[Math.floor(Math.random() * gameState.activeCategories.length)];
+    const randomCat = (i === 0 && baseCategory)
+      ? baseCategory
+      : gameState.activeCategories[Math.floor(Math.random() * gameState.activeCategories.length)];
     const randomLevel = Math.floor(Math.random() * (maxLevel - minLevel + 1)) + minLevel;
     requestedItems.push({ category: randomCat, level: randomLevel });
   }
@@ -1914,8 +1969,6 @@ function renderOrders() {
 
   // Получаем список старых ID для сохранения структуры
   const currentCards = Array.from(ordersList.children);
-  // eslint-disable-next-line no-unused-vars
-  const currentIds = currentCards.map(c => c.id);
 
   // Создаем временный список доступных на поле предметов для проверки
   const availableItemsOnGrid = gameState.gridData.filter(item =>
@@ -2039,23 +2092,14 @@ function completeOrder(id) {
   const cellElements = document.querySelectorAll('.cell');
   const targetAvatarElement = cardElement ? cardElement.querySelector('.character-avatar') : null;
 
-  let elementsToAnimate = [];
-  let tempGrid = [...gameState.gridData];
-
-  order.items.forEach(reqItem => {
-    const foundIdx = tempGrid.findIndex((item, idx) =>
-      item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart &&
-      item.category === reqItem.category && item.level === reqItem.level && // Убеждаемся, что предмет не заблокирован
-      !gameState.lockedCells.includes(idx)
-    );
-    if (foundIdx !== -1) {
-      elementsToAnimate.push({
-        idx: foundIdx,
-        icon: CATEGORIES_CONFIG[reqItem.category].items[reqItem.level - 1].icon,
-        level: reqItem.level
-      });
-      tempGrid[foundIdx] = null;
-    }
+  // Используем предварительно рассчитанные индексы из checkOrdersAvailability
+  const elementsToAnimate = order.allocatedIndices.map(idx => {
+    const item = gameState.gridData[idx];
+    return {
+      idx: idx,
+      icon: CATEGORIES_CONFIG[item.category].items[item.level - 1].icon,
+      level: item.level
+    };
   });
 
   elementsToAnimate.forEach(el => {
