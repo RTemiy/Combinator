@@ -242,6 +242,8 @@ const CONFIG = {
   DRAG_THRESHOLD: 5,
 
   // System
+  VERSION_KEY: 'merge_game_version',
+  GAME_VERSION: '1.1.0', // Увеличивайте это значение при несовместимых изменениях
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },
@@ -288,6 +290,19 @@ const gameState = {
     time: 0,
   }
 };
+
+// --- Проверка версии игры ---
+(function checkVersion() {
+  const storedVersion = localStorage.getItem(CONFIG.VERSION_KEY);
+  // Если версия не совпадает, сбрасываем сохранение и перезагружаем страницу
+  if (storedVersion !== CONFIG.GAME_VERSION) {
+    console.warn(`Обнаружена смена версии игры (была ${storedVersion}, стала ${CONFIG.GAME_VERSION}). Сохранение будет сброшено.`);
+    localStorage.removeItem(CONFIG.SAVE_KEY);
+    localStorage.removeItem(CONFIG.LAST_LOGIN_KEY); // Также очищаем время последнего входа
+    localStorage.setItem(CONFIG.VERSION_KEY, CONFIG.GAME_VERSION); // Устанавливаем новую версию
+    window.location.reload(); // Перезагружаем страницу, чтобы избежать ошибок
+  }
+})();
 
 // --- DOM Elements ---
 const DOMElements = {
@@ -381,11 +396,6 @@ function addListeners() {
 
   DOMElements.infoModal.closeBtn.addEventListener('click', closeModal);
   DOMElements.infoModal.cancelBtn.addEventListener('click', closeModal);
-  DOMElements.resetBtn.addEventListener('click', confirmReset);
-  // Если основной скрипт загрузился, он должен перехватить управление у аварийного сброса.
-  // Сначала удаляем старый обработчик, чтобы избежать двойного срабатывания.
-  // `fallbackResetHandler` должен быть доступен в глобальной области видимости из index.html.
-  if (typeof fallbackResetHandler === 'function') DOMElements.resetBtn.removeEventListener('click', fallbackResetHandler);
   DOMElements.resetBtn.addEventListener('click', confirmReset);
 
   // Event delegation for dynamic order cards
