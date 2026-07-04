@@ -201,7 +201,7 @@ body {
   min-height: 106px;
   justify-content: center;
   top: 135px;
-  flex-shrink: 0; /
+  flex-shrink: 0;
 }
 
 .reward-item {
