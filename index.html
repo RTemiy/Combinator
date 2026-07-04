@@ -34,6 +34,12 @@
 
 <div class="header-controls">
     <div class="stats-container">
+
+        <div class="coins-container" title="Монеты">
+            <span class="coins-icon">🪙</span>
+            <span id="coins-val">0</span>
+        </div>
+
         <div class="level-container">
             <div class="level-text">Ур. <span id="player-level">1</span> • Очки: <span id="score-text">0</span></div>
             <div class="level-bar-bg">
@@ -42,10 +48,7 @@
         </div>
 
         <div class="energy-container">
-            <div class="energy-text">⚡ Энергия: <span id="energy-val">100/100</span></div>
-            <div class="energy-bar-bg">
-                <div class="energy-bar-fill" id="energy-bar"></div>
-            </div>
+            <div class="energy-text">⚡ <span id="energy-val">100</span></div>
         </div>
     </div>
     <button class="reset-btn" title="Начать заново">🚫</button>

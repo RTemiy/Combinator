@@ -1,7 +1,20 @@
-const ITEM_CATEGORIES = {
+const GENERATORS_DATA = {
+  'stationery': { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.', categories: ['stationery'] },
+  'flowers': { icon: '🌱', name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'] },
+  'sweets': { icon: '🍬', name: 'Конфетный автомат', desc: 'Аппарат, выдающий кондитерские изделия.', categories: ['sweets'] },
+  'accessories': { icon: '✨', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'] },
+  'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'] },
+  'fastfood': { icon: '🍔', name: 'Фастфуд-кафе', desc: 'Кухонный конвейер для быстрой и сытной еды.', categories: ['fastfood'] },
+  'alcohol': { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.', categories: ['alcohol'] },
+  'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где из ниток и ткани рождаются стильные наряды.', categories: ['atelier'] },
+  'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true },
+};
+
+const CATEGORIES_CONFIG = {
   stationery: {
     name: 'Канцелярия',
     color: '#8a1b0b',
+    generatorKey: 'stationery',
     items: [
       { level: 1, icon: '✏️', name: 'Простой карандаш', desc: 'Оставляет тонкий след на бумаге. Базовый инструмент художника.' },
       { level: 2, icon: '✒️', name: 'Гелевая ручка', desc: 'Пишет четко и ярко. Чернила сохнут мгновенно.' },
@@ -15,6 +28,7 @@ const ITEM_CATEGORIES = {
   flowers: {
     name: 'Растения',
     color: '#06d6a0',
+    generatorKey: 'flowers',
     items: [
       { level: 1, icon: '🍃', name: 'Семена растений', desc: 'Маленькие спящие зерна. Посадите их в землю, чтобы дать жизнь.' },
       { level: 2, icon: '🌱', name: 'Зеленый росток', desc: 'Юный и хрупкий стебелек. Требует заботы, солнца и полива.' },
@@ -28,6 +42,7 @@ const ITEM_CATEGORIES = {
   sweets: {
     name: 'Сладости',
     color: '#0353ff',
+    generatorKey: 'sweets',
     items: [
       { level: 1, icon: '🍬', name: 'Мятная конфета', desc: 'Маленький леденец в шуршащей обертке.' },
       { level: 2, icon: '🍭', name: 'Леденец на палочке', desc: 'Сладкий карамельный кругляш.' },
@@ -41,6 +56,7 @@ const ITEM_CATEGORIES = {
   accessories: {
     name: 'Драгоценности',
     color: '#e0aaff',
+    generatorKey: 'accessories',
     items: [
       { level: 1, icon: '🪨', name: 'Необработанный камень', desc: 'Простой булыжник, в котором скрыт потенциал.' },
       { level: 2, icon: '🗝', name: 'Серебряный ключ', desc: 'Изящный ключ от шкатулки с драгоценностями.' },
@@ -54,6 +70,7 @@ const ITEM_CATEGORIES = {
   gadgets: {
     name: 'Гаджеты',
     color: '#4cc9f0',
+    generatorKey: 'gadgets',
     items: [
       { level: 1, icon: '📼', name: 'Видеокассета', desc: 'Старая магнитная лента с записью памятных моментов.' },
       { level: 2, icon: '💽', name: 'Компакт-диск', desc: 'Цифровой носитель информации начала эры технологий.' },
@@ -67,6 +84,7 @@ const ITEM_CATEGORIES = {
   fastfood: {
     name: 'Фастфуд',
     color: '#ff8a5c',
+    generatorKey: 'fastfood',
     items : [
       { level: 1, icon: '🥓', name: 'Хрустящий бекон', desc: 'Тонко нарезанный и хорошо прожаренные ломтики бекона.' },
       { level: 2, icon: '🍟', name: 'Картофель фри', desc: 'Хрустящие золотистые палочки.' },
@@ -80,6 +98,7 @@ const ITEM_CATEGORIES = {
   alcohol: {
     name: 'Алкоголь',
     color: '#ff5cf1',
+    generatorKey: 'alcohol',
     items : [
       { level: 1, icon: '🍺', name: 'Светлое пиво', desc: 'Классическое холодное пиво в кружке.' },
       { level: 2, icon: '🍻', name: 'Две кружки', desc: 'Пара бокалов для приятной компании.' },
@@ -93,6 +112,7 @@ const ITEM_CATEGORIES = {
   atelier: {
     name: 'Ателье',
     color: '#00ffd0',
+    generatorKey: 'atelier',
     items: [
       { level: 1, icon: '🪡', name: 'Игла', desc: 'Острый инструмент для начала большой работы.' },
       { level: 2, icon: '🧵', name: 'Катушка ниток', desc: 'Прочная нить для соединения деталей.' },
@@ -102,18 +122,35 @@ const ITEM_CATEGORIES = {
       { level: 6, icon: '👗', name: 'Вечернее платье', desc: 'Изысканный наряд для особого случая.' },
       { level: 7, icon: '🧥', name: 'Дизайнерское пальто', desc: 'Вершина портновского искусства и стиля.' }
     ]
+  },
+  tools: {
+    name: 'Инструменты',
+    color: '#a9a9a9',
+    generatorKey: 'household',
+    items: [
+      { level: 1, icon: '⚙️', name: 'Болт', desc: 'Простейший крепежный элемент.' },
+      { level: 2, icon: '🔧', name: 'Гаечный ключ', desc: 'Инструмент для закручивания гаек.' },
+      { level: 3, icon: '🔨', name: 'Молоток', desc: 'Надежный помощник для забивания гвоздей.' },
+      { level: 4, icon: '🪚', name: 'Ручная пила', desc: 'Позволяет работать с деревом.' },
+      { level: 5, icon: '🪓', name: 'Топор', desc: 'Тяжелый инструмент для рубки дров.' },
+      { level: 6, icon: '🪏', name: 'Лопата', desc: 'Надежное приспособление для выкапывания земли.' },
+      { level: 7, icon: '🧰', name: 'Ящик с инструментами', desc: 'Полный набор для любого ремонта.' }
+    ]
+  },
+  electricity: {
+    name: 'Электричество',
+    color: '#ffc300',
+    generatorKey: 'household',
+    items: [
+      { level: 1, icon: '⛓️‍💥', name: 'Провода', desc: 'Спутанные провода.' },
+      { level: 2, icon: '🔌', name: 'Электрическая вилка', desc: 'Соединяет прибор с сетью.' },
+      { level: 3, icon: '🔋', name: 'Батарейка', desc: 'Портативный источник энергии.' },
+      { level: 4, icon: '🔦', name: 'Карманный фонарик', desc: 'Освещает путь в темноте.' },
+      { level: 5, icon: '🎚', name: 'Микросхема', desc: 'Самая проста схема, подойдет для пульта.' },
+      { level: 6, icon: '📻', name: 'Портативное радио', desc: 'Ловит сигналы из эфира.' },
+      { level: 7, icon: '📺', name: 'Телевизор', desc: 'Показывает несколько каналов .' },
+    ]
   }
-};
-
-const GENERATOR_BOXES = {
-  stationery: { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.' },
-  flowers: { icon: '🌱', name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.' },
-  sweets: { icon: '🍬', name: 'Конфетный автомат', desc: 'Аппарат, выдающий кондитерские изделия.' },
-  accessories: { icon: '✨', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.' },
-  gadgets: { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.' },
-  fastfood: { icon: '🍔', name: 'Фастфуд-кафе', desc: 'Кухонный конвейер для быстрой и сытной еды.' },
-  alcohol: { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.' },
-  atelier: { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где из ниток и ткани рождаются стильные наряды.' }
 };
 
 const CHARACTERS = [
@@ -137,31 +174,48 @@ const STORY_CHARACTERS = [
 ];
 
 const CONFIG = {
+  // Grid and Board
   GRID_COLS: 5,
   GRID_ROWS: 7,
+  MAX_ITEM_LEVEL: 7,
+  MAX_GENERATOR_LEVEL: 5,
+  STARTING_ITEMS_COUNT: 2,
+  BLOCKED_ITEMS_AT_START: 23,
+
+  // Energy
   MAX_ENERGY: 100,
   ENERGY_REGEN_INTERVAL: 10000,
   ENERGY_REGEN_AMOUNT: 1,
-  ENERGY_PER_ORDER_COMPLETION: 3,
-  ENERGY_PER_ORDER_CANCEL: 50,
+  STORY_ORDER_ENERGY_REWARD: 3,
   ITEM_DELETE_COST: 15,
-  TRASH_CLEAR_COST: 25,
-  TRASH_AT_START: 23,
-  MAX_ITEM_LEVEL: 7,
-  MAX_ORDERS: 4,
-  MAX_GENERATOR_LEVEL: 5,
+  OFFLINE_ENERGY_REGEN_RATE: 10000 / 1, // ms per 1 energy unit (Interval / Amount)
+
+  // Coins
+  COIN_MULTIPLIER: 5,
+  COINS_PER_ORDER_CANCEL: 100,
+  BLOCKED_CLEAR_COST_COINS: 75,
+
+  // Orders
+  MAX_ORDERS: 3,
+  ORDER_GENERATION_STORY_CHANCE: 0.15,
+
+  // Scoring and Progression
+  ITEM_SCORE_MULTIPLIER: 50,
+
+  // Timings and Animations
+  ANIMATION: {
+    FLY_DURATION: 400,
+    FADE_DURATION: 400,
+    PARTICLE_DURATION: 500,
+    PARTICLE_COUNT: 12,
+  },
+  DOUBLE_CLICK_DELAY: 300, // ms
+  DRAG_THRESHOLD: 5,
+
+  // System
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
-  OFFLINE_ENERGY_REGEN_RATE: 10000, // 1 energy per 10s
-  ORDER_GENERATION_STORY_CHANCE: 0.15,
-  ITEM_SCORE_MULTIPLIER: 50,
-  ANIMATION_DURATION_FLY: 400,
-  ANIMATION_DURATION_FADE: 400,
-  ANIMATION_DURATION_PARTICLE: 500,
-  DRAG_THRESHOLD: 5,
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },
-  TRASH_ICONS: ['🪨', '📦', '🪵', '🏺'],
-  DOUBLE_CLICK_DELAY: 300, // ms
 };
 
 const GEN_ENERGY_CONFIG = {
@@ -173,35 +227,37 @@ const GEN_ENERGY_CONFIG = {
 };
 
 const UNLOCK_THRESHOLDS = [
-  { score: 500, unlocked: false, level: 2, prevLimit: 0, orderLevels: { min: 1, max: 2 } },
-  { score: 1500, unlocked: false, level: 3, prevLimit: 500, orderLevels: { min: 1, max: 3 } },
-  { score: 3000, unlocked: false, level: 4, prevLimit: 1500, orderLevels: { min: 1, max: 4 } },
-  { score: 6000, unlocked: false, level: 5, prevLimit: 3000, orderLevels: { min: 2, max: 5 } },
-  { score: 12000, unlocked: false, level: 6, prevLimit: 6000, orderLevels: { min: 2, max: 6 } },
-  { score: 24000, unlocked: false, level: 7, prevLimit: 12000, orderLevels: { min: 3, max: 7 } }
+  { score: 500, unlocked: false, level: 2, prevLimit: 0, orderLevels: { min: 3, max: 4 } },
+  { score: 1500, unlocked: false, level: 3, prevLimit: 500, orderLevels: { min: 4, max: 4 } },
+  { score: 3000, unlocked: false, level: 4, prevLimit: 1500, orderLevels: { min: 4, max: 5 } },
+  { score: 6000, unlocked: false, level: 5, prevLimit: 3000, orderLevels: { min: 5, max: 5 } },
+  { score: 12000, unlocked: false, level: 6, prevLimit: 6000, orderLevels: { min: 5, max: 6 } },
+  { score: 24000, unlocked: false, level: 7, prevLimit: 12000, orderLevels: { min: 6, max: 7 } }
 ];
 
-// --- State ---
-
-let gridData = [];
-let score = 0;
-let energy = 100;
-let orders = [];
-let orderIdCounter = 1;
-let lockedCells = [];
-let activeCategories = [];
-let lockedCategories = [];
-
-let dragElement = null;
-let dragStartIndex = null;
-let isMoved = false;
-let isDragging = false;
-let startX = 0;
-let startY = 0;
-
-let lastClick = {
-  index: null,
-  time: 0,
+// --- Game State ---
+const gameState = {
+  gridData: [],
+  score: 0,
+  coins: 0,
+  energy: 100,
+  orders: [],
+  orderIdCounter: 1,
+  lockedCells: [],
+  activeCategories: [],
+  lockedCategories: [],
+  dragState: {
+    element: null,
+    startIndex: null,
+    isMoved: false,
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+  },
+  lastClick: {
+    index: null,
+    time: 0,
+  }
 };
 
 // --- DOM Elements ---
@@ -228,9 +284,12 @@ const DOMElements = {
     container: document.querySelector('.level-container'),
   },
   energy: {
-    bar: document.getElementById('energy-bar'),
     value: document.getElementById('energy-val'),
     container: document.querySelector('.energy-container'),
+  },
+  coins: {
+    value: document.getElementById('coins-val'),
+    container: document.querySelector('.coins-container'),
   },
   resetBtn: document.querySelector('.reset-btn'),
   ordersList: document.getElementById('orders-list'),
@@ -246,11 +305,10 @@ function initGame() {
   restoreGeneratorsEnergy();
   updateUI();
   addListeners();
-
   setInterval(() => {
     regenerateEnergy();
     restoreGeneratorsEnergy();
-    updateUI();
+    updateEnergyUI();
   }, CONFIG.ENERGY_REGEN_INTERVAL);
 }
 
@@ -270,7 +328,7 @@ function addListeners() {
       icon: '⚡️',
       title: 'Энергия',
       subtitle: 'Вечный движитель',
-      desc: 'За каждое использование генератора тратится 1 ед. энергии. Каждые 10 сек. восстанавливается 1 ед. энергии. За каждый готовый заказ восстанавливается 3 ед. энергии.'
+      desc: `За каждое использование генератора тратится 1 ед. энергии. Каждые ${CONFIG.ENERGY_REGEN_INTERVAL / 1000} сек. восстанавливается ${CONFIG.ENERGY_REGEN_AMOUNT} ед. энергии. За каждый выполненный сюжетный заказ вы получаете ${CONFIG.STORY_ORDER_ENERGY_REWARD} ед. энергии.`
     })
   })
 
@@ -280,6 +338,15 @@ function addListeners() {
       title: 'Уровень',
       subtitle: 'Главный показатель эффективности',
       desc: 'За сдачу заказов выдаются очки. Чем сложнее заказ, тем больше очков получается. При получении определенного количества очков, уровень повышается.'
+    })
+  })
+
+  DOMElements.coins.container.addEventListener('click', () => {
+    showModal({
+      icon: '🪙',
+      title: 'Монеты',
+      subtitle: 'Игровая валюта',
+      desc: `Монеты зарабатываются за выполнение заказов. Их можно потратить на пропуск нежелательных заказов, заплатив ${CONFIG.COINS_PER_ORDER_CANCEL} монет.`
     })
   })
 
@@ -296,54 +363,81 @@ function addListeners() {
     const orderId = parseInt(card.dataset.orderId);
     if (isNaN(orderId)) return;
 
-    if (target.closest('.cancel-btn')) confirmCancelOrder(orderId);
-    else if (target.closest('.complete-btn')) completeOrder(orderId);
-    else if (target.closest('.order-header-info')) showCharacterById(orderId);
+    const orderItemTarget = target.closest('.order-target');
+
+    if (target.closest('.cancel-btn')) {
+      confirmCancelOrder(orderId);
+    } else if (target.closest('.complete-btn')) {
+      completeOrder(orderId);
+    } else if (target.closest('.order-header-info')) {
+      showCharacterById(orderId);
+    } else if (orderItemTarget) {
+      const category = orderItemTarget.dataset.category;
+      if (category) {
+        showCategoryProgressionModal(category);
+      }
+    }
   });
 }
 
 function startNewGame() {
-  gridData = Array(CONFIG.GRID_COLS * CONFIG.GRID_ROWS).fill(null);
-  score = 0;
-  energy = CONFIG.MAX_ENERGY;
+  gameState.gridData = Array(CONFIG.GRID_COLS * CONFIG.GRID_ROWS).fill(null);
+  gameState.score = 0;
+  gameState.coins = 0;
+  gameState.energy = CONFIG.MAX_ENERGY;
   UNLOCK_THRESHOLDS.forEach(t => t.unlocked = false);
 
-  let allCategories = Object.keys(ITEM_CATEGORIES);
-  shuffleArray(allCategories);
-  activeCategories = allCategories.slice(0, 2);
-  lockedCategories = allCategories.slice(2);
+  // --- Новая логика генерации стартовых генераторов ---
+  const allGeneratorKeys = Object.keys(GENERATORS_DATA);
+  const startingGenerators = [];
+  const activeCategoriesSet = new Set();
+
+  // Выбираем 2 уникальные случайные категории
+  const shuffledGenKeys = [...allGeneratorKeys].sort(() => 0.5 - Math.random());
+  const genKey1 = shuffledGenKeys[0];
+  const genKey2 = shuffledGenKeys[1];
+
+  // Создаем два генератора на основе этих категорий
+  startingGenerators.push({ isGenerator: true, generatorKey: genKey1, genLevel: 1, genEnergy: GEN_ENERGY_CONFIG[1].max, lastRegenTime: Date.now() });
+  startingGenerators.push({ isGenerator: true, generatorKey: genKey2, genLevel: 1, genEnergy: GEN_ENERGY_CONFIG[1].max, lastRegenTime: Date.now() });
+
+  [genKey1, genKey2].forEach(key => GENERATORS_DATA[key].categories.forEach(cat => activeCategoriesSet.add(cat)));
+  gameState.activeCategories = Array.from(activeCategoriesSet);
+  gameState.lockedCategories = Object.keys(CATEGORIES_CONFIG).filter(cat => !gameState.activeCategories.includes(cat));
+  shuffleArray(gameState.lockedCategories);
+  // --- Конец новой логики ---
 
   let availableIndices = Array.from({length: CONFIG.GRID_COLS * CONFIG.GRID_ROWS}, (_, i) => i);
-  for (let i = 0; i < CONFIG.TRASH_AT_START; i++) {
+  for (let i = 0; i < CONFIG.BLOCKED_ITEMS_AT_START; i++) {
     if (availableIndices.length > 5) {
       const randIdx = Math.floor(Math.random() * availableIndices.length);
       const cellIndex = availableIndices.splice(randIdx, 1)[0];
-      const randomTrashIcon = CONFIG.TRASH_ICONS[Math.floor(Math.random() * CONFIG.TRASH_ICONS.length)];
-      gridData[cellIndex] = { isTrash: true, icon: randomTrashIcon };
+      // Теперь создаем реальный предмет, но заблокированный
+      const randomCat = gameState.activeCategories[Math.floor(Math.random() * gameState.activeCategories.length)];
+      const randomLevel = Math.floor(Math.random() * 3) + 1; // Блокируем предметы с 1 по 3 уровень
+      gameState.gridData[cellIndex] = { category: randomCat, level: randomLevel, isBlocked: true };
     }
   }
 
-  activeCategories.forEach(cat => {
-    const randIdx = Math.floor(Math.random() * availableIndices.length);
-    const cellIndex = availableIndices.splice(randIdx, 1)[0];
-    gridData[cellIndex] = {
-      isGenerator: true,
-      category: cat,
-      genLevel: 1,
-      genEnergy: GEN_ENERGY_CONFIG[1].max,
-      lastRegenTime: Date.now()
-    };
+  // Размещаем стартовые генераторы
+  startingGenerators.forEach(gen => {
+    if (availableIndices.length > 0) {
+      const randIdx = Math.floor(Math.random() * availableIndices.length);
+      const cellIndex = availableIndices.splice(randIdx, 1)[0];
+      gameState.gridData[cellIndex] = gen;
+    }
   });
 
-  for(let i = 0; i < 2; i++) {
+
+  for(let i = 0; i < CONFIG.STARTING_ITEMS_COUNT; i++) {
     let emptyCells = getEmptyGridCells();
     if(emptyCells.length > 0) {
       let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-      gridData[randomCell] = { category: activeCategories[i % activeCategories.length], level: 1 };
+      gameState.gridData[randomCell] = { category: gameState.activeCategories[i % gameState.activeCategories.length], level: 1 };
     }
   }
 
-  orders = [];
+  gameState.orders = [];
   for (let i = 0; i < CONFIG.MAX_ORDERS; i++) {
     generateOrder();
   }
@@ -353,13 +447,14 @@ function startNewGame() {
 
 function saveGame() {
   const saveData = {
-    gridData: gridData,
-    score: score,
-    energy: energy,
-    orders: orders,
-    orderIdCounter: orderIdCounter,
-    activeCategories: activeCategories,
-    lockedCategories: lockedCategories,
+    gridData: gameState.gridData,
+    score: gameState.score,
+    coins: gameState.coins,
+    energy: gameState.energy,
+    orders: gameState.orders,
+    orderIdCounter: gameState.orderIdCounter,
+    activeCategories: gameState.activeCategories,
+    lockedCategories: gameState.lockedCategories,
     thresholds: UNLOCK_THRESHOLDS.map(t => ({ score: t.score, unlocked: t.unlocked, level: t.level }))
   };
   localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(saveData));
@@ -378,16 +473,17 @@ function loadGame() {
     const timePassed = Date.now() - lastTime;
     const energyToRestore = Math.floor(timePassed / CONFIG.OFFLINE_ENERGY_REGEN_RATE);
 
-    gridData = loaded.gridData;
-    score = loaded.score;
-    energy = loaded.energy;
-    orders = loaded.orders;
-    orderIdCounter = loaded.orderIdCounter;
-    activeCategories = loaded.activeCategories;
-    lockedCategories = loaded.lockedCategories;
+    gameState.gridData = loaded.gridData;
+    gameState.score = loaded.score;
+    gameState.coins = loaded.coins || 0;
+    gameState.energy = loaded.energy;
+    gameState.orders = loaded.orders;
+    gameState.orderIdCounter = loaded.orderIdCounter;
+    gameState.activeCategories = loaded.activeCategories;
+    gameState.lockedCategories = loaded.lockedCategories;
 
     if (energyToRestore > 0) {
-      energy = Math.min(CONFIG.MAX_ENERGY, energy + energyToRestore);
+      gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
     }
 
     if (loaded.thresholds) {
@@ -404,7 +500,7 @@ function loadGame() {
 function restoreGeneratorsEnergy() {
   let changed = false;
   const now = Date.now();
-  gridData.forEach(item => {
+  gameState.gridData.forEach(item => {
     if (item && item.isGenerator) {
       const lvl = item.genLevel || 1;
       const config = GEN_ENERGY_CONFIG[lvl];
@@ -443,17 +539,17 @@ function createGrid() {
 }
 
 function getAvailableEmptyCells() {
-  return gridData.map((val, idx) => (val === null && !lockedCells.includes(idx)) ? idx : null).filter(val => val !== null);
+  return gameState.gridData.map((val, idx) => (val === null && !gameState.lockedCells.includes(idx)) ? idx : null).filter(val => val !== null);
 }
 
 function getEmptyGridCells() {
-  return gridData.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
+  return gameState.gridData.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
 }
 
 function getCurrentPlayerLevel() {
   let currentLvl = 1;
   UNLOCK_THRESHOLDS.forEach(t => {
-    if (score >= t.score) currentLvl = t.level;
+    if (gameState.score >= t.score) currentLvl = t.level;
   });
   return currentLvl;
 }
@@ -464,7 +560,7 @@ function updateLevelProgressBar() {
 
   if (currentLvl >= CONFIG.MAX_ITEM_LEVEL) {
     barFill.style.width = '100%';
-    DOMElements.level.score.innerText = score;
+    DOMElements.level.score.innerText = gameState.score;
     return;
   }
 
@@ -472,16 +568,18 @@ function updateLevelProgressBar() {
   if (currentThreshold) {
     const min = currentThreshold.prevLimit;
     const max = currentThreshold.score;
-    const percentage = Math.max(0, ((score - min) / (max - min)) * 100);
+    const percentage = Math.max(0, ((gameState.score - min) / (max - min)) * 100);
     barFill.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
   }
-  DOMElements.level.score.innerText = score;
+  DOMElements.level.score.innerText = gameState.score;
 }
 
 function regenerateEnergy() {
-  if (energy < CONFIG.MAX_ENERGY) {
-    energy += CONFIG.ENERGY_REGEN_AMOUNT;
+  if (gameState.energy < CONFIG.MAX_ENERGY) {
+    gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + CONFIG.ENERGY_REGEN_AMOUNT);
     saveGame();
+    // Обновляем только текстовое значение энергии, без перерисовки всего
+    DOMElements.energy.value.innerText = gameState.energy;
   }
 }
 
@@ -489,16 +587,20 @@ function updateUI() {
   checkOrdersAvailability();
   renderGrid();
   renderOrders();
-  DOMElements.energy.value.innerText = `${energy}/${CONFIG.MAX_ENERGY}`;
+  DOMElements.coins.value.innerText = gameState.coins;
+  DOMElements.energy.value.innerText = gameState.energy;
   DOMElements.level.text.innerText = getCurrentPlayerLevel();
   updateLevelProgressBar();
+}
 
-  const barFill = DOMElements.energy.bar;
-  const percentage = (energy / CONFIG.MAX_ENERGY) * 100;
-  barFill.style.width = `${percentage}%`;
-
-  if (percentage <= 25) barFill.classList.add('low');
-  else barFill.classList.remove('low');
+function updateEnergyUI() {
+  DOMElements.energy.value.innerText = gameState.energy;
+  const cells = document.querySelectorAll('.cell');
+  gameState.gridData.forEach((item, idx) => {
+    if (item && item.isGenerator) {
+      renderGeneratorBadges(cells[idx], item);
+    }
+  });
 }
 
 function createParticleEffectHTML() {
@@ -517,23 +619,15 @@ function createParticleEffectHTML() {
 function renderGrid() {
   const cells = document.querySelectorAll('.cell');
   cells.forEach((cell, idx) => {
-    const item = gridData[idx];
+    const item = gameState.gridData[idx];
     cell.innerHTML = '';
     cell.className = 'cell';
 
     if (item) {
-      // Добавляем класс для ячеек с бустерами
-      if (item.isUpgradePart || item.isMagicTool) {
+      if (item.isBlocked) {
+        cell.classList.add('blocked');
+      } else if (item.isUpgradePart || item.isMagicTool) {
         cell.classList.add('booster-cell');
-      }
-
-      if (item.isTrash) {
-        cell.classList.add('trash-blocked');
-        const trashSpan = document.createElement('span');
-        trashSpan.classList.add('trash-icon');
-        trashSpan.innerHTML = item.icon || '🪨';
-        cell.appendChild(trashSpan);
-        return;
       }
 
       const wrapper = document.createElement('div');
@@ -553,34 +647,13 @@ function renderGrid() {
 
         const fgItem = document.createElement('span');
         fgItem.classList.add('generator-item-fg');
-        fgItem.innerText = GENERATOR_BOXES[item.category].icon;
+        const genInfo = GENERATORS_DATA[item.generatorKey];
+        fgItem.innerText = genInfo.icon;
 
         container.appendChild(bgBox);
         container.appendChild(fgItem);
         wrapper.appendChild(container);
-
-        const energyBadge = document.createElement('span');
-        energyBadge.classList.add('gen-energy-badge');
-        energyBadge.innerText = `⚡${item.genEnergy}`;
-        cell.appendChild(energyBadge);
-
-
-        if (item.genEnergy <= 5 && item.genEnergy > 0) {
-          cell.classList.add('generator-slot-low-energy');
-          energyBadge.classList.add('gen-energy-badge-no-energy')
-        } else if (item.genEnergy === 0) {
-          cell.classList.add('generator-slot-no-energy');
-          energyBadge.classList.add('gen-energy-badge-no-energy')
-        } else {
-          cell.classList.remove('generator-slot-no-energy');
-          energyBadge.classList.remove('gen-energy-badge-no-energy')
-          cell.classList.remove('generator-slot-low-energy');
-        }
-
-        const levelBadge = document.createElement('span');
-        levelBadge.classList.add('gen-level-badge');
-        levelBadge.innerText = CONFIG.ROMAN_NUMERALS[lvl];
-        cell.appendChild(levelBadge);
+        renderGeneratorBadges(cell, item);
       } else if (item.isUpgradePart) {
         cell.innerHTML += createParticleEffectHTML();
         wrapper.innerHTML = '🔩';
@@ -588,7 +661,7 @@ function renderGrid() {
         cell.innerHTML += createParticleEffectHTML();
         wrapper.innerHTML = '⚒️';
       } else {
-        wrapper.innerHTML = ITEM_CATEGORIES[item.category].items[item.level - 1].icon;
+        wrapper.innerHTML = CATEGORIES_CONFIG[item.category].items[item.level - 1].icon;
         const levelBadge = document.createElement('span');
         levelBadge.classList.add('item-level');
         levelBadge.innerText = item.level;
@@ -599,6 +672,14 @@ function renderGrid() {
           levelBadge.style.color = '#000';
           cell.innerHTML += createParticleEffectHTML();
         }
+
+        // Подсветка для предметов, подходящих под заказ (не заблокированных)
+        if (item.isAllocatedToOrder) {
+          cell.classList.add('allocated-for-order');
+          const checkmark = document.createElement('div');
+          checkmark.classList.add('item-checkmark');
+          cell.appendChild(checkmark);
+        }
         cell.appendChild(levelBadge);
       }
       cell.appendChild(wrapper);
@@ -606,100 +687,127 @@ function renderGrid() {
   });
 }
 
+function renderGeneratorBadges(cell, item) {
+  if (!cell || !item || !item.isGenerator) return;
+
+  const lvl = item.genLevel || 1;
+
+  // Удаляем старые значки, чтобы избежать дублирования
+  cell.querySelector('.gen-energy-badge')?.remove();
+  cell.querySelector('.gen-level-badge')?.remove();
+
+  // Обновляем значок энергии
+  const energyBadge = document.createElement('span');
+  energyBadge.classList.add('gen-energy-badge');
+  energyBadge.innerText = `⚡${item.genEnergy}`;
+  cell.appendChild(energyBadge);
+
+  // Обновляем классы ячейки в зависимости от энергии
+  cell.classList.remove('generator-slot-no-energy', 'generator-slot-low-energy');
+  energyBadge.classList.remove('gen-energy-badge-no-energy');
+
+  if (item.genEnergy <= 5 && item.genEnergy > 0) {
+    cell.classList.add('generator-slot-low-energy');
+    energyBadge.classList.add('gen-energy-badge-no-energy');
+  } else if (item.genEnergy === 0) {
+    cell.classList.add('generator-slot-no-energy');
+    energyBadge.classList.add('gen-energy-badge-no-energy');
+  }
+
+  // Обновляем значок уровня
+  const levelBadge = document.createElement('span');
+  levelBadge.classList.add('gen-level-badge');
+  levelBadge.innerText = CONFIG.ROMAN_NUMERALS[lvl];
+  cell.appendChild(levelBadge);
+}
+
 function startDrag(e, index) {
-  if (lockedCells.includes(index) || !gridData[index] || isDragging) return;
+  if (gameState.lockedCells.includes(index) || !gameState.gridData[index] || gameState.dragState.isDragging) return;
 
-  // Исправление: удаляем "зависшие" призрачные элементы перед началом
-  const ghost = document.querySelector('.item-wrapper.dragging');
-  if (ghost) ghost.remove();
-
-  isDragging = true; // Блокировка
+  gameState.dragState.isDragging = true; // Блокировка
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  dragStartIndex = index;
-  isMoved = false;
-  startX = clientX;
-  startY = clientY;
+  gameState.dragState.startIndex = index;
+  gameState.dragState.isMoved = false;
+  gameState.dragState.startX = clientX;
+  gameState.dragState.startY = clientY;
+}
 
-  const cells = document.querySelectorAll('.cell');
-  const targetCell = cells[index];
-  const originalWrapper = targetCell.querySelector('.item-wrapper');
-  if (!originalWrapper) {
-    isDragging = false;
-    return;
+function handleDragMove(clientX, clientY) {
+  const { startIndex, isMoved, startX, startY } = gameState.dragState;
+  if (startIndex === null) return;
+
+  if (!isMoved && (Math.abs(clientX - startX) > CONFIG.DRAG_THRESHOLD || Math.abs(clientY - startY) > CONFIG.DRAG_THRESHOLD)) {
+    gameState.dragState.isMoved = true;
+    if (!gameState.dragState.element) {
+      // Запрещаем перетаскивание заблокированных предметов
+      if (gameState.gridData[startIndex] && gameState.gridData[startIndex].isBlocked) { cleanDragState(); return; }
+
+      // Создаем "призрак" только при реальном начале перетаскивания (когда курсор сдвинулся)
+      const cells = document.querySelectorAll('.cell');
+      const targetCell = cells[startIndex];
+      const originalWrapper = targetCell.querySelector('.item-wrapper');
+      if (!originalWrapper) {
+        gameState.dragState.isDragging = false;
+        return;
+      }
+
+      gameState.dragState.element = originalWrapper.cloneNode(true);
+      gameState.dragState.element.classList.add('dragging');
+      const rect = originalWrapper.getBoundingClientRect();
+      gameState.dragState.element.style.left = `${rect.left}px`;
+      gameState.dragState.element.style.top = `${rect.top}px`;
+      document.body.appendChild(gameState.dragState.element);
+
+      originalWrapper.style.opacity = '0.3';
+    }
   }
 
-  dragElement = originalWrapper.cloneNode(true);
-  dragElement.classList.add('dragging');
-  const rect = originalWrapper.getBoundingClientRect();
-  dragElement.style.left = `${rect.left}px`;
-  dragElement.style.top = `${rect.top}px`;
-  document.body.appendChild(dragElement);
-
-  originalWrapper.style.opacity = '0.3';
+  if (gameState.dragState.element) {
+    gameState.dragState.element.style.left = `${clientX - 27}px`;
+    gameState.dragState.element.style.top = `${clientY - 27}px`;
+  }
 }
 
 function handleMouseMove(e) {
-  if (dragStartIndex === null || !dragElement) return;
-  const clientX = e.clientX;
-  const clientY = e.clientY;
-
-  if (Math.abs(clientX - startX) > CONFIG.DRAG_THRESHOLD || Math.abs(clientY - startY) > CONFIG.DRAG_THRESHOLD) {
-    isMoved = true;
-  }
-
-  dragElement.style.left = `${clientX - 27}px`;
-  dragElement.style.top = `${clientY - 27}px`;
+  handleDragMove(e.clientX, e.clientY);
 }
 
 function handleTouchMove(e) {
-  if (dragStartIndex === null || !dragElement) return;
-  const clientX = e.touches[0].clientX;
-  const clientY = e.touches[0].clientY;
-
-  if (Math.abs(clientX - startX) > CONFIG.DRAG_THRESHOLD || Math.abs(clientY - startY) > CONFIG.DRAG_THRESHOLD) {
-    isMoved = true;
-  }
-
-  dragElement.style.left = `${clientX - 27}px`;
-  dragElement.style.top = `${clientY - 27}px`;
+  handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
 }
 
 function handleMouseUp(e) {
-  if (dragStartIndex === null) return;
+  if (gameState.dragState.startIndex === null) return;
   endDrag(e.clientX, e.clientY);
 }
 
 function handleTouchEnd(e) {
-  if (dragStartIndex === null) return;
+  if (gameState.dragState.startIndex === null) return;
   const changedTouch = e.changedTouches[0];
   endDrag(changedTouch.clientX, changedTouch.clientY);
 }
 
 function endDrag(clientX, clientY) {
-  if (dragElement) dragElement.remove();
+  const { element, isMoved, startIndex } = gameState.dragState;
+  if (element) element.remove();
 
   if (!isMoved) {
-    const item = gridData[dragStartIndex];
-    if (item) {
-      if (item.isTrash) { // Click on trash
-        confirmClearTrash(dragStartIndex);
-      } else if (item.isGenerator) { // Click on generator
-        const now = Date.now();
-        if (lastClick.index === dragStartIndex && (now - lastClick.time) < CONFIG.DOUBLE_CLICK_DELAY) {
-          // Double click: spawn item
-          triggerGenerator(item, dragStartIndex);
-          // Reset click tracker to prevent triple click action
-          lastClick = { index: null, time: 0 };
+    const item = gameState.gridData[startIndex]; // Получаем предмет, по которому кликнули
+    if (item) { // Если в ячейке есть предмет
+      if (item.isGenerator) { // Клик по генератору
+        if (gameState.lastClick.index === startIndex) {
+          // Второй клик по тому же генератору: спавним предмет
+          triggerGenerator(item, startIndex);
         } else {
-          // Single click: show info
+          // Первый клик: показываем информацию и запоминаем, что этот генератор был выбран
           showItemInfoModal(item);
-          // Record this click for double-click detection
-          lastClick = { index: dragStartIndex, time: now };
+          gameState.lastClick = { index: startIndex, time: Date.now() };
         }
-      } else { // Click on regular item or upgrade part
-        showItemInfoModal(item, dragStartIndex);
+      } else { // Клик по обычному предмету, бустеру или заблокированному
+        showItemInfoModal(item, startIndex);
+        gameState.lastClick = { index: null, time: 0 }; // Сбрасываем состояние
       }
     }
     cleanDragState();
@@ -719,29 +827,46 @@ function endDrag(clientX, clientY) {
   }
 
   const dragTargetIndex = parseInt(targetCell.dataset.index);
-  if (dragStartIndex === dragTargetIndex || lockedCells.includes(dragTargetIndex) || (gridData[dragTargetIndex] && gridData[dragTargetIndex].isTrash)) {
+  if (startIndex === dragTargetIndex || gameState.lockedCells.includes(dragTargetIndex)) {
     cleanDragState();
     return;
   }
 
-  executeMergeOrSwap(dragStartIndex, dragTargetIndex);
+  executeMergeOrSwap(startIndex, dragTargetIndex);
   cleanDragState();
 }
 
 function cleanDragState() {
-  isDragging = false;
-  if (dragElement) {
-    dragElement.remove();
-    dragElement = null;
+  gameState.dragState.isDragging = false;
+  if (gameState.dragState.element) {
+    gameState.dragState.element.remove();
+    gameState.dragState.element = null;
   }
-  dragStartIndex = null;
-  isMoved = false;
+  gameState.dragState.startIndex = null;
+  gameState.dragState.isMoved = false;
   renderGrid(); // Принудительный рендер восстановит все opacity
 }
 
 function executeMergeOrSwap(fromIdx, toIdx) {
-  const source = gridData[fromIdx];
-  const target = gridData[toIdx];
+  const source = gameState.gridData[fromIdx];
+  const target = gameState.gridData[toIdx];
+
+  // 0. Новая логика разблокировки
+  if (target && target.isBlocked) {
+    // Проверяем, что это слияние одинаковых предметов
+    if (source.category === target.category && source.level === target.level && !source.isGenerator && !target.isGenerator) {
+      if (source.level < CONFIG.MAX_ITEM_LEVEL) {
+        gameState.gridData[fromIdx] = null; // Удаляем перетаскиваемый предмет
+        gameState.gridData[toIdx] = { category: source.category, level: source.level + 1 }; // Разблокируем и улучшаем целевой
+        triggerMergeEffects(toIdx, source.category);
+        showToast("Паутина снята!", "success");
+      }
+    }
+    // Если предметы не совпадают, ничего не делаем, предмет вернется на место
+    saveGame();
+    updateUI();
+    return; // Завершаем функцию здесь
+  }
 
   // Определяем, какой из предметов - деталь, а какой - генератор
   const upgradePart = source.isUpgradePart ? source : (target && target.isUpgradePart ? target : null);
@@ -751,60 +876,60 @@ function executeMergeOrSwap(fromIdx, toIdx) {
 
   // Определяем, какой из предметов - магический инструмент, а какой - обычный предмет
   const magicTool = source.isMagicTool ? source : (target && target.isMagicTool ? target : null);
-  const regularItem = (source && !source.isGenerator && !source.isTrash && !source.isUpgradePart && !source.isMagicTool) ? source :
-    (target && !target.isGenerator && !target.isTrash && !target.isUpgradePart && !target.isMagicTool) ? target : null;
+  const regularItem = (source && !source.isGenerator && !source.isBlocked && !source.isUpgradePart && !source.isMagicTool) ? source :
+    (target && !target.isGenerator && !target.isBlocked && !target.isUpgradePart && !target.isMagicTool) ? target : null;
   const toolIdx = source.isMagicTool ? fromIdx : (target && target.isMagicTool ? toIdx : -1);
-  const itemIdx = (source && !source.isGenerator && !source.isTrash && !source.isUpgradePart && !source.isMagicTool) ? fromIdx :
-    (target && !target.isGenerator && !target.isTrash && !target.isUpgradePart && !target.isMagicTool) ? toIdx : -1;
+  const itemIdx = (source && !source.isGenerator && !source.isBlocked && !source.isUpgradePart && !source.isMagicTool) ? fromIdx :
+    (target && !target.isGenerator && !target.isBlocked && !target.isUpgradePart && !target.isMagicTool) ? toIdx : -1;
 
   // 1. Логика улучшения генератора деталью
   if (upgradePart && generator && partIdx !== -1 && genIdx !== -1) {
     if (generator.genLevel < CONFIG.MAX_GENERATOR_LEVEL) {
       const nextLvl = generator.genLevel + 1;
-      gridData[partIdx] = null; // Удаляем деталь
-      gridData[genIdx] = { // Улучшаем генератор
+      gameState.gridData[partIdx] = null; // Удаляем деталь
+      gameState.gridData[genIdx] = { // Улучшаем генератор
         ...generator,
         genLevel: nextLvl,
         genEnergy: GEN_ENERGY_CONFIG[nextLvl].max,
         lastRegenTime: Date.now()
       };
-      triggerMergeEffects(genIdx, generator.category);
+      triggerMergeEffects(genIdx, GENERATORS_DATA[generator.generatorKey].categories[0]);
       showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
     }
     // 2. Логика улучшения предмета магическим инструментом
   } else if (magicTool && regularItem && toolIdx !== -1 && itemIdx !== -1) {
     if (regularItem.level < CONFIG.MAX_ITEM_LEVEL) {
       const nextLvl = regularItem.level + 1;
-      gridData[toolIdx] = null; // Удаляем инструмент
-      gridData[itemIdx] = { ...regularItem, level: nextLvl }; // Улучшаем предмет
+      gameState.gridData[toolIdx] = null; // Удаляем инструмент
+      gameState.gridData[itemIdx] = { ...regularItem, level: nextLvl }; // Улучшаем предмет
       triggerMergeEffects(itemIdx, regularItem.category);
       showToast(`✨ Предмет улучшен до уровня ${nextLvl}!`, "success");
     }
-    // 2. Логика слияния обычных предметов
+    // 3. Логика слияния обычных предметов
   } else if (target && !source.isGenerator && !target.isGenerator && !source.isUpgradePart && !target.isUpgradePart && source.category === target.category && source.level === target.level) {
     if (source.level < CONFIG.MAX_ITEM_LEVEL) {
-      gridData[fromIdx] = null;
-      gridData[toIdx] = { category: source.category, level: source.level + 1 };
+      gameState.gridData[fromIdx] = null;
+      gameState.gridData[toIdx] = { category: source.category, level: source.level + 1 };
       triggerMergeEffects(toIdx, source.category);
     }
-    // 3. Логика слияния генераторов
-  } else if (target && source.isGenerator && target.isGenerator && source.category === target.category && source.genLevel === target.genLevel) {
+    // 4. Логика слияния генераторов
+  } else if (target && source.isGenerator && target.isGenerator && source.generatorKey === target.generatorKey && source.genLevel === target.genLevel) {
     if (source.genLevel < CONFIG.MAX_GENERATOR_LEVEL) {
       const nextLvl = source.genLevel + 1;
-      gridData[fromIdx] = null;
-      gridData[toIdx] = {
+      gameState.gridData[fromIdx] = null;
+      gameState.gridData[toIdx] = {
         isGenerator: true,
-        category: source.category,
+        generatorKey: source.generatorKey,
         genLevel: nextLvl,
         genEnergy: GEN_ENERGY_CONFIG[nextLvl].max,
         lastRegenTime: Date.now()
       };
-      triggerMergeEffects(toIdx, source.category);
+      triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
       showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
     }
-    // 4. Стандартная логика перемещения
-  } else {
-    [gridData[fromIdx], gridData[toIdx]] = [target, source];
+    // 5. Стандартная логика перемещения
+  } else if (!target || (!target.isBlocked)) {
+    [gameState.gridData[fromIdx], gameState.gridData[toIdx]] = [target, source];
   }
 
   saveGame();
@@ -828,19 +953,18 @@ function triggerMergeEffects(idx, category) {
 
     const targetCell = DOMElements.grid.children[idx];
     if (targetCell) {
-      const themeColor = ITEM_CATEGORIES[category] ? ITEM_CATEGORIES[category].color : '#ff477e';
+      const themeColor = CATEGORIES_CONFIG[category] ? CATEGORIES_CONFIG[category].color : '#ff477e';
       const flash = document.createElement('div');
       flash.classList.add('merge-flash');
       flash.style.setProperty('--flash-color', themeColor);
       targetCell.appendChild(flash);
-      setTimeout(() => flash.remove(), CONFIG.ANIMATION_DURATION_FADE);
+      setTimeout(() => flash.remove(), CONFIG.ANIMATION.FADE_DURATION);
 
       const rect = targetCell.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
-      const particleCount = 12;
-      for (let i = 0; i < particleCount; i++) {
+      for (let i = 0; i < CONFIG.ANIMATION.PARTICLE_COUNT; i++) {
         const particle = document.createElement('div');
         particle.classList.add('merge-particle');
         particle.style.backgroundColor = themeColor;
@@ -856,52 +980,56 @@ function triggerMergeEffects(idx, category) {
         particle.style.setProperty('--y', `${pY}px`);
 
         document.body.appendChild(particle);
-        setTimeout(() => particle.remove(), CONFIG.ANIMATION_DURATION_PARTICLE);
+        setTimeout(() => particle.remove(), CONFIG.ANIMATION.PARTICLE_DURATION);
       }
     }
   }, 0);
 }
 
-function confirmClearTrash(index) {
-  showModal({
-    icon: gridData[index].icon || '🪨',
-    title: 'Завал на участке',
-    subtitle: 'Заблокировано',
-    desc: 'Эта клетка покрыта паутиной и завалена старым мусором. Потратьте энергию, чтобы очистить поле и найти полезный предмет!',
-    actionButton: {
-      text: `Расчистить завал (⚡ ${CONFIG.TRASH_CLEAR_COST})`,
-      onClick: () => clearTrash(index),
-    },
-    isBlocking: true,
-  });
-}
-
-function clearTrash(index) {
-  if (energy < CONFIG.TRASH_CLEAR_COST) {
-    showToast(`⚡ Недостаточно энергии для расчистки (нужно ${CONFIG.TRASH_CLEAR_COST})!`, "error");
+function clearBlockedItemWithCoins(index) {
+  if (gameState.coins < CONFIG.BLOCKED_CLEAR_COST_COINS) {
+    showToast(`🪙 Недостаточно монет для расчистки (нужно ${CONFIG.BLOCKED_CLEAR_COST_COINS})!`, "error");
     closeModal();
     return;
   }
-  energy -= CONFIG.TRASH_CLEAR_COST;
-  const randomCat = activeCategories[Math.floor(Math.random() * activeCategories.length)];
-  gridData[index] = { category: randomCat, level: 1 };
+
+  gameState.coins -= CONFIG.BLOCKED_CLEAR_COST_COINS;
+  delete gameState.gridData[index].isBlocked; // Просто убираем флаг блокировки
+
   closeModal();
   saveGame();
   updateUI();
-  showToast("Клетка успешно очищена!", "success");
+  showToast("Завал успешно расчищен!", "success");
   setTimeout(() => animateCellPop(index), 50);
 }
 
 function showItemInfoModal(item, index = -1) {
   let modalOptions = {};
 
-  if (item.isGenerator) {
-    const genInfo = GENERATOR_BOXES[item.category];
+  if (item.isBlocked) {
+    const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
+    modalOptions = {
+      icon: '🕸️',
+      title: `Заблокированный: ${info.name}`,
+      subtitle: 'В паутине',
+      desc: 'Этот предмет в паутине. Чтобы его освободить, перетащите на него точно такой же предмет с поля, либо расчистите завал за монеты.',
+      actionButton: {
+        text: `Расчистить завал (-${CONFIG.BLOCKED_CLEAR_COST_COINS}🪙)`,
+        onClick: () => clearBlockedItemWithCoins(index)
+      },
+      isBlocking: false
+    };
+  } else if (item.isGenerator) {
+    const genInfo = GENERATORS_DATA[item.generatorKey];
+    const isHybrid = genInfo.isHybrid;
     const lvl = item.genLevel || 1;
     const config = GEN_ENERGY_CONFIG[lvl];
     if (item.genEnergy === undefined) item.genEnergy = config.max;
 
-    let desc = `${genInfo.desc} `;
+    let desc = isHybrid
+      ? `Гибридный генератор. Производит предметы из категорий: ${genInfo.categories.map(c => CATEGORIES_CONFIG[c].name).join(' и ')}. `
+      : `${genInfo.desc} `;
+
     const cdSec = config.cooldown / 1000;
 
     if (lvl === 1) {
@@ -918,10 +1046,10 @@ function showItemInfoModal(item, index = -1) {
 
     modalOptions = {
       icon: `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`,
-      title: `${genInfo.name} [${CONFIG.ROMAN_NUMERALS[lvl]}]`,
+      title: isHybrid ? `Гибридный генератор [${CONFIG.ROMAN_NUMERALS[lvl]}]` : `${genInfo.name} [${CONFIG.ROMAN_NUMERALS[lvl]}]`,
       subtitle: `Генератор • Уровень ${CONFIG.ROMAN_NUMERALS[lvl]}`,
       desc: desc,
-      infoButton: { onClick: () => showCategoryProgressionModal(item.category) }
+      infoButton: { onClick: () => showCategoryProgressionModal(genInfo.categories) }
     };
   } else if (item.isUpgradePart) {
     modalOptions = {
@@ -940,17 +1068,21 @@ function showItemInfoModal(item, index = -1) {
       isBlocking: false
     };
   } else {
-    const info = ITEM_CATEGORIES[item.category].items[item.level - 1];
+    const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
     modalOptions = {
       icon: info.icon,
       title: info.name,
-      subtitle: `${ITEM_CATEGORIES[item.category].name} • Уровень ${item.level}`,
+      subtitle: `${CATEGORIES_CONFIG[item.category].name} • Уровень ${item.level}`,
       desc: info.desc,
       dangerButtons: {
-        confirmText: `Удалить (-${CONFIG.ITEM_DELETE_COST}⚡)`,
+        confirmButtonText: `Удалить (-${CONFIG.ITEM_DELETE_COST}⚡)`,
         onConfirm: () => deleteItem(index)
       },
-      isBlocking: true
+      // Добавляем кнопку информации о родительском генераторе
+      infoButton: {
+        onClick: () => showCategoryProgressionModal(item.category)
+      },
+      isBlocking: false
     };
   }
 
@@ -958,16 +1090,16 @@ function showItemInfoModal(item, index = -1) {
 }
 
 function deleteItem(index) {
-  if (index === -1 || !gridData[index] || gridData[index].isGenerator || gridData[index].isTrash) return;
+  if (index === -1 || !gameState.gridData[index] || gameState.gridData[index].isGenerator || gameState.gridData[index].isBlocked) return;
 
-  if (energy < CONFIG.ITEM_DELETE_COST) {
+  if (gameState.energy < CONFIG.ITEM_DELETE_COST) {
     showToast(`⚡ Недостаточно энергии для удаления (нужно ${CONFIG.ITEM_DELETE_COST})!`, "error");
     closeModal();
     return;
   }
 
-  energy -= CONFIG.ITEM_DELETE_COST;
-  gridData[index] = null;
+  gameState.energy -= CONFIG.ITEM_DELETE_COST;
+  gameState.gridData[index] = null;
   closeModal();
   saveGame();
   updateUI();
@@ -983,28 +1115,44 @@ function showCharacterModal(order) {
   });
 }
 
-function showCategoryProgressionModal(categoryKey) {
-  const category = ITEM_CATEGORIES[categoryKey];
-  if (!category) return;
+function showCategoryProgressionModal(categoryKeyOrKeys) {
+  const categoryKeys = Array.isArray(categoryKeyOrKeys) ? categoryKeyOrKeys : [categoryKeyOrKeys];
+  if (categoryKeys.length === 0) return;
 
-  let progressionHTML = '<div class="progression-container">';
-  category.items.forEach((item, index) => {
-    progressionHTML += `
-      <div class="progression-item-square">
-        <div class="progression-item-icon">${item.icon}</div>
-        <div class="progression-item-level">${item.level}</div>
-      </div>
-    `;
-    if (index < category.items.length - 1) {
-      progressionHTML += '<div class="progression-arrow-h">→</div>';
+  let progressionHTML = '';
+  let modalTitle = 'Цепочка: ';
+  let genInfo;
+
+  categoryKeys.forEach((key, index) => {
+    const category = CATEGORIES_CONFIG[key];
+    if (!category) return;
+
+    if (index > 0) {
+      progressionHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
+      modalTitle += ` & ${category.name}`;
+    } else {
+      modalTitle += category.name;
+      genInfo = GENERATORS_DATA[category.generatorKey]; // Используем иконку первого генератора
     }
-  });
-  progressionHTML += '</div>';
 
-  const genInfo = GENERATOR_BOXES[categoryKey];
+    progressionHTML += `<div class="progression-container">`;
+    category.items.forEach((item, itemIndex) => {
+      progressionHTML += `
+        <div class="progression-item-square">
+          <div class="progression-item-icon">${item.icon}</div>
+          <div class="progression-item-level">${item.level}</div>
+        </div>
+      `;
+      if (itemIndex < category.items.length - 1) {
+        progressionHTML += '<div class="progression-arrow-h">→</div>';
+      }
+    });
+    progressionHTML += '</div>';
+  });
+
   showModal({
     icon: `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`,
-    title: `Цепочка: ${category.name}`,
+    title: modalTitle,
     subtitle: 'Эволюция предметов',
     desc: progressionHTML
   });
@@ -1021,7 +1169,7 @@ function showCategoryProgressionModal(categoryKey) {
  * @param {string} options.actionButton.text - Text for the button.
  * @param {function} options.actionButton.onClick - Click handler.
  * @param {object} [options.dangerButtons] - Optional confirmation buttons.
- * @param {string} options.dangerButtons.confirmText - Text for confirm button.
+ * @param {string} options.dangerButtons.confirmButtonText - Text for confirm button.
  * @param {function} options.dangerButtons.onConfirm - Confirm click handler.
  * @param {object} [options.infoButton] - Optional info button.
  * @param {boolean} [options.isBlocking=false] - If true, modal is blocking.
@@ -1036,9 +1184,7 @@ function showModal(options) {
   modal.desc.innerText = desc;
 
   // Если описание содержит HTML, используем innerHTML
-  if (desc.startsWith('<div')) {
-    modal.desc.innerHTML = desc;
-  }
+  if (desc.startsWith('<div')) modal.desc.innerHTML = desc;
 
   modal.infoBtn.style.display = infoButton ? 'block' : 'none';
   if (infoButton) {
@@ -1052,7 +1198,7 @@ function showModal(options) {
 
   modal.dangerGroup.style.display = dangerButtons ? 'flex' : 'none';
   if (dangerButtons) {
-    modal.confirmBtn.innerText = dangerButtons.confirmText;
+    modal.confirmBtn.innerText = dangerButtons.confirmButtonText;
     modal.confirmBtn.onclick = dangerButtons.onConfirm;
   }
 
@@ -1073,22 +1219,59 @@ function triggerGenerator(generator, fromIndex) {
     showToast("📦 Генератор истощен! Подождите, пока накопятся заряды.", "error");
     return;
   }
-  if (energy <= 0) {
+  if (gameState.energy <= 0) {
     showToast("⚡ Упс! Недостаточно энергии игрока!", "error");
     return;
   }
 
   let emptyCells = getAvailableEmptyCells();
-  if (emptyCells.length === 0) return;
+  if (emptyCells.length === 0) {
+    showToast("Нет места для создания предмета!", "error");
+    return;
+  }
 
   if (generator.genEnergy === config.max) {
     generator.lastRegenTime = Date.now();
   }
   generator.genEnergy--;
-  energy--;
+  gameState.energy--;
 
-  let targetCellIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-  lockedCells.push(targetCellIndex);
+  // --- Новая логика: ищем ближайшую пустую ячейку ---
+  const genX = fromIndex % CONFIG.GRID_COLS;
+  const genY = Math.floor(fromIndex / CONFIG.GRID_COLS);
+
+  let closestCells = [];
+  let minDistance = Infinity;
+
+  emptyCells.forEach(cellIndex => {
+    const cellX = cellIndex % CONFIG.GRID_COLS;
+    const cellY = Math.floor(cellIndex / CONFIG.GRID_COLS);
+    const distance = Math.abs(genX - cellX) + Math.abs(genY - cellY);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestCells = [cellIndex];
+    } else if (distance === minDistance) {
+      closestCells.push(cellIndex);
+    }
+  });
+
+  // Выбираем случайную ячейку из самых близких
+  const targetCellIndex = closestCells[Math.floor(Math.random() * closestCells.length)];
+  // --- Конец новой логики ---
+
+  gameState.lockedCells.push(targetCellIndex);
+
+  // --- Логика для гибридных генераторов ---
+  const genInfo = GENERATORS_DATA[generator.generatorKey];
+  let spawnCategory;
+  if (genInfo.isHybrid) {
+    // 50/50 шанс выбрать одну из двух категорий
+    spawnCategory = genInfo.categories[Math.random() < 0.5 ? 0 : 1];
+  } else {
+    spawnCategory = genInfo.categories[0];
+  }
+  // --- Конец логики для гибридных генераторов ---
 
   let spawnLevel = 1;
   const rand = Math.random() * 100;
@@ -1111,11 +1294,11 @@ function triggerGenerator(generator, fromIndex) {
   const cellElements = document.querySelectorAll('.cell');
   const fromCellElement = cellElements[fromIndex];
   const targetCellElement = cellElements[targetCellIndex];
-  const itemInfo = ITEM_CATEGORIES[generator.category].items[spawnLevel - 1];
+  const itemInfo = CATEGORIES_CONFIG[spawnCategory].items[spawnLevel - 1];
 
   moveItem3D(fromCellElement, targetCellElement, itemInfo.icon).then(() => {
-    gridData[targetCellIndex] = { category: generator.category, level: spawnLevel };
-    lockedCells = lockedCells.filter(idx => idx !== targetCellIndex);
+    gameState.gridData[targetCellIndex] = { category: spawnCategory, level: spawnLevel };
+    gameState.lockedCells = gameState.lockedCells.filter(idx => idx !== targetCellIndex);
     saveGame();
     updateUI();
     animateCellPop(targetCellIndex);
@@ -1152,8 +1335,43 @@ function moveItem3D(fromElem, toElem, icon) {
     setTimeout(() => {
       flyer.remove();
       resolve();
-    }, CONFIG.ANIMATION_DURATION_FLY);
+    }, CONFIG.ANIMATION.FLY_DURATION);
   });
+}
+
+function animateRewardFly(startElement, endElement, icon, count = 5, className = 'coin') {
+  if (!startElement || !endElement) return;
+
+  const endRect = endElement.getBoundingClientRect();
+  const endX = endRect.left + endRect.width / 2;
+  const endY = endRect.top + endRect.height / 2;
+
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const startRect = startElement.getBoundingClientRect();
+      const startX = startRect.left + startRect.width / 2 + (Math.random() - 0.5) * 40;
+      const startY = startRect.top + startRect.height / 2 + (Math.random() - 0.5) * 20;
+
+      const flyer = document.createElement('div');
+      flyer.classList.add('flying-reward', className);
+      flyer.innerHTML = icon;
+      flyer.style.left = `${startX}px`;
+      flyer.style.top = `${startY}px`;
+      document.body.appendChild(flyer);
+
+      void flyer.offsetWidth;
+
+      const dX = endX - startX;
+      const dY = endY - startY;
+
+      flyer.style.transform = `translate(${dX}px, ${dY}px) scale(0.5)`;
+      flyer.style.opacity = '0';
+
+      setTimeout(() => {
+        flyer.remove();
+      }, 700);
+    }, i * 60);
+  }
 }
 
 function confirmReset() {
@@ -1163,7 +1381,7 @@ function confirmReset() {
     subtitle: 'Полное обнуление',
     desc: 'Вы потеряете все свои открытые предметы, генераторы, очки уровня и текущие заказы. Это действие нельзя отменить.',
     dangerButtons: {
-      confirmText: 'Да, сбросить',
+      confirmButtonText: 'Да, сбросить',
       onConfirm: () => {
         localStorage.removeItem(CONFIG.SAVE_KEY);
         closeModal();
@@ -1178,25 +1396,26 @@ function confirmReset() {
 
 function checkProgressiveUnlocks() {
   UNLOCK_THRESHOLDS.forEach(threshold => {
-    if (score >= threshold.score && !threshold.unlocked) {
+    if (gameState.score >= threshold.score && !threshold.unlocked) {
       threshold.unlocked = true;
-      if (lockedCategories.length > 0) {
-        const newCat = lockedCategories.shift();
-        activeCategories.push(newCat);
+      if (gameState.lockedCategories.length > 0) {
+        const newCat = gameState.lockedCategories.shift();
+        gameState.activeCategories.push(newCat);
 
         let emptyCells = getEmptyGridCells();
         if (emptyCells.length > 0) {
           const targetCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-          gridData[targetCell] = {
+          const genKey = CATEGORIES_CONFIG[newCat].generatorKey;
+          gameState.gridData[targetCell] = {
             isGenerator: true,
-            category: newCat,
+            generatorKey: genKey,
             genLevel: 1,
             genEnergy: GEN_ENERGY_CONFIG[1].max,
             lastRegenTime: Date.now()
           };
           setTimeout(() => animateCellPop(targetCell), 50);
         }
-        showToast(`🎉 Уровень ${threshold.level}! Новый генератор: ${GENERATOR_BOXES[newCat].name}!`, "success");
+        showToast(`🎉 Уровень ${threshold.level}! Новый генератор: ${GENERATORS_DATA[CATEGORIES_CONFIG[newCat].generatorKey].name}!`, "success");
       } else {
         spawnUpgradePart();
         showToast(`🎉 Уровень ${threshold.level}! Бонус: получена Новая деталь 🔩!`, "success");
@@ -1209,10 +1428,11 @@ function spawnBonusGenerator() {
   let emptyCells = getEmptyGridCells();
   if (emptyCells.length > 0) {
     const targetCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    const randomActiveCat = activeCategories[Math.floor(Math.random() * activeCategories.length)];
-    gridData[targetCell] = {
+    const randomActiveCat = gameState.activeCategories[Math.floor(Math.random() * gameState.activeCategories.length)];
+    const genKey = CATEGORIES_CONFIG[randomActiveCat].generatorKey;
+    gameState.gridData[targetCell] = {
       isGenerator: true,
-      category: randomActiveCat,
+      generatorKey: genKey,
       genLevel: 1,
       genEnergy: GEN_ENERGY_CONFIG[1].max,
       lastRegenTime: Date.now()
@@ -1225,7 +1445,7 @@ function spawnUpgradePart() {
   let emptyCells = getEmptyGridCells();
   if (emptyCells.length > 0) {
     const targetCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    gridData[targetCell] = {
+    gameState.gridData[targetCell] = {
       isUpgradePart: true,
       icon: '🔩',
       name: 'Новая деталь'
@@ -1238,7 +1458,7 @@ function spawnMagicTool() {
   let emptyCells = getEmptyGridCells();
   if (emptyCells.length > 0) {
     const targetCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    gridData[targetCell] = {
+    gameState.gridData[targetCell] = {
       isMagicTool: true,
       icon: '⚒️',
       name: 'Магические инструменты'
@@ -1268,7 +1488,7 @@ function showToast(text, type = "success") {
 
 function generateOrder() {
   const isStoryRoll = Math.random() < CONFIG.ORDER_GENERATION_STORY_CHANCE;
-  const hasActiveStory = orders.some(o => o.isStory);
+  const hasActiveStory = gameState.orders.some(o => o.isStory);
 
   if (isStoryRoll && !hasActiveStory) {
     generateStoryOrder(1);
@@ -1293,15 +1513,15 @@ function generateOrder() {
   const { min: minLevel, max: maxLevel } = orderLevelConfig;
 
   for (let i = 0; i < itemsCount; i++) {
-    const randomCat = activeCategories[Math.floor(Math.random() * activeCategories.length)];
+    const randomCat = gameState.activeCategories[Math.floor(Math.random() * gameState.activeCategories.length)];
     const randomLevel = Math.floor(Math.random() * (maxLevel - minLevel + 1)) + minLevel;
     requestedItems.push({ category: randomCat, level: randomLevel });
   }
 
   requestedItems.sort((a, b) => a.level - b.level);
 
-  orders.push({
-    id: orderIdCounter++,
+  gameState.orders.push({
+    id: gameState.orderIdCounter++,
     character: char,
     items: requestedItems,
     canComplete: false,
@@ -1314,18 +1534,18 @@ function generateStoryOrder(step, fixedChar = null) {
   const requestedItems = [];
 
   let targetLevel = Math.min(CONFIG.MAX_ITEM_LEVEL, step + 2);
-  const randomCat = activeCategories[Math.floor(Math.random() * activeCategories.length)];
+  const randomCat = gameState.activeCategories[Math.floor(Math.random() * gameState.activeCategories.length)];
   requestedItems.push({ category: randomCat, level: targetLevel });
 
   if (step >= 2) {
-    const randomCat2 = activeCategories[Math.floor(Math.random() * activeCategories.length)];
+    const randomCat2 = gameState.activeCategories[Math.floor(Math.random() * gameState.activeCategories.length)];
     requestedItems.push({ category: randomCat2, level: Math.max(1, targetLevel - 2) });
   }
 
   requestedItems.sort((a, b) => a.level - b.level);
 
-  orders.push({
-    id: orderIdCounter++,
+  gameState.orders.push({
+    id: gameState.orderIdCounter++,
     character: char,
     items: requestedItems,
     canComplete: false,
@@ -1339,44 +1559,100 @@ function generateStoryOrder(step, fixedChar = null) {
 }
 
 function checkOrdersAvailability() {
-  orders.forEach(order => {
-    let tempGrid = [...gridData];
-    let matchCount = 0;
-
+  // 1. Собираем все уникальные предметы, требуемые во всех заказах
+  const allRequiredItems = new Map();
+  gameState.orders.forEach(order => {
     order.items.forEach(reqItem => {
-      const foundIdx = tempGrid.findIndex((item, idx) =>
-        item && !item.isGenerator && !item.isTrash && !item.isUpgradePart &&
-        item.category === reqItem.category && item.level === reqItem.level &&
-        !lockedCells.includes(idx)
-      );
-      if (foundIdx !== -1) {
-        matchCount++;
-        tempGrid[foundIdx] = null;
+      const key = `${reqItem.category}-${reqItem.level}`;
+      if (!allRequiredItems.has(key)) {
+        allRequiredItems.set(key, reqItem);
       }
     });
-    order.canComplete = (matchCount === order.items.length);
   });
 
+  // 2. Сбрасываем предыдущие выделения и помечаем нужные предметы
+  gameState.gridData.forEach(item => {
+    if (item) {
+      const key = `${item.category}-${item.level}`;
+      item.isAllocatedToOrder = allRequiredItems.has(key) && !item.isBlocked;
+    }
+  });
+
+  // 3. Создаем полный список доступных для заказов предметов на поле
+  const allAvailableItemIndices = gameState.gridData.map((item, idx) =>
+    (item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !gameState.lockedCells.includes(idx)) ? idx : -1
+  ).filter(idx => idx !== -1);
+
+  let allAllocatedForAnyOrder = [];
+
+  // 4. Проверяем, какие заказы можно выполнить ПОЛНОСТЬЮ, и помечаем их предметы галочками
+  gameState.orders.forEach((order) => {
+    let tempAvailableIndices = [...allAvailableItemIndices]; // Используем копию для каждого заказа
+    let matchCount = 0;
+    let allocatedForThisOrder = [];
+
+    order.items.forEach(reqItem => {
+      const foundItemGridIndex = tempAvailableIndices.find(gridIdx => {
+        const item = gameState.gridData[gridIdx];
+        return item && item.category === reqItem.category && item.level === reqItem.level;
+      });
+
+      if (foundItemGridIndex !== undefined) {
+        matchCount++;
+        allocatedForThisOrder.push(foundItemGridIndex);
+        tempAvailableIndices.splice(tempAvailableIndices.indexOf(foundItemGridIndex), 1);
+      }
+    });
+
+    order.canComplete = (matchCount === order.items.length);
+    order.allocatedIndices = order.canComplete ? allocatedForThisOrder : [];
+    if (order.canComplete) allAllocatedForAnyOrder.push(...order.allocatedIndices);
+  });
+
+  // Проверяем, появился ли новый готовый к сдаче заказ
+  const hasNewlyCompletedOrder = gameState.orders.some(o => o.canComplete && !o.wasCompletableBefore);
+
   // Автоматическое перемещение готовых к сдаче заказов влево
-  orders.sort((a, b) => {
+  gameState.orders.sort((a, b) => {
     if (a.canComplete && !b.canComplete) return -1;
     if (!a.canComplete && b.canComplete) return 1;
     return 0;
   });
+
+  // Если появился новый выполненный заказ, плавно прокручиваем панель влево
+  if (hasNewlyCompletedOrder) {
+    setTimeout(() => {
+      DOMElements.ordersList.scrollTo({ left: 0, behavior: 'smooth' });
+    }, 50); // Небольшая задержка, чтобы DOM успел обновиться перед прокруткой
+  }
+
 }
+
 
 function renderOrders() {
   const ordersList = DOMElements.ordersList;
+
+  // Сохраняем предыдущее состояние для отслеживания изменений
+  gameState.orders.forEach(order => {
+    order.wasCompletableBefore = order.canComplete;
+  });
 
   // Получаем список старых ID для сохранения структуры
   const currentCards = Array.from(ordersList.children);
   // eslint-disable-next-line no-unused-vars
   const currentIds = currentCards.map(c => c.id);
 
+  // Создаем временный список доступных на поле предметов для проверки
+  const availableItemsOnGrid = gameState.gridData.filter(item =>
+    item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart
+  );
+
   // Создаем или обновляем карточки на основе отсортированного массива
-  orders.forEach((order, index) => {
+  gameState.orders.forEach((order, index) => {
     const cardId = `order-card-${order.id}`;
     let card = document.getElementById(cardId);
+    // Создаем копию доступных предметов для этого конкретного заказа, чтобы не влиять на другие
+    let tempAvailable = [...availableItemsOnGrid];
 
     if (!card) {
       card = document.createElement('div');
@@ -1394,8 +1670,20 @@ function renderOrders() {
 
     let itemsHTML = '<div class="order-items-list">';
     order.items.forEach(item => {
-      const itemInfo = ITEM_CATEGORIES[item.category].items[item.level - 1];
-      itemsHTML += `<div class="order-target" title="${itemInfo.name}"><span class="order-item-icon">${itemInfo.icon}</span></div>`;
+      const itemInfo = CATEGORIES_CONFIG[item.category].items[item.level - 1];
+      // Ищем, есть ли подходящий предмет на поле
+      const foundItemIndex = tempAvailable.findIndex(gridItem =>
+        gridItem.category === item.category && gridItem.level === item.level
+      );
+
+      let isFulfilled = foundItemIndex !== -1;
+      if (isFulfilled) {
+        // Если предмет найден, "удаляем" его из временного списка, чтобы он не засчитался дважды
+        tempAvailable.splice(foundItemIndex, 1);
+      }
+
+      const fulfilledClass = isFulfilled ? 'fulfilled' : '';
+      itemsHTML += `<div class="order-target ${fulfilledClass}" title="${itemInfo.name}" data-category="${item.category}"><span class="order-item-icon">${itemInfo.icon}</span></div>`;
     });
     itemsHTML += '</div>';
 
@@ -1413,7 +1701,7 @@ function renderOrders() {
   });
 
   // Удаляем карточки, которых больше нет в логике игры
-  const activeIds = orders.map(o => `order-card-${o.id}`);
+  const activeIds = gameState.orders.map(o => `order-card-${o.id}`);
   currentCards.forEach(c => {
     if (!activeIds.includes(c.id) && !c.classList.contains('fade-out')) {
       c.remove();
@@ -1422,32 +1710,28 @@ function renderOrders() {
 }
 
 function showCharacterById(id) {
-  const order = orders.find(o => o.id === id);
+  const order = gameState.orders.find(o => o.id === id);
   if (order) showCharacterModal(order);
 }
 
 function confirmCancelOrder(id) {
-  const order = orders.find(o => o.id === id);
+  const order = gameState.orders.find(o => o.id === id);
   if (!order || order.isStory) return;
 
   showModal({
     icon: '❓',
     title: 'Отменить заказ?',
     subtitle: 'Подтверждение действия',
-    desc: `Вы уверены, что хотите отменить этот заказ? Это будет стоить ${CONFIG.ENERGY_PER_ORDER_CANCEL} энергии.`,
+    desc: `Вы уверены, что хотите отменить этот заказ? Это будет стоить ${CONFIG.COINS_PER_ORDER_CANCEL} монет.`,
     dangerButtons: {
-      confirmText: `Да, отменить (-${CONFIG.ENERGY_PER_ORDER_CANCEL}⚡)`,
+      confirmButtonText: `Да, отменить (-${CONFIG.COINS_PER_ORDER_CANCEL}🪙)`,
       onConfirm: () => {
-        if (energy < CONFIG.ENERGY_PER_ORDER_CANCEL) {
-          showToast(`⚡ Недостаточно энергии для отмены (нужно ${CONFIG.ENERGY_PER_ORDER_CANCEL})!`, "error");
-          closeModal();
-          return;
-        }
+        if (gameState.coins < CONFIG.COINS_PER_ORDER_CANCEL) { showToast(`🪙 Недостаточно монет для отмены (нужно ${CONFIG.COINS_PER_ORDER_CANCEL})!`, "error"); closeModal(); return; }
 
-        energy -= CONFIG.ENERGY_PER_ORDER_CANCEL;
-        const idx = orders.findIndex(o => o.id === id);
+        gameState.coins -= CONFIG.COINS_PER_ORDER_CANCEL;
+        const idx = gameState.orders.findIndex(o => o.id === id);
         if (idx !== -1) {
-          orders.splice(idx, 1);
+          gameState.orders.splice(idx, 1);
           generateOrder();
           saveGame();
           updateUI();
@@ -1462,10 +1746,10 @@ function confirmCancelOrder(id) {
 
 function completeOrder(id) {
   checkOrdersAvailability();
-  const orderIndex = orders.findIndex(o => o.id === id);
+  const orderIndex = gameState.orders.findIndex(o => o.id === id);
   if (orderIndex === -1) return;
 
-  const order = orders[orderIndex];
+  const order = gameState.orders[orderIndex];
   if (!order.canComplete) {
     showToast("У вас нет необходимых предметов на поле!", "error");
     return;
@@ -1481,18 +1765,18 @@ function completeOrder(id) {
   const targetAvatarElement = cardElement ? cardElement.querySelector('.character-avatar') : null;
 
   let elementsToAnimate = [];
-  let tempGrid = [...gridData];
+  let tempGrid = [...gameState.gridData];
 
   order.items.forEach(reqItem => {
     const foundIdx = tempGrid.findIndex((item, idx) =>
-      item && !item.isGenerator && !item.isTrash && !item.isUpgradePart &&
-      item.category === reqItem.category && item.level === reqItem.level &&
-      !lockedCells.includes(idx)
+      item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart &&
+      item.category === reqItem.category && item.level === reqItem.level && // Убеждаемся, что предмет не заблокирован
+      !gameState.lockedCells.includes(idx)
     );
     if (foundIdx !== -1) {
       elementsToAnimate.push({
         idx: foundIdx,
-        icon: ITEM_CATEGORIES[reqItem.category].items[reqItem.level - 1].icon,
+        icon: CATEGORIES_CONFIG[reqItem.category].items[reqItem.level - 1].icon,
         level: reqItem.level
       });
       tempGrid[foundIdx] = null;
@@ -1500,31 +1784,39 @@ function completeOrder(id) {
   });
 
   elementsToAnimate.forEach(el => {
-    lockedCells.push(el.idx);
-    gridData[el.idx] = null;
+    gameState.lockedCells.push(el.idx);
+    gameState.gridData[el.idx] = null;
   });
   renderGrid();
 
   const animationPromises = elementsToAnimate.map(el => {
-    score += el.level * CONFIG.ITEM_SCORE_MULTIPLIER;
+    gameState.score += el.level * CONFIG.ITEM_SCORE_MULTIPLIER;
+    gameState.coins += el.level * CONFIG.COIN_MULTIPLIER;
     return moveItem3D(cellElements[el.idx], targetAvatarElement, el.icon).then(() => {
-      lockedCells = lockedCells.filter(idx => idx !== el.idx);
+      gameState.lockedCells = gameState.lockedCells.filter(idx => idx !== el.idx);
     });
   });
 
   // After all items have flown to the card
   Promise.all(animationPromises).then(() => {
+    // Animate coins and energy flying to the top panel
+    const coinsEarned = elementsToAnimate.reduce((sum, el) => sum + el.level * CONFIG.COIN_MULTIPLIER, 0);
+    animateRewardFly(targetAvatarElement, DOMElements.coins.value, '🪙', Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
+    if (order.isStory) {
+      animateRewardFly(targetAvatarElement, DOMElements.energy.value, '⚡', CONFIG.STORY_ORDER_ENERGY_REWARD, 'energy');
+    }
+
     // Wait for the card fade-out animation to complete
     setTimeout(() => {
       const wasStory = order.isStory;
       const currentStep = order.storyStep;
       const storyChar = order.character;
 
-      orders.splice(orderIndex, 1);
+      gameState.orders.splice(orderIndex, 1);
       checkProgressiveUnlocks();
 
       if (wasStory) {
-        energy = Math.min(CONFIG.MAX_ENERGY, energy + CONFIG.ENERGY_PER_ORDER_COMPLETION);
+        gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + CONFIG.STORY_ORDER_ENERGY_REWARD);
         if (currentStep < 3) {
           generateStoryOrder(currentStep + 1, storyChar);
           showToast(`🔮 Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
@@ -1548,7 +1840,7 @@ function completeOrder(id) {
 
       saveGame();
       updateUI();
-    }, CONFIG.ANIMATION_DURATION_FADE);
+    }, CONFIG.ANIMATION.FADE_DURATION);
   });
 }
 
