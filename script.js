@@ -1087,7 +1087,7 @@ function showItemInfoModal(item, index = -1) {
 
     modalOptions = {
       icon: `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`,
-      title: isHybrid ? `Гибридный генератор [${CONFIG.ROMAN_NUMERALS[lvl]}]` : `${genInfo.name} [${CONFIG.ROMAN_NUMERALS[lvl]}]`,
+      title: `${genInfo.name} [${CONFIG.ROMAN_NUMERALS[lvl]}]`,
       subtitle: `Генератор • Уровень ${CONFIG.ROMAN_NUMERALS[lvl]}`,
       desc: desc,
       infoButton: { onClick: () => showCategoryProgressionModal(genInfo.categories) }
