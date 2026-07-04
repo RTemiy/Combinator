@@ -2,14 +2,13 @@ const GENERATORS_DATA = {
   'stationery': { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.', categories: ['stationery'] },
   'flowers': { icon: '🌱', name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'] },
   'sweets': { icon: '🍬', name: 'Конфетный автомат', desc: 'Аппарат, выдающий кондитерские изделия.', categories: ['sweets'] },
-  'accessories': { icon: '✨', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'] },
+  'accessories': { icon: '💎', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'] },
   'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'] },
-  'fastfood': { icon: '🍔', name: 'Фастфуд-кафе', desc: 'Кухонный конвейер для быстрой и сытной еды.', categories: ['fastfood'] },
   'alcohol': { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.', categories: ['alcohol'] },
   'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где из ниток и ткани рождаются стильные наряды.', categories: ['atelier'] },
   'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true },
-  'transport': { icon: '🚗', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'] },
-  'asian_food': { icon: '🍜', name: 'Wok-кафе', desc: 'Аутентичная кухня Азии.', categories: ['asian_food'] },
+  'transport': { icon: '🏠', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'] },
+  'food_court': { icon: '🥙', name: 'Ресторанный дворик', desc: 'Место, где можно найти еду на любой вкус.', categories: ['fastfood', 'asian_food'], isHybrid: true },
 };
 
 const CATEGORIES_CONFIG = {
@@ -692,15 +691,19 @@ function renderGrid() {
         wrapper.innerHTML = '⚒️';
       } else {
         wrapper.innerHTML = CATEGORIES_CONFIG[item.category].items[item.level - 1].icon;
-        const levelBadge = document.createElement('span');
-        levelBadge.classList.add('item-level');
-        levelBadge.innerText = item.level;
 
         // Добавляем эффект частиц для предметов максимального уровня
         if (item.level === CONFIG.MAX_ITEM_LEVEL) {
-          levelBadge.style.background = 'linear-gradient(45deg, #ffb703, #ff8500)';
-          levelBadge.style.color = '#000';
+          const starBadge = document.createElement('span');
+          starBadge.classList.add('max-level-star');
+          starBadge.innerText = '⭐';
+          cell.appendChild(starBadge);
           cell.innerHTML += createParticleEffectHTML();
+        } else {
+          const levelBadge = document.createElement('span');
+          levelBadge.classList.add('item-level');
+          levelBadge.innerText = item.level;
+          cell.appendChild(levelBadge);
         }
 
         // Подсветка для предметов, подходящих под заказ (не заблокированных)
@@ -710,7 +713,6 @@ function renderGrid() {
           checkmark.classList.add('item-checkmark');
           cell.appendChild(checkmark);
         }
-        cell.appendChild(levelBadge);
       }
       cell.appendChild(wrapper);
     }
@@ -749,6 +751,14 @@ function renderGeneratorBadges(cell, item) {
   levelBadge.classList.add('gen-level-badge');
   levelBadge.innerText = CONFIG.ROMAN_NUMERALS[lvl];
   cell.appendChild(levelBadge);
+
+  // Добавляем звезду для генератора максимального уровня
+  if (lvl === CONFIG.MAX_GENERATOR_LEVEL) {
+    const starBadge = document.createElement('span');
+    starBadge.classList.add('max-level-star');
+    starBadge.innerText = '⭐';
+    cell.appendChild(starBadge);
+  }
 }
 
 function startDrag(e, index) {
@@ -1056,9 +1066,10 @@ function showItemInfoModal(item, index = -1) {
     const config = GEN_ENERGY_CONFIG[lvl];
     if (item.genEnergy === undefined) item.genEnergy = config.max;
 
-    let desc = isHybrid
-      ? `Гибридный генератор. Производит предметы из категорий: ${genInfo.categories.map(c => CATEGORIES_CONFIG[c].name).join(' и ')}. `
-      : `${genInfo.desc} `;
+    let desc = `${genInfo.desc} `;
+    if (isHybrid) {
+      desc += `Производит предметы из категорий: ${genInfo.categories.map(c => CATEGORIES_CONFIG[c].name).join(' и ')}. `;
+    }
 
     const cdSec = config.cooldown / 1000;
 

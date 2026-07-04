@@ -237,14 +237,11 @@ body {
   100% {
     opacity: 0;
     transform: scale(0.7) translateY(-20px);
-    min-width: 0px;
-    width: 0px;
-    min-height: 0px;
-    height: 0px;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+    min-width: 0;
+    width: 0;
+    min-height: 0;
+    height: 0;
+    padding: 0;
     margin-right: -10px;
   }
 }
@@ -576,6 +573,20 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   letter-spacing: 0.2px;
   line-height: 1;
+}
+
+.max-level-star {
+  display: block;
+  position: absolute;
+  bottom: 3px;
+  right: 4px;
+  font-size: 0.8rem;
+  color: #ffd700;
+  pointer-events: none;
+  z-index: 12;
+  text-shadow: 0 0 5px #ffb703, 0 0 2px rgba(0,0,0,0.8);
+  line-height: 1;
+  animation: star-pulse 2s infinite;
 }
 
 .flying-item {
@@ -935,6 +946,11 @@ body {
   100% {
     transform: translate(-50%, -50%) rotate(360deg);
   }
+}
+
+@keyframes star-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
 }
 
 @media (max-width: 380px) {
