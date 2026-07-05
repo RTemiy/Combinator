@@ -260,7 +260,7 @@ const GEN_ENERGY_CONFIG = {
 };
 
 const SPAWN_CHANCES = {
-  2: [{ level: 2, chance: 20 }],
+  2: [{ level: 2, chance: 20  }],
   3: [{ level: 3, chance: 10 }, { level: 2, chance: 35 }],
   4: [{ level: 4, chance: 5 }, { level: 3, chance: 20 }, { level: 2, chance: 50 }],
   5: [{ level: 5, chance: 5 }, { level: 4, chance: 15 }, { level: 3, chance: 40 }, { level: 2, chance: 70 }]

@@ -878,7 +878,7 @@ body {
   font-weight: bold;
   cursor: pointer;
 }
-.modal-btn-confirm:active { background: #bd2130; }
+.modal-btn-confirm:active {  background: #bd2130; }
 
 .modal-btn-cancel {
   flex: 1;
