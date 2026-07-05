@@ -459,6 +459,11 @@ body {
   background: #333;
 }
 
+.cell.generator-part-cell .item-level {
+  /* Показываем уровень только для ячеек с запчастями */
+  display: block;
+}
+
 .cell.generator-slot {
   /* Устанавливаем положение для псевдоэлемента */
   position: relative;

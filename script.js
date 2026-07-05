@@ -1,13 +1,13 @@
 const GENERATORS_DATA = {
-  'stationery': { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.', categories: ['stationery'], partIcon: '🔩' },
+  'stationery': { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.', categories: ['stationery'], partIcon: '🧷' },
   'flowers': { icon: '🌱', name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'], partIcon: '🌿' },
   'sweets': { icon: '🍬', name: 'Конфетный автомат', desc: 'Аппарат, выдающий кондитерские изделия.', categories: ['sweets'], partIcon: '🍥' },
   'accessories': { icon: '💎', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'], partIcon: '✨' },
-  'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'], partIcon: '🔌' },
+  'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'], partIcon: '🎛' },
   'alcohol': { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.', categories: ['alcohol'], partIcon: '🧊' },
   'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где из ниток и ткани рождаются стильные наряды.', categories: ['atelier'], partIcon: '🎗️' },
-  'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true, partIcon: '⚙️' },
-  'transport': { icon: '🏠', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'], partIcon: '☸️' },
+  'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true, partIcon: '💡' },
+  'transport': { icon: '🏠', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'], partIcon: '🛞' },
   'food_court': { icon: '🥙', name: 'Ресторанный дворик', desc: 'Место, где можно найти еду на любой вкус.', categories: ['fastfood', 'asian_food'], isHybrid: true, partIcon: '🌶️' },
   'bonus_chest': { icon: '🎁', name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true },
 };
@@ -245,7 +245,7 @@ const CONFIG = {
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.1.1',
+  GAME_VERSION: '1.1.2',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },
@@ -463,6 +463,9 @@ function claimReward(rewardIndex, startElement) {
     icon = '🔩';
   } else if (reward.isMagicTool) {
     icon = '⚒️';
+  }
+  else if (reward.isGeneratorPart) {
+    icon = GENERATORS_DATA[reward.generatorKey].partIcon;
   }
 
   moveItem3D(startElement, targetCellElement, icon).then(() => {
