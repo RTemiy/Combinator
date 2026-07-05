@@ -31,6 +31,13 @@ body {
   user-select: none;
   box-sizing: border-box;
   -webkit-user-select: none;
+  transition: padding-bottom 0.25s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+}
+
+body.modal-is-active {
+  /* Добавляем отступ снизу, равный высоте модального окна + небольшой запас,
+     чтобы приподнять игровой контент и избежать перекрытия. */
+  padding-bottom: 220px;
 }
 
 .header-controls {
@@ -421,6 +428,9 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  flex: 1; /* Занимает оставшееся пространство */
+  min-height: 0; /* Для корректной работы flex */
+  justify-content: flex-start; /* Прижимаем сетку к верху доступного пространства */
 }
 
 .grid {
@@ -437,8 +447,6 @@ body {
   box-sizing: border-box;
   /* Адаптивная ширина и высота поля */
   max-width: min(400px, 90vw);
-  /* Ограничиваем максимальную высоту, чтобы поле не вылезало за экран */
-  max-height: 85vh;
 }
 
 .cell {
@@ -757,7 +765,7 @@ body {
   grid-template-columns: auto 1fr;
   gap: 12px;
   align-items: center;
-  max-height: 200px;
+  max-height: 190px; /* Немного уменьшим высоту по умолчанию */
 }
 
 .modal-overlay.active .modal-content { transform: translateY(0); }
@@ -794,7 +802,7 @@ body {
 .modal-title { font-size: 1rem; font-weight: bold; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .modal-subtitle { font-size: 0.7rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; }
 .modal-desc {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #b3b3b3;
   line-height: 1.25;
   margin: 0;
@@ -1094,10 +1102,25 @@ body {
     height: 90px;
   }
   .grid {
-    /* Вот ключевое изменение: уменьшаем максимальную ширину и высоту */
     max-width: min(320px, 85vw);
-    max-height: 70vh;
     gap: 5px;
     padding: 8px;
+  }
+  .modal-content {
+    padding: 10px 12px 12px;
+    gap: 8px;
+    max-height: 160px; /* Значительно уменьшаем высоту модалки на низких экранах */
+  }
+  .modal-desc {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    max-height: 70px; /* Ограничиваем высоту описания, чтобы остальное влезло */
+  }
+  .modal-title { font-size: 0.9rem; }
+  .modal-subtitle { font-size: 0.65rem; }
+  .modal-icon { width: 40px; height: 40px; font-size: 1.8rem; }
+
+  body.modal-is-active {
+    padding-bottom: 180px; /* Адаптируем отступ под уменьшенную модалку */
   }
 }

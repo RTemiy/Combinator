@@ -1523,6 +1523,7 @@ function showCategoryProgressionModal(categoryKeyOrKeys) {
  * @param {boolean} [options.isBlocking=false] - If true, modal is blocking.
  */
 function showModal(options) {
+  document.body.classList.add('modal-is-active');
   const { icon, title, subtitle, desc, actionButton, dangerButtons, infoButton, isBlocking } = options;
   const modal = DOMElements.infoModal;
 
@@ -1554,6 +1555,7 @@ function showModal(options) {
 }
 
 function closeModal() {
+  document.body.classList.remove('modal-is-active');
   DOMElements.infoModal.overlay.className = 'modal-overlay';
 }
 
