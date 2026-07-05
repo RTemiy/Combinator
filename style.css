@@ -237,6 +237,11 @@ body {
 .reward-item.generator .generator-box-bg { font-size: 1.8rem; }
 .reward-item.generator .generator-item-fg { font-size: 1.1rem; }
 
+.reward-item.generator-part .part-bg-box { font-size: 1.8rem; }
+.reward-item.generator-part .part-bg-icon { font-size: 1.1rem; }
+.reward-item.generator-part .part-fg-icon { font-size: 1.1rem; }
+
+
 .reward-item .max-level-star { font-size: 0.7rem; bottom: 2px; right: 2px; }
 
 
@@ -449,6 +454,11 @@ body {
   aspect-ratio: 1 / 1;
 }
 
+.cell.generator-part-cell {
+  border: 2px dashed #888;
+  background: #333;
+}
+
 .cell.generator-slot {
   /* Устанавливаем положение для псевдоэлемента */
   position: relative;
@@ -556,6 +566,35 @@ body {
   bottom: 22%;
   transform: translateY(10%);
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+}
+
+.generator-part-icon-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.part-bg-box {
+  font-size: 1.5rem;
+  z-index: 1;
+  opacity: 0.8;
+}
+.part-bg-icon {
+  display: none;
+  position: absolute;
+  font-size: 0.95rem;
+  z-index: 2;
+  opacity: 0.5;
+}
+.part-fg-icon {
+  position: absolute;
+  font-size: 1.2rem;
+  z-index: 3;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
 }
 
 .item-level {

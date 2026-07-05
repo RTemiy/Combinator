@@ -1,14 +1,14 @@
 const GENERATORS_DATA = {
-  'stationery': { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.', categories: ['stationery'] },
-  'flowers': { icon: '🌱', name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'] },
-  'sweets': { icon: '🍬', name: 'Конфетный автомат', desc: 'Аппарат, выдающий кондитерские изделия.', categories: ['sweets'] },
-  'accessories': { icon: '💎', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'] },
-  'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'] },
-  'alcohol': { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.', categories: ['alcohol'] },
-  'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где из ниток и ткани рождаются стильные наряды.', categories: ['atelier'] },
-  'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true },
-  'transport': { icon: '🏠', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'] },
-  'food_court': { icon: '🥙', name: 'Ресторанный дворик', desc: 'Место, где можно найти еду на любой вкус.', categories: ['fastfood', 'asian_food'], isHybrid: true },
+  'stationery': { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.', categories: ['stationery'], partIcon: '🔩' },
+  'flowers': { icon: '🌱', name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'], partIcon: '🌿' },
+  'sweets': { icon: '🍬', name: 'Конфетный автомат', desc: 'Аппарат, выдающий кондитерские изделия.', categories: ['sweets'], partIcon: '🍥' },
+  'accessories': { icon: '💎', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'], partIcon: '✨' },
+  'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'], partIcon: '🔌' },
+  'alcohol': { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.', categories: ['alcohol'], partIcon: '🧊' },
+  'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где из ниток и ткани рождаются стильные наряды.', categories: ['atelier'], partIcon: '🎗️' },
+  'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true, partIcon: '⚙️' },
+  'transport': { icon: '🏠', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'], partIcon: '☸️' },
+  'food_court': { icon: '🥙', name: 'Ресторанный дворик', desc: 'Место, где можно найти еду на любой вкус.', categories: ['fastfood', 'asian_food'], isHybrid: true, partIcon: '🌶️' },
   'bonus_chest': { icon: '🎁', name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true },
 };
 
@@ -267,12 +267,12 @@ const SPAWN_CHANCES = {
 };
 
 const UNLOCK_THRESHOLDS = [
-  { score: 500, unlocked: false, level: 2, prevLimit: 0, orderLevels: { min: 3, max: 4 } },
-  { score: 1500, unlocked: false, level: 3, prevLimit: 500, orderLevels: { min: 4, max: 4 } },
-  { score: 3000, unlocked: false, level: 4, prevLimit: 1500, orderLevels: { min: 4, max: 5 } },
-  { score: 6000, unlocked: false, level: 5, prevLimit: 3000, orderLevels: { min: 5, max: 5 } },
-  { score: 12000, unlocked: false, level: 6, prevLimit: 6000, orderLevels: { min: 5, max: 6 } },
-  { score: 24000, unlocked: false, level: 7, prevLimit: 12000, orderLevels: { min: 6, max: 7 } }
+  { score: 1500, unlocked: false, level: 2, prevLimit: 0, orderLevels: { min: 3, max: 4 } },
+  { score: 3000, unlocked: false, level: 3, prevLimit: 1500, orderLevels: { min: 4, max: 4 } },
+  { score: 6000, unlocked: false, level: 4, prevLimit: 3000, orderLevels: { min: 4, max: 5 } },
+  { score: 12000, unlocked: false, level: 5, prevLimit: 6000, orderLevels: { min: 5, max: 5 } },
+  { score: 24000, unlocked: false, level: 6, prevLimit: 12000, orderLevels: { min: 5, max: 6 } },
+  { score: 48000, unlocked: false, level: 7, prevLimit: 24000, orderLevels: { min: 6, max: 7 } }
 ];
 
 // --- Game State ---
@@ -587,7 +587,7 @@ function loadGame() {
 
     if (energyToRestore > 0) {
       gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
-      showToast(`Вы отсутствовали. Восстановлено ${energyToRestore}⚡ энергии!`, "success");
+      showToast(`Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100}⚡ энергии!`, "success");
     }
 
     if (loaded.thresholds) {
@@ -735,6 +735,16 @@ function renderRewardQueue() {
     } else if (reward.isMagicTool) {
       rewardElem.innerHTML = '⚒️';
       rewardElem.title = 'Забрать: Магические инструменты';
+    } else if (reward.isGeneratorPart) {
+      const genInfo = GENERATORS_DATA[reward.generatorKey];
+      rewardElem.classList.add('generator-part');
+      rewardElem.title = `Забрать: Деталь для "${genInfo.name}"`;
+      rewardElem.innerHTML = `
+          <div class="generator-part-icon-container">
+              <span class="part-bg-box">📦</span>
+              <span class="part-bg-icon">${genInfo.icon}</span>
+              <span class="part-fg-icon">${genInfo.partIcon}</span>
+          </div>`;
     }
 
     panel.appendChild(rewardElem);
@@ -776,6 +786,8 @@ function renderGrid() {
     if (item) {
       if (item.isBlocked) {
         cell.classList.add('blocked');
+      } else if (item.isGeneratorPart) {
+        cell.classList.add('generator-part-cell');
       } else if (item.isUpgradePart || item.isMagicTool) {
         cell.classList.add('booster-cell');
       }
@@ -803,6 +815,19 @@ function renderGrid() {
         container.appendChild(fgItem);
         wrapper.appendChild(container);
         renderGeneratorBadges(cell, item);
+      } else if (item.isGeneratorPart) {
+        const genInfo = GENERATORS_DATA[item.generatorKey];
+        wrapper.innerHTML = `
+            <div class="generator-part-icon-container">
+                <span class="part-bg-box">📦</span>
+                <span class="part-bg-icon">${genInfo.icon}</span>
+                <span class="part-fg-icon">${genInfo.partIcon}</span>
+            </div>`;
+
+        const levelBadge = document.createElement('span');
+        levelBadge.classList.add('item-level');
+        levelBadge.innerText = item.level;
+        cell.appendChild(levelBadge);
       } else if (item.isUpgradePart || item.isMagicTool) {
         // Общая логика для деталей и инструментов
         wrapper.innerHTML = item.isUpgradePart ? '🔩' : '⚒️';
@@ -1038,7 +1063,7 @@ function handleUnblockMerge(fromIdx, toIdx, source) {
     gameState.gridData[fromIdx] = null;
     gameState.gridData[toIdx] = { category: source.category, level: source.level + 1 };
     triggerMergeEffects(toIdx, source.category);
-    showToast("Паутина снята!", "success");
+    // showToast("Паутина снята!", "success");
     return true;
 }
 
@@ -1054,8 +1079,30 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
         lastRegenTime: Date.now()
     };
     triggerMergeEffects(genIdx, GENERATORS_DATA[generator.generatorKey].categories[0]);
-    showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
+    // showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
     return true;
+}
+
+function handleGeneratorPartMerge(fromIdx, toIdx, source) {
+    if (source.level >= 3) { // Max level for parts is 3. Merging two L3 parts.
+        gameState.gridData[fromIdx] = null;
+        // Create a new L1 generator
+        gameState.gridData[toIdx] = {
+            isGenerator: true,
+            generatorKey: source.generatorKey,
+            genLevel: 1,
+            genEnergy: GEN_ENERGY_CONFIG[1].max,
+            lastRegenTime: Date.now()
+        };
+        triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
+        // showToast(`🛠️ Собран новый генератор!`, "success");
+        return true;
+    } else { // Levels 1 and 2 merge up
+        gameState.gridData[fromIdx] = null;
+        gameState.gridData[toIdx] = { isGeneratorPart: true, generatorKey: source.generatorKey, level: source.level + 1 };
+        triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
+        return true;
+    }
 }
 
 function handleItemUpgradeWithTool(toolIdx, itemIdx, regularItem) {
@@ -1064,7 +1111,7 @@ function handleItemUpgradeWithTool(toolIdx, itemIdx, regularItem) {
     gameState.gridData[toolIdx] = null;
     gameState.gridData[itemIdx] = { ...regularItem, level: nextLvl };
     triggerMergeEffects(itemIdx, regularItem.category);
-    showToast(`✨ Предмет улучшен до уровня ${nextLvl}!`, "success");
+    // showToast(`✨ Предмет улучшен до уровня ${nextLvl}!`, "success");
     return true;
 }
 
@@ -1087,7 +1134,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
             genCharges: 3,
         };
         triggerMergeEffects(toIdx, 'stationery');
-        showToast(`🎁 Коробка улучшена! Теперь в ней 3 заряда.`, "success");
+        // showToast(`🎁 Коробка улучшена! Теперь в ней 3 заряда.`, "success");
         return true;
     }
 
@@ -1103,7 +1150,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
         lastRegenTime: Date.now()
     };
     triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
-    showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
+    // showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
     return true;
 }
 
@@ -1128,18 +1175,22 @@ function executeMergeOrSwap(fromIdx, toIdx) {
         handleGeneratorUpgrade(toIdx, fromIdx, source);
     }
     // Случай 3: Улучшение предмета магическим инструментом
-    else if (source.isMagicTool && target && !target.isGenerator && !target.isBlocked && !target.isUpgradePart && !target.isMagicTool) {
+    else if (source.isMagicTool && target && !target.isGenerator && !target.isBlocked && !target.isUpgradePart && !target.isMagicTool && !target.isGeneratorPart) {
         handleItemUpgradeWithTool(fromIdx, toIdx, target);
-    } else if (target?.isMagicTool && source && !source.isGenerator && !source.isBlocked && !source.isUpgradePart && !source.isMagicTool) {
+    } else if (target?.isMagicTool && source && !source.isGenerator && !source.isBlocked && !source.isUpgradePart && !source.isMagicTool && !source.isGeneratorPart) {
         handleItemUpgradeWithTool(toIdx, fromIdx, source);
     }
     // Случай 4: Слияние двух обычных предметов
-    else if (target && !source.isGenerator && !target.isGenerator && !source.isUpgradePart && !target.isUpgradePart && source.category === target.category && source.level === target.level) {
+    else if (target && !source.isGenerator && !target.isGenerator && !source.isUpgradePart && !target.isUpgradePart && !source.isGeneratorPart && !target.isGeneratorPart && source.category === target.category && source.level === target.level) {
         handleItemMerge(fromIdx, toIdx, source);
     }
     // Случай 5: Слияние двух генераторов
     else if (target && source.isGenerator && target.isGenerator && source.generatorKey === target.generatorKey && source.genLevel === target.genLevel) {
         handleGeneratorMerge(fromIdx, toIdx, source);
+    }
+    // Новый случай: Слияние двух деталей генератора
+    else if (target && source.isGeneratorPart && target.isGeneratorPart && source.generatorKey === target.generatorKey && source.level === target.level) {
+        handleGeneratorPartMerge(fromIdx, toIdx, source);
     }
     // Случай 6: Перемещение предметов
     else {
@@ -1213,7 +1264,7 @@ function clearBlockedItemWithCoins(index) {
   closeModal();
   saveGame();
   updateUI();
-  showToast("Завал успешно расчищен!", "success");
+  // showToast("Завал успешно расчищен!", "success");
   setTimeout(() => animateCellPop(index), 50);
 }
 function rechargeGeneratorWithCoins(index) {
@@ -1325,6 +1376,28 @@ function getBoosterModalOptions(item) {
     return {};
 }
 
+function getGeneratorPartModalOptions(item, index) {
+    const genInfo = GENERATORS_DATA[item.generatorKey];
+    const iconHTML = `
+        <div class="generator-part-icon-container">
+            <span class="part-bg-box">📦</span>
+            <span class="part-bg-icon">${genInfo.icon}</span>
+            <span class="part-fg-icon">${genInfo.partIcon}</span>
+        </div>`;
+
+    return {
+        icon: iconHTML,
+        title: `Деталь для "${genInfo.name}"`,
+        subtitle: `Деталь для сборки • Уровень ${item.level}`,
+        desc: 'Объедините две одинаковые детали, чтобы получить деталь следующего уровня. Две детали 3-го уровня создают полноценный генератор.',
+        dangerButtons: {
+            confirmButtonText: `Удалить (-${CONFIG.ITEM_DELETE_COST}⚡)`,
+            onConfirm: () => deleteItem(index)
+        },
+        isBlocking: false
+    };
+}
+
 function getRegularItemModalOptions(item, index) {
     const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
     return {
@@ -1350,6 +1423,8 @@ function showItemInfoModal(item, index = -1) {
         modalOptions = getBlockedItemModalOptions(item, index);
     } else if (item.isGenerator) {
         modalOptions = getGeneratorModalOptions(item, index);
+    } else if (item.isGeneratorPart) {
+        modalOptions = getGeneratorPartModalOptions(item, index);
     } else if (item.isUpgradePart || item.isMagicTool) {
         modalOptions = getBoosterModalOptions(item);
     } else {
@@ -1505,7 +1580,7 @@ function findClosestEmptyCell(fromIndex, emptyCells) {
 
 function triggerSpecialGenerator(generator, fromIndex) {
     if (generator.genCharges <= 0) {
-        showToast("🎁 Коробка пуста!", "error");
+        // showToast("🎁 Коробка пуста!", "error");
         return;
     }
 
@@ -1528,7 +1603,7 @@ function triggerSpecialGenerator(generator, fromIndex) {
       gameState.lockedCells = gameState.lockedCells.filter(idx => idx !== targetCellIndex);
       if (generator.genCharges <= 0) {
             gameState.gridData[fromIndex] = null;
-            showToast("🎁 Коробка исчезла!", "success");
+            // showToast("🎁 Коробка исчезла!", "success");
         }
         saveGame();
         updateUI();
@@ -1820,6 +1895,28 @@ function spawnMagicTool() {
   });
 }
 
+function spawnGeneratorPart() {
+  // 1. Get all unique generator keys from active categories.
+  const activeGeneratorKeys = [...new Set(gameState.activeCategories.map(cat => CATEGORIES_CONFIG[cat].generatorKey))];
+
+  // 2. Filter out special generators.
+  const regularGeneratorKeys = activeGeneratorKeys.filter(key => !GENERATORS_DATA[key].isSpecial);
+
+  if (regularGeneratorKeys.length > 0) {
+    // 3. Pick one randomly.
+    const randomGenKey = regularGeneratorKeys[Math.floor(Math.random() * regularGeneratorKeys.length)];
+    const generatorData = GENERATORS_DATA[randomGenKey];
+
+    // 4. Add it to the reward queue.
+    gameState.rewardQueue.push({
+      isGeneratorPart: true,
+      generatorKey: randomGenKey,
+      level: 1
+    });
+    // showToast(`⚙️ Получена деталь для "${generatorData.name}"!`, "success");
+  }
+}
+
 function showToast(text, type = "success") {
   const toast = document.createElement('div');
   toast.classList.add('game-toast', type);
@@ -1933,7 +2030,7 @@ function checkOrdersAvailability() {
   // 2. Сбрасываем предыдущие выделения и помечаем нужные предметы
   gameState.gridData.forEach(item => {
     if (item) {
-      const key = `${item.category}-${item.level}`;
+      const key = item.isGeneratorPart ? null : `${item.category}-${item.level}`;
       item.isAllocatedToOrder = allRequiredItems.has(key) && !item.isBlocked;
     }
   });
@@ -1941,7 +2038,7 @@ function checkOrdersAvailability() {
   // 3. Создаем полный список доступных для заказов предметов на поле
   const allAvailableItemIndices = gameState.gridData.map((item, idx) =>
     (item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !gameState.lockedCells.includes(idx)) ? idx : -1
-  ).filter(idx => idx !== -1);
+  ).filter(idx => idx !== -1 && gameState.gridData[idx] && !gameState.gridData[idx].isGeneratorPart);
 
   let allAllocatedForAnyOrder = [];
 
@@ -2189,6 +2286,7 @@ function completeOrder(id) {
         }
       } else {
         generateOrder();
+        spawnGeneratorPart();
       }
 
       saveGame();
