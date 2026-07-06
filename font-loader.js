@@ -17,7 +17,6 @@
       }
     `;
     document.head.appendChild(style);
-    console.log('Шрифт успешно подключен.');
   }
 
   try {
@@ -25,17 +24,14 @@
     const cachedResponse = await cache.match(FONT_URL);
 
     if (cachedResponse) {
-      console.log('Шрифт найден в кэше. Загрузка из кэша...');
       const fontBlob = await cachedResponse.blob();
       const fontUrl = URL.createObjectURL(fontBlob);
       injectFontFaceStyle(fontUrl);
     } else {
-      console.log('Шрифт не найден в кэше. Загрузка из сети...');
       const fetchResponse = await fetch(FONT_URL);
 
       if (fetchResponse.ok) {
         await cache.put(FONT_URL, fetchResponse.clone());
-        console.log('Шрифт загружен и сохранен в кэше.');
         const fontBlob = await fetchResponse.blob();
         const fontUrl = URL.createObjectURL(fontBlob);
         injectFontFaceStyle(fontUrl);

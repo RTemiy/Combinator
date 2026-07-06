@@ -1,14 +1,14 @@
 const GENERATORS_DATA = {
   'stationery': { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.', categories: ['stationery'], partIcon: '🧷' },
   'flowers': { icon: '🌱', name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'], partIcon: '🌿' },
-  'sweets': { icon: '🍬', name: 'Конфетный автомат', desc: 'Аппарат, выдающий кондитерские изделия.', categories: ['sweets'], partIcon: '🍥' },
+  'sweets': { icon: '🧁', name: 'Кондитерская', desc: 'Уютное место, где создаются сладости и свежая выпечка.', categories: ['sweets', 'bakery'], isHybrid: true, partIcon: '🥣' },
   'accessories': { icon: '💎', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'], partIcon: '✨' },
   'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'], partIcon: '🎛' },
   'alcohol': { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.', categories: ['alcohol'], partIcon: '🧊' },
   'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где из ниток и ткани рождаются стильные наряды.', categories: ['atelier'], partIcon: '🎗️' },
   'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true, partIcon: '💡' },
   'transport': { icon: '🏠', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'], partIcon: '🛞' },
-  'food_court': { icon: '🥙', name: 'Ресторанный дворик', desc: 'Место, где можно найти еду на любой вкус.', categories: ['fastfood', 'asian_food'], isHybrid: true, partIcon: '🌶️' },
+  'food_court': { icon: '🥙', name: 'Ресторанный дворик', desc: 'Место, где можно найти еду на любой вкус.', categories: ['fastfood', 'asian_food'], isHybrid: true, partIcon: '🍳' },
   'bonus_chest': { icon: '🎁', name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true },
 };
 
@@ -53,6 +53,20 @@ const CATEGORIES_CONFIG = {
       { level: 5, icon: '🍩', name: 'Глазированный пончик', desc: 'Пышное тесто с яркой посыпкой.' },
       { level: 6, icon: '🍰', name: 'Кусочек торта', desc: 'Бисквит с нежным ягодным кремом.' },
       { level: 7, icon: '🎂', name: 'Праздничный торт', desc: 'Шедевр со свечами — пик кондитерского искусства!' }
+    ]
+  },
+  bakery: {
+    name: 'Выпечка',
+    color: '#d4a373',
+    generatorKey: 'sweets',
+    items: [
+      { level: 1, icon: '🥠', name: 'Печенье с предсказанием', desc: 'Хрустящее лакомство с загадочной запиской внутри.' },
+      { level: 2, icon: '🥨', name: 'Соленый крендель', desc: 'Классическая закуска с крупными кристаллами соли.' },
+      { level: 3, icon: '🥐', name: 'Свежий круассан', desc: 'Воздушное слоеное тесто, тающее во рту.' },
+      { level: 4, icon: '🥯', name: 'Бейгл с кунжутом', desc: 'Плотный бублик, идеально подходящий для сэндвичей.' },
+      { level: 5, icon: '🥖', name: 'Французский багет', desc: 'Длинный хлеб с хрустящей корочкой и мягкой сердцевиной.' },
+      { level: 6, icon: '🍞', name: 'Буханка хлеба', desc: 'Домашний пышный хлеб, основа любого стола.' },
+      { level: 7, icon: '🥮', name: 'Каравай', desc: 'Традиционный большой хлеб на всю семью.' }
     ]
   },
   accessories: {
@@ -155,7 +169,7 @@ const CATEGORIES_CONFIG = {
   },
   transport: {
     name: 'Транспорт',
-    color: '#74c69d', // Приятный зеленый цвет
+    color: '#74c69d',
     generatorKey: 'transport',
     items: [
       { level: 1, icon: '🛼', name: 'Ролики', desc: 'Простой способ быстро передвигаться по парку.' },
@@ -184,23 +198,29 @@ const CATEGORIES_CONFIG = {
 };
 
 const CHARACTERS = [
-  { icon: '🐱', name: 'Кот Том', desc: 'Местный пушистый сибарит. Обожает сладости и мягкие рюкзаки, в которых можно сладко вздремнуть.' },
-  { icon: '🦊', name: 'Лиса Алиса', desc: 'Хитрая авантюристка. Собирает редкие аксессуары и гаджеты для своих тайных ночных вылазок.' },
-  { icon: '🐻', name: 'Мишка По', desc: 'Добродушный любитель природы. Всегда рад свежим цветам и вкусным тортам на праздники.' },
-  { icon: '🐸', name: 'Жабка Пепе', desc: 'Философ и ценитель мемов. Постоянно сидит в гаджетах и записывает свои умные мысли в блокноты.' },
-  { icon: '🧙‍♂️', name: 'Маг Гендальф', desc: 'Древний волшебник. Ищет Энциклопедии магии и древние артефакты для защиты здешних земель.' },
-  { icon: '🧝‍♀️', name: 'Эльфийка Лия', desc: 'Хранительница лесного спокойствия. Приходит за красивыми букетами цветов и редкими амулетами.' },
-  { icon: '🧛‍♂️', name: 'Граф Влад', desc: 'Загадочный аристократ из замка неподалеку. Предпочитает алые розы и роскошные золотые короны.' },
-  { icon: '🦝', name: 'Енот Рокки', desc: 'Завзятый изобретатель и мастер на все руки. Постоянно ищет провода, детали и канцелярию для новых чертежей.' },
-  { icon: '🐼', name: 'Панда Мэй', desc: 'Милая любительница уюта и чаепитий. Всегда рада поднять настроение вкусной конфетой или сочным бургером.' },
-  { icon: '🦉', name: 'Сова Оливия', desc: 'Мудрая исследовательница местной академии. Собирает старинные книги и обожает перекусить пиццей во время ночных чтений.' }
+  { icon: '🐱', name: 'Кот Том', desc: 'Местный пушистый сибарит. Ценит комфорт и уют, всегда в поисках чего-то приятного.' },
+  { icon: '🦊', name: 'Лиса Алиса', desc: 'Хитрая авантюристка. Всегда в движении, ищет что-то необычное для своих приключений.' },
+  { icon: '🐻', name: 'Мишка По', desc: 'Добродушный любитель природы. Ценит простые радости и всё, что приносит хорошее настроение.' },
+  { icon: '🐸', name: 'Жабка Пепе', desc: 'Философ и ценитель мемов. Постоянно в раздумьях, ищет вдохновение в самых разных вещах.' },
+  { icon: '🧙‍♂️', name: 'Маг Гендальф', desc: 'Древний волшебник. Ищет знания и артефакты, чтобы поддерживать баланс в мире.' },
+  { icon: '🧝‍♀️', name: 'Эльфийка Лия', desc: 'Хранительница лесного спокойствия. Ценит красоту и гармонию, всегда рада новым открытиям.' },
+  { icon: '🧛‍♂️', name: 'Граф Влад', desc: 'Загадочный аристократ из замка неподалеку. Предпочитает изысканные вещи, подчеркивающие его статус.' },
+  { icon: '🦝', name: 'Енот Рокки', desc: 'Завзятый изобретатель и мастер на все руки. Постоянно ищет материалы для своих новых проектов.' },
+  { icon: '🐼', name: 'Панда Мэй', desc: 'Милая любительница уюта и чаепитий. Всегда рада поднять настроение чем-то вкусным и приятным.' },
+  { icon: '🦉', name: 'Сова Оливия', desc: 'Мудрая исследовательница местной академии. Собирает информацию и ценит всё, что способствует обучению.' },
+  { icon: '👩‍🍳', name: 'Шеф-повар Анна', desc: 'Талантливый кулинар, который постоянно ищет новые ингредиенты для своих гастрономических шедевров.' },
+  { icon: '👨‍🌾', name: 'Фермер Джон', desc: 'Трудолюбивый земледелец. Ему всегда нужны инструменты и материалы для своей фермы.' },
+  { icon: '👨‍🚀', name: 'Астронавт Алекс', desc: 'Исследователь космоса. Собирает припасы и оборудование для долгой миссии на орбите.' },
+  { icon: '🧜‍♀️', name: 'Русалка Ариэль', desc: 'Загадочная обитательница морских глубин. Интересуется всем, что связано с миром людей.' }
 ];
 
 const STORY_CHARACTERS = [
-  { icon: '🕵️‍♂️', name: 'Незнакомец', desc: 'Секретный агент под прикрытием. Его крупные запросы окутаны тайной государственной важности.' },
-  { icon: '🦸‍♂️', name: 'Супергерой', desc: 'Защитник города. Ему экстренно требуются редкие ресурсы для борьбы со вселенским злом.' },
-  { icon: '👽', name: 'Пришелец', desc: 'Гость с далеких звезд. Изучает земную культуру через самые неожиданные и огромные наборы предметов.' },
-  { icon: '🤖', name: 'Киборг X-100', desc: 'Робот из будущего. Его алгоритмы требуют четких поставок высокоуровневых вещей.' }
+  { icon: '🕵️‍♂️', name: 'Незнакомец', desc: 'Секретный агент под прикрытием. Его запросы всегда важны и окутаны тайной.' },
+  { icon: '🦸‍♂️', name: 'Супергерой', desc: 'Защитник города. Ему экстренно требуются ресурсы для борьбы со вселенским злом.' },
+  { icon: '👽', name: 'Пришелец', desc: 'Гость с далеких звезд. Изучает земную культуру через самые необычные запросы.' },
+  { icon: '🤖', name: 'Киборг X-100', desc: 'Робот из будущего. Его алгоритмы требуют четких поставок для выполнения миссии.' },
+  { icon: '👑', name: 'Королева', desc: 'Правительница далекого королевства. Ее указы требуют немедленного исполнения и лучших ресурсов.' },
+  { icon: '🐉', name: 'Дракон', desc: 'Древнее и мудрое существо. Его запросы редки, но всегда имеют огромное значение для всего мира.' }
 ];
 
 const CONFIG = {
@@ -218,7 +238,6 @@ const CONFIG = {
   ENERGY_REGEN_AMOUNT: 1,
   STORY_ORDER_ENERGY_REWARD: 3,
   ORDER_ENERGY_REWARD: 1,
-  ITEM_DELETE_COST: 15,
   OFFLINE_ENERGY_REGEN_RATE: 10000, 
 
   // Coins
@@ -245,7 +264,7 @@ const CONFIG = {
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.1.2',
+  GAME_VERSION: '1.1.3',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },
@@ -331,6 +350,12 @@ const DOMElements = {
     cancelBtn: document.querySelector('#m-danger-group .modal-btn-cancel'),
     infoBtn: document.getElementById('m-info-btn'),
   },
+  detailModal: {
+    overlay: document.getElementById('detail-modal'),
+    closeBtn: document.getElementById('d-m-close'),
+    title: document.getElementById('d-m-title'),
+    body: document.getElementById('d-m-body'),
+  },
   level: {
     bar: document.getElementById('level-bar'),
     text: document.getElementById('player-level'),
@@ -414,6 +439,7 @@ function addListeners() {
   DOMElements.infoModal.closeBtn.addEventListener('click', closeModal);
   DOMElements.infoModal.cancelBtn.addEventListener('click', closeModal);
   DOMElements.resetBtn.addEventListener('click', confirmReset);
+  DOMElements.detailModal.closeBtn.addEventListener('click', closeDetailModal);
 
   // Event delegation for dynamic order cards
   DOMElements.ordersList.addEventListener('click', (e) => {
@@ -950,6 +976,7 @@ function handleDragMove(clientX, clientY) {
 
   if (!isMoved && (Math.abs(clientX - startX) > CONFIG.DRAG_THRESHOLD || Math.abs(clientY - startY) > CONFIG.DRAG_THRESHOLD)) {
     gameState.dragState.isMoved = true;
+    document.body.classList.add('is-dragging');
     if (!gameState.dragState.element) {
       // Запрещаем перетаскивание заблокированных предметов
       if (gameState.gridData[startIndex] && gameState.gridData[startIndex].isBlocked) { cleanDragState(); return; }
@@ -1001,37 +1028,60 @@ function handleTouchEnd(e) {
 
 function endDrag(clientX, clientY) {
     const { element, isMoved, startIndex } = gameState.dragState;
-    if (element) element.remove();
 
+    // Если это был клик, а не перетаскивание
     if (!isMoved) {
         handleCellClick(startIndex);
         cleanDragState();
         return;
     }
 
+    // Если это было перетаскивание, но что-то пошло не так (нет "призрака")
+    if (!element) {
+        cleanDragState();
+        return;
+    }
+
     const elementUnder = document.elementFromPoint(clientX, clientY);
-    if (!elementUnder) {
-        cleanDragState();
+    const targetCell = elementUnder ? elementUnder.closest('.cell') : null;
+    const dragTargetIndex = targetCell ? parseInt(targetCell.dataset.index) : -1;
+
+    // Условие для невалидного броска (за пределы поля, на себя, на заблокированную ячейку)
+    const isInvalidDrop = !targetCell || startIndex === dragTargetIndex || gameState.lockedCells.includes(dragTargetIndex);
+
+    if (isInvalidDrop) {
+        // Анимируем "призрак" обратно на исходную позицию
+        const originalCell = DOMElements.grid.children[startIndex];
+        const rect = originalCell.getBoundingClientRect();
+        
+        element.classList.add('returning');
+        element.style.left = `${rect.left}px`;
+        element.style.top = `${rect.top}px`;
+        element.style.transform = 'scale(1)';
+
+        // После анимации очищаем состояние. Это перерисует поле и вернет видимость исходному предмету.
+        setTimeout(() => {
+            cleanDragState(true); // Перерисовать, чтобы восстановить opacity
+        }, 200); // Должно совпадать с длительностью transition в CSS
         return;
     }
 
-    const targetCell = elementUnder.closest('.cell');
-    if (!targetCell) {
-        cleanDragState();
-        return;
-    }
+    // Валидный бросок: анимируем "призрак" в целевую ячейку
+    const targetRect = targetCell.getBoundingClientRect();
+    element.classList.add('dropping');
+    element.style.left = `${targetRect.left}px`;
+    element.style.top = `${targetRect.top}px`;
+    element.style.transform = 'scale(1)';
 
-    const dragTargetIndex = parseInt(targetCell.dataset.index);
-    if (startIndex === dragTargetIndex || gameState.lockedCells.includes(dragTargetIndex)) {
-        cleanDragState();
-        return;
-    }
-
-    executeMergeOrSwap(startIndex, dragTargetIndex);
-    cleanDragState();
+    // После анимации выполняем логику игры и очищаем состояние
+    setTimeout(() => {
+        executeMergeOrSwap(startIndex, dragTargetIndex); // Эта функция вызывает updateUI() -> renderGrid()
+        cleanDragState(false); // Очищаем состояние перетаскивания без лишней перерисовки
+    }, 150); // Должно совпадать с длительностью transition в CSS
 }
 
-function cleanDragState() {
+function cleanDragState(shouldRender = true) {
+  document.body.classList.remove('is-dragging');
   gameState.dragState.isDragging = false;
   if (gameState.dragState.element) {
     gameState.dragState.element.remove();
@@ -1039,7 +1089,9 @@ function cleanDragState() {
   }
   gameState.dragState.startIndex = null;
   gameState.dragState.isMoved = false;
-  renderGrid(); // Принудительный рендер восстановит все opacity
+  if (shouldRender) {
+    renderGrid(); // Принудительный рендер восстановит все opacity
+  }
 }
 
 function handleCellClick(index) {
@@ -1064,7 +1116,7 @@ function handleCellClick(index) {
 function handleUnblockMerge(fromIdx, toIdx, source) {
     if (source.level >= CONFIG.MAX_ITEM_LEVEL) return false;
     gameState.gridData[fromIdx] = null;
-    gameState.gridData[toIdx] = { category: source.category, level: source.level + 1 };
+    gameState.gridData[toIdx] = { ...source, level: source.level + 1, isBlocked: false };
     triggerMergeEffects(toIdx, source.category);
     // showToast("Паутина снята!", "success");
     return true;
@@ -1137,7 +1189,6 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
             genCharges: 3,
         };
         triggerMergeEffects(toIdx, 'stationery');
-        // showToast(`🎁 Коробка улучшена! Теперь в ней 3 заряда.`, "success");
         return true;
     }
 
@@ -1163,45 +1214,71 @@ function handleSwap(fromIdx, toIdx, source, target) {
     return true;
 }
 
+const MERGE_HANDLERS = [
+    // Слияние с заблокированным предметом
+    {
+        canHandle: (s, t) => t?.isBlocked && !s.isGenerator && s.category === t.category && s.level === t.level,
+        execute: (from, to, src) => handleUnblockMerge(from, to, src)
+    },
+    // Улучшение генератора деталью (в обе стороны)
+    {
+        canHandle: (s, t) => s.isUpgradePart && t?.isGenerator && t.generatorKey !== 'bonus_chest',
+        execute: (from, to, src, trg) => handleGeneratorUpgrade(from, to, trg)
+    },
+    {
+        canHandle: (s, t) => t?.isUpgradePart && s.isGenerator && s.generatorKey !== 'bonus_chest',
+        execute: (from, to, src, trg) => handleGeneratorUpgrade(to, from, src)
+    },
+    // Улучшение предмета магическим инструментом (в обе стороны)
+    {
+        canHandle: (s, t) => s.isMagicTool && t && !t.isGenerator && !t.isBlocked && !t.isUpgradePart && !t.isMagicTool && !t.isGeneratorPart,
+        execute: (from, to, src, trg) => handleItemUpgradeWithTool(from, to, trg)
+    },
+    {
+        canHandle: (s, t) => t?.isMagicTool && s && !s.isGenerator && !s.isBlocked && !s.isUpgradePart && !s.isMagicTool && !s.isGeneratorPart,
+        execute: (from, to, src, trg) => handleItemUpgradeWithTool(to, from, src)
+    },
+    // Слияние двух деталей генератора
+    {
+        canHandle: (s, t) => t && s.isGeneratorPart && t.isGeneratorPart && s.generatorKey === t.generatorKey && s.level === t.level,
+        execute: (from, to, src) => handleGeneratorPartMerge(from, to, src)
+    },
+    // Слияние двух генераторов
+    {
+        canHandle: (s, t) => t && s.isGenerator && t.isGenerator && s.generatorKey === t.generatorKey && s.genLevel === t.genLevel,
+        execute: (from, to, src) => handleGeneratorMerge(from, to, src)
+    },
+    // Слияние двух обычных предметов
+    {
+        canHandle: (s, t) => t && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && s.category === t.category && s.level === t.level,
+        execute: (from, to, src) => handleItemMerge(from, to, src)
+    },
+];
+
 function executeMergeOrSwap(fromIdx, toIdx) {
     const source = gameState.gridData[fromIdx];
     const target = gameState.gridData[toIdx];
 
-    // Случай 1: Слияние с заблокированным предметом
-    if (target?.isBlocked && source.category === target.category && source.level === target.level && !source.isGenerator) {
-        handleUnblockMerge(fromIdx, toIdx, source);
-    }
-    // Случай 2: Улучшение генератора деталью
-    else if (source.isUpgradePart && target?.isGenerator && target.generatorKey !== 'bonus_chest') {
-        handleGeneratorUpgrade(fromIdx, toIdx, target);
-    } else if (target?.isUpgradePart && source.isGenerator && source.generatorKey !== 'bonus_chest') {
-        handleGeneratorUpgrade(toIdx, fromIdx, source);
-    }
-    // Случай 3: Улучшение предмета магическим инструментом
-    else if (source.isMagicTool && target && !target.isGenerator && !target.isBlocked && !target.isUpgradePart && !target.isMagicTool && !target.isGeneratorPart) {
-        handleItemUpgradeWithTool(fromIdx, toIdx, target);
-    } else if (target?.isMagicTool && source && !source.isGenerator && !source.isBlocked && !source.isUpgradePart && !source.isMagicTool && !source.isGeneratorPart) {
-        handleItemUpgradeWithTool(toIdx, fromIdx, source);
-    }
-    // Случай 4: Слияние двух обычных предметов
-    else if (target && !source.isGenerator && !target.isGenerator && !source.isUpgradePart && !target.isUpgradePart && !source.isGeneratorPart && !target.isGeneratorPart && source.category === target.category && source.level === target.level) {
-        handleItemMerge(fromIdx, toIdx, source);
-    }
-    // Случай 5: Слияние двух генераторов
-    else if (target && source.isGenerator && target.isGenerator && source.generatorKey === target.generatorKey && source.genLevel === target.genLevel) {
-        handleGeneratorMerge(fromIdx, toIdx, source);
-    }
-    // Новый случай: Слияние двух деталей генератора
-    else if (target && source.isGeneratorPart && target.isGeneratorPart && source.generatorKey === target.generatorKey && source.level === target.level) {
-        handleGeneratorPartMerge(fromIdx, toIdx, source);
-    }
-    // Случай 6: Перемещение предметов
-    else {
-        handleSwap(fromIdx, toIdx, source, target);
+    for (const handler of MERGE_HANDLERS) {
+        if (handler.canHandle(source, target)) {
+            handler.execute(fromIdx, toIdx, source, target);
+            saveGame();
+            updateUI();
+            return;
+        }
     }
 
+    // Если ни один обработчик слияния не сработал, выполняем перемещение
+    const wasSwapped = handleSwap(fromIdx, toIdx, source, target);
     saveGame();
     updateUI();
+
+    if (wasSwapped) {
+        setTimeout(() => {
+            animateCellPop(toIdx);
+            if (target) animateCellPop(fromIdx);
+        }, 10); // Небольшая задержка, чтобы DOM успел обновиться
+    }
 }
 
 function animateCellPop(index) {
@@ -1263,7 +1340,6 @@ function clearBlockedItemWithCoins(index) {
 
   gameState.coins -= CONFIG.BLOCKED_CLEAR_COST_COINS;
   delete gameState.gridData[index].isBlocked; // Просто убираем флаг блокировки
-
   closeModal();
   saveGame();
   updateUI();
@@ -1313,44 +1389,34 @@ function getBlockedItemModalOptions(item, index) {
 function getGeneratorModalOptions(item, index) {
     const genInfo = GENERATORS_DATA[item.generatorKey];
     const lvl = item.genLevel || 1;
-
+    
     if (item.generatorKey === 'bonus_chest') {
         return {
             icon: '🎁',
-            title: `Подарочная коробка [${CONFIG.ROMAN_NUMERALS[lvl]}]`,
+            title: `Подарочная коробка ${CONFIG.ROMAN_NUMERALS[lvl]}`,
             subtitle: 'Особый генератор',
             desc: `Этот генератор содержит редкие предметы. У него осталось ${item.genCharges} заряд(ов). Когда заряды закончатся, он исчезнет. Перетащите на него такую же коробку, чтобы улучшить и получить больше предметов.`,
-            isBlocking: false
+            isBlocking: false,
         };
     }
 
     const config = GEN_ENERGY_CONFIG[lvl];
-    let desc = `${genInfo.desc} `;
-    if (genInfo.isHybrid) {
-        desc += `Производит предметы из категорий: ${genInfo.categories.map(c => CATEGORIES_CONFIG[c].name).join(' и ')}. `;
-    }
-    const cdSec = config.cooldown / 1000;
-    const levelDescriptions = {
-        1: `Базовый уровень. Создаёт предметы 1-го уровня. Восстанавливает 1 заряд каждые ${cdSec} сек.`,
-        2: `Продвинутый ранг. Шансы получения: 80% (ур. 1), 20% (ур. 2). Заряд каждые ${cdSec} сек.`,
-        3: `Профессиональный ранг. Шансы получения: 65% (ур. 1), 25% (ур. 2), 10% (ур. 3). Заряд каждые ${cdSec} сек.`,
-        4: `Элитный ранг. Шансы получения: 50% (ур. 1), 30% (ур. 2), 15% (ур. 3), 5% (ур. 4). Заряд каждые ${cdSec} сек.`,
-        5: `Легендарный ранг! Шансы: 30% (ур. 1), 30% (ур. 2), 25% (ур. 3), 10% (ур. 4), 5% (ур. 5). Самая быстрая перезарядка: ${cdSec} сек.`
-    };
-    desc += levelDescriptions[lvl];
+    const desc = `Создает предметы из своей категории.`;
 
     const modalOptions = {
         icon: `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`,
-        title: `${genInfo.name} [${CONFIG.ROMAN_NUMERALS[lvl]}]`,
+        title: `${genInfo.name} ${CONFIG.ROMAN_NUMERALS[lvl]}`,
         subtitle: `Генератор • Уровень ${CONFIG.ROMAN_NUMERALS[lvl]}`,
         desc: desc,
-        infoButton: { onClick: () => showCategoryProgressionModal(genInfo.categories) }
+        infoButton: {
+            onClick: () => showGeneratorDetailModal(item)
+        }
     };
 
     if (item.genEnergy < config.max) {
         modalOptions.actionButton = {
             text: `Восстановить (-${CONFIG.GENERATOR_RECHARGE_COST}🪙)`,
-            onClick: () => rechargeGeneratorWithCoins(index)
+            onClick: () => rechargeGeneratorWithCoins(index),
         };
     }
 
@@ -1387,15 +1453,19 @@ function getGeneratorPartModalOptions(item, index) {
             <span class="part-bg-icon">${genInfo.icon}</span>
             <span class="part-fg-icon">${genInfo.partIcon}</span>
         </div>`;
+    const sellPrice = (item.level || 1) * 2;
 
     return {
         icon: iconHTML,
         title: `Деталь для "${genInfo.name}"`,
         subtitle: `Деталь для сборки • Уровень ${item.level}`,
-        desc: 'Объедините две одинаковые детали, чтобы получить деталь следующего уровня. Две детали 3-го уровня создают полноценный генератор.',
+        desc: 'Часть будущего генератора. Объединяйте с такими же деталями. Ненужные детали можно продать.',
         dangerButtons: {
-            confirmButtonText: `Удалить (-${CONFIG.ITEM_DELETE_COST}⚡)`,
+            confirmButtonText: `Продать (+${sellPrice}🪙)`,
             onConfirm: () => deleteItem(index)
+        },
+        infoButton: {
+            onClick: () => showGeneratorPartDetailModal(item)
         },
         isBlocking: false
     };
@@ -1403,55 +1473,66 @@ function getGeneratorPartModalOptions(item, index) {
 
 function getRegularItemModalOptions(item, index) {
     const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
+    const sellPrice = (item.level || 1) * 2;
     return {
         icon: info.icon,
         title: info.name,
         subtitle: `${CATEGORIES_CONFIG[item.category].name} • Уровень ${item.level}`,
-        desc: info.desc,
+        desc: 'Предмет для выполнения заказов и слияния. Если он не нужен, его можно продать.',
         dangerButtons: {
-            confirmButtonText: `Удалить (-${CONFIG.ITEM_DELETE_COST}⚡)`,
+            confirmButtonText: `Продать (+${sellPrice}🪙)`,
             onConfirm: () => deleteItem(index)
         },
         infoButton: {
-            onClick: () => showCategoryProgressionModal(item.category)
+            onClick: () => showItemDetailModal(item)
         },
         isBlocking: false
     };
 }
 
+const MODAL_OPTIONS_GETTERS = {
+    blocked: getBlockedItemModalOptions,
+    generator: getGeneratorModalOptions,
+    generatorPart: getGeneratorPartModalOptions,
+    booster: getBoosterModalOptions,
+    regular: getRegularItemModalOptions,
+};
+
+function getItemType(item) {
+    if (item.isBlocked) return 'blocked';
+    if (item.isGenerator) return 'generator';
+    if (item.isGeneratorPart) return 'generatorPart';
+    if (item.isUpgradePart || item.isMagicTool) return 'booster';
+    return 'regular';
+}
+
 function showItemInfoModal(item, index = -1) {
-    let modalOptions;
-
-    if (item.isBlocked) {
-        modalOptions = getBlockedItemModalOptions(item, index);
-    } else if (item.isGenerator) {
-        modalOptions = getGeneratorModalOptions(item, index);
-    } else if (item.isGeneratorPart) {
-        modalOptions = getGeneratorPartModalOptions(item, index);
-    } else if (item.isUpgradePart || item.isMagicTool) {
-        modalOptions = getBoosterModalOptions(item);
-    } else {
-        modalOptions = getRegularItemModalOptions(item, index);
+    const itemType = getItemType(item);
+    const getOptions = MODAL_OPTIONS_GETTERS[itemType];
+    if (getOptions) {
+        const modalOptions = getOptions(item, index);
+        showModal(modalOptions);
     }
-
-    showModal(modalOptions);
 }
 
 function deleteItem(index) {
-  if (index === -1 || !gameState.gridData[index] || gameState.gridData[index].isGenerator || gameState.gridData[index].isBlocked) return;
-
-  if (gameState.energy < CONFIG.ITEM_DELETE_COST) {
-    showToast(`⚡ Недостаточно энергии для удаления (нужно ${CONFIG.ITEM_DELETE_COST})!`, "error");
+  const item = gameState.gridData[index];
+  // Проверяем, что предмет существует и его можно продать (не генератор, не заблокирован)
+  if (index === -1 || !item || item.isGenerator || item.isBlocked || item.isUpgradePart || item.isMagicTool) {
     closeModal();
     return;
   }
 
-  gameState.energy -= CONFIG.ITEM_DELETE_COST;
+  // Цена продажи зависит от уровня предмета. Для деталей генератора тоже есть уровень.
+  const sellPrice = (item.level || 1) * 2;
+
+  gameState.coins += sellPrice;
   gameState.gridData[index] = null;
+
   closeModal();
   saveGame();
   updateUI();
-  showToast("Предмет удален", "success");
+  showToast(`Предмет продан за ${sellPrice}🪙`, "success");
 }
 
 function showCharacterModal(order) {
@@ -1466,45 +1547,179 @@ function showCharacterModal(order) {
 function showCategoryProgressionModal(categoryKeyOrKeys) {
   const categoryKeys = Array.isArray(categoryKeyOrKeys) ? categoryKeyOrKeys : [categoryKeyOrKeys];
   if (categoryKeys.length === 0) return;
-
-  let progressionHTML = '';
-  let modalTitle = 'Цепочка: ';
-  let genInfo;
+  const modal = DOMElements.detailModal; // Используем большой модал
+  let contentHTML = '';
+  let modalTitle = 'Цепочка эволюции';
 
   categoryKeys.forEach((key, index) => {
     const category = CATEGORIES_CONFIG[key];
     if (!category) return;
 
     if (index > 0) {
-      progressionHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
-      modalTitle += ` & ${category.name}`;
-    } else {
-      modalTitle += category.name;
-      genInfo = GENERATORS_DATA[category.generatorKey]; // Используем иконку первого генератора
+      contentHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
     }
+    
+    contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
 
-    progressionHTML += `<div class="progression-container">`;
+    contentHTML += `<div class="progression-container">`;
     category.items.forEach((item, itemIndex) => {
-      progressionHTML += `
-        <div class="progression-item-square">
+      contentHTML += `
+        <div class="progression-item-square" title="${item.name}">
           <div class="progression-item-icon">${item.icon}</div>
           <div class="progression-item-level">${item.level}</div>
         </div>
       `;
       if (itemIndex < category.items.length - 1) {
-        progressionHTML += '<div class="progression-arrow-h">→</div>';
+        contentHTML += '<div class="progression-arrow-h">→</div>';
       }
     });
-    progressionHTML += '</div>';
+    contentHTML += '</div>';
   });
 
-  showModal({
-    icon: `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`,
-    title: modalTitle,
-    subtitle: 'Эволюция предметов',
-    desc: progressionHTML
-  });
+  modal.title.innerText = modalTitle;
+  modal.body.innerHTML = contentHTML;
+  modal.overlay.classList.add('active');
 }
+
+function showGeneratorDetailModal(item) {
+  const modal = DOMElements.detailModal;
+  const genInfo = GENERATORS_DATA[item.generatorKey];
+  const lvl = item.genLevel || 1;
+
+  modal.title.innerText = `${genInfo.name} ${CONFIG.ROMAN_NUMERALS[lvl]}`;
+
+  // --- Генерация контента ---
+  let contentHTML = '';
+
+  // 1. Описание генератора
+  let desc = `<p class="modal-desc">${genInfo.desc} `;
+  if (genInfo.isHybrid) {
+      desc += `Производит предметы из категорий: ${genInfo.categories.map(c => CATEGORIES_CONFIG[c].name).join(' и ')}. `;
+  }
+  const cdSec = GEN_ENERGY_CONFIG[lvl].cooldown / 1000;
+  const levelDescriptions = {
+      1: `Базовый уровень. Создаёт предметы 1-го уровня. Восстанавливает 1 заряд каждые ${cdSec} сек.`,
+      2: `Продвинутый ранг. Шансы получения: 80% (ур. 1), 20% (ур. 2). Заряд каждые ${cdSec} сек.`,
+      3: `Профессиональный ранг. Шансы получения: 65% (ур. 1), 25% (ур. 2), 10% (ур. 3). Заряд каждые ${cdSec} сек.`,
+      4: `Элитный ранг. Шансы получения: 50% (ур. 1), 30% (ур. 2), 15% (ур. 3), 5% (ур. 4). Заряд каждые ${cdSec} сек.`,
+      5: `Легендарный ранг! Шансы: 30% (ур. 1), 30% (ур. 2), 25% (ур. 3), 10% (ур. 4), 5% (ур. 5). Самая быстрая перезарядка: ${cdSec} сек.`
+  };
+  desc += (levelDescriptions[lvl] || '') + '</p>';
+  contentHTML += desc;
+
+  // 2. Цепочка(и) предметов
+  const categoryKeys = genInfo.categories;
+  categoryKeys.forEach((key, index) => {
+      const category = CATEGORIES_CONFIG[key];
+      if (!category) return;
+
+      if (index > 0) {
+          contentHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
+      }
+      
+      contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
+
+      contentHTML += `<div class="progression-container">`;
+      category.items.forEach((item, itemIndex) => {
+          contentHTML += `
+              <div class="progression-item-square" title="${item.name}">
+                  <div class="progression-item-icon">${item.icon}</div>
+                  <div class="progression-item-level">${item.level}</div>
+              </div>
+          `;
+          if (itemIndex < category.items.length - 1) {
+              contentHTML += '<div class="progression-arrow-h">→</div>';
+          }
+      });
+      contentHTML += '</div>';
+  });
+
+  modal.body.innerHTML = contentHTML;
+  modal.overlay.classList.add('active');
+}
+
+function showItemDetailModal(item) {
+  const modal = DOMElements.detailModal;
+  const category = CATEGORIES_CONFIG[item.category];
+  const itemInfo = category.items[item.level - 1];
+
+  modal.title.innerText = itemInfo.name;
+
+  let contentHTML = '';
+
+  // 1. Описание самого предмета
+  contentHTML += `<p class="modal-desc">${itemInfo.desc}</p>`;
+
+  // 2. Цепочка эволюции
+  contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
+
+  contentHTML += `<div class="progression-container">`;
+  category.items.forEach((progItem, itemIndex) => {
+      contentHTML += `
+          <div class="progression-item-square" title="${progItem.name}">
+              <div class="progression-item-icon">${progItem.icon}</div>
+              <div class="progression-item-level">${progItem.level}</div>
+          </div>
+      `;
+      if (itemIndex < category.items.length - 1) {
+          contentHTML += '<div class="progression-arrow-h">→</div>';
+      }
+  });
+  contentHTML += '</div>';
+
+  modal.body.innerHTML = contentHTML;
+  modal.overlay.classList.add('active');
+}
+
+function showGeneratorPartDetailModal(item) {
+    const modal = DOMElements.detailModal;
+    const genInfo = GENERATORS_DATA[item.generatorKey];
+
+    modal.title.innerText = `Сборка: ${genInfo.name}`;
+
+    let contentHTML = '';
+    contentHTML += `<p class="modal-desc">Объединяйте детали, чтобы собрать полноценный генератор. Две детали 3-го уровня создают генератор 1-го уровня.</p>`;
+    contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Цепочка сборки</h4>`;
+    contentHTML += `<div class="progression-container">`;
+
+    const partHTML = (level) => `
+        <div class="progression-item-square" title="Деталь, Ур. ${level}">
+            <div class="progression-item-icon">
+                <div class="generator-part-icon-container">
+                    <span class="part-bg-box">📦</span>
+                    <span class="part-bg-icon">${genInfo.icon}</span>
+                    <span class="part-fg-icon">${genInfo.partIcon}</span>
+                </div>
+            </div>
+            <div class="progression-item-level">${level}</div>
+        </div>
+    `;
+
+    const generatorHTML = `
+        <div class="progression-item-square" title="${genInfo.name}, Ур. I">
+            <div class="progression-item-icon">
+                 <div class="generator-icon-container">
+                    <span class="generator-box-bg">📦</span>
+                    <span class="generator-item-fg">${genInfo.icon}</span>
+                </div>
+            </div>
+            <div class="progression-item-level">I</div>
+        </div>
+    `;
+
+    contentHTML += partHTML(1);
+    contentHTML += '<div class="progression-arrow-h">→</div>';
+    contentHTML += partHTML(2);
+    contentHTML += '<div class="progression-arrow-h">→</div>';
+    contentHTML += partHTML(3);
+    contentHTML += '<div class="progression-arrow-h">→</div>';
+    contentHTML += generatorHTML;
+    contentHTML += '</div>';
+
+    modal.body.innerHTML = contentHTML;
+    modal.overlay.classList.add('active');
+}
+
 
 /**
  * Shows a modal with the given options.
@@ -1523,7 +1738,6 @@ function showCategoryProgressionModal(categoryKeyOrKeys) {
  * @param {boolean} [options.isBlocking=false] - If true, modal is blocking.
  */
 function showModal(options) {
-  document.body.classList.add('modal-is-active');
   const { icon, title, subtitle, desc, actionButton, dangerButtons, infoButton, isBlocking } = options;
   const modal = DOMElements.infoModal;
 
@@ -1555,8 +1769,16 @@ function showModal(options) {
 }
 
 function closeModal() {
-  document.body.classList.remove('modal-is-active');
   DOMElements.infoModal.overlay.className = 'modal-overlay';
+}
+
+function closeDetailModal() {
+  const modal = DOMElements.detailModal;
+  modal.overlay.classList.remove('active');
+  // Очищаем контент после скрытия, чтобы не было "мелькания" при следующем открытии
+  setTimeout(() => {
+    modal.body.innerHTML = '';
+  }, 300); // Должно совпадать с transition-duration
 }
 
 function findClosestEmptyCell(fromIndex, emptyCells) {
@@ -1585,7 +1807,6 @@ function findClosestEmptyCell(fromIndex, emptyCells) {
 
 function triggerSpecialGenerator(generator, fromIndex) {
     if (generator.genCharges <= 0) {
-        // showToast("🎁 Коробка пуста!", "error");
         return;
     }
 
@@ -1608,7 +1829,6 @@ function triggerSpecialGenerator(generator, fromIndex) {
       gameState.lockedCells = gameState.lockedCells.filter(idx => idx !== targetCellIndex);
       if (generator.genCharges <= 0) {
             gameState.gridData[fromIndex] = null;
-            // showToast("🎁 Коробка исчезла!", "success");
         }
         saveGame();
         updateUI();
@@ -1950,7 +2170,14 @@ function generateOrder() {
     return;
   }
 
-  const char = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+  // --- Новая логика выбора персонажа ---
+  // 1. Получаем имена персонажей, у которых уже есть заказы
+  const activeCharacterNames = gameState.orders.map(o => o.character.name);
+  // 2. Фильтруем список доступных персонажей, исключая уже активных
+  const availableCharacters = CHARACTERS.filter(c => !activeCharacterNames.includes(c.name));
+  // 3. Выбираем случайного персонажа из доступных. Если все заняты, выбираем из полного списка.
+  const characterPool = availableCharacters.length > 0 ? availableCharacters : CHARACTERS;
+  const char = characterPool[Math.floor(Math.random() * characterPool.length)];
   let baseCategory;
   if (gameState.newlyUnlockedCategories && gameState.newlyUnlockedCategories.length > 0) {
     baseCategory = gameState.newlyUnlockedCategories.shift();
@@ -1992,7 +2219,18 @@ function generateOrder() {
 }
 
 function generateStoryOrder(step, fixedChar = null) {
-  const char = fixedChar || STORY_CHARACTERS[Math.floor(Math.random() * STORY_CHARACTERS.length)];
+  let char;
+  if (fixedChar) {
+    char = fixedChar;
+  } else {
+    // --- Новая логика выбора персонажа ---
+    const activeCharacterNames = gameState.orders.map(o => o.character.name);
+    const availableCharacters = STORY_CHARACTERS.filter(c => !activeCharacterNames.includes(c.name));
+    const characterPool = availableCharacters.length > 0 ? availableCharacters : STORY_CHARACTERS;
+    char = characterPool[Math.floor(Math.random() * characterPool.length)];
+    // --- Конец новой логики ---
+  }
+
   const requestedItems = [];
 
   let targetLevel = Math.min(CONFIG.MAX_ITEM_LEVEL, step + 2);
@@ -2021,54 +2259,56 @@ function generateStoryOrder(step, fixedChar = null) {
 }
 
 function checkOrdersAvailability() {
-  // 1. Собираем все уникальные предметы, требуемые во всех заказах
-  const allRequiredItems = new Map();
-  gameState.orders.forEach(order => {
-    order.items.forEach(reqItem => {
-      const key = `${reqItem.category}-${reqItem.level}`;
-      if (!allRequiredItems.has(key)) {
-        allRequiredItems.set(key, reqItem);
-      }
-    });
-  });
+  // 1. Сброс выделения и сбор всех требуемых предметов в Set для быстрой проверки
+  const requiredItemsSet = new Set();
+  gameState.orders.forEach(order => order.items.forEach(req => requiredItemsSet.add(`${req.category}-${req.level}`)));
 
-  // 2. Сбрасываем предыдущие выделения и помечаем нужные предметы
-  gameState.gridData.forEach(item => {
-    if (item) {
-      const key = item.isGeneratorPart ? null : `${item.category}-${item.level}`;
-      item.isAllocatedToOrder = allRequiredItems.has(key) && !item.isBlocked;
+  // 2. Создаем частотную карту доступных предметов на поле и одновременно подсвечиваем их
+  const availableItemsMap = new Map();
+  gameState.gridData.forEach((item, idx) => {
+    if (!item) return;
+
+    item.isAllocatedToOrder = false; // Сброс
+
+    const isAvailableForOrder = item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !item.isGeneratorPart && !gameState.lockedCells.includes(idx);
+    if (!isAvailableForOrder) return;
+
+    const key = `${item.category}-${item.level}`;
+
+    // Подсветка, если предмет нужен для любого из заказов
+    if (requiredItemsSet.has(key)) {
+      item.isAllocatedToOrder = true;
     }
+
+    // Добавление в карту доступных предметов
+    if (!availableItemsMap.has(key)) {
+      availableItemsMap.set(key, []);
+    }
+    availableItemsMap.get(key).push(idx);
   });
 
-  // 3. Создаем полный список доступных для заказов предметов на поле
-  const allAvailableItemIndices = gameState.gridData.map((item, idx) =>
-    (item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !gameState.lockedCells.includes(idx)) ? idx : -1
-  ).filter(idx => idx !== -1 && gameState.gridData[idx] && !gameState.gridData[idx].isGeneratorPart);
-
-  let allAllocatedForAnyOrder = [];
-
-  // 4. Проверяем, какие заказы можно выполнить ПОЛНОСТЬЮ, и помечаем их предметы галочками
+  // 3. Проверяем каждый заказ на выполнимость
   gameState.orders.forEach((order) => {
-    let tempAvailableIndices = [...allAvailableItemIndices]; // Используем копию для каждого заказа
-    let matchCount = 0;
-    let allocatedForThisOrder = [];
+    // Для каждого заказа создаем временную копию карты доступных предметов
+    const tempAvailableMap = new Map(Array.from(availableItemsMap.entries()).map(([k, v]) => [k, [...v]]));
+    let canComplete = true;
+    const allocatedForThisOrder = [];
 
-    order.items.forEach(reqItem => {
-      const foundItemGridIndex = tempAvailableIndices.find(gridIdx => {
-        const item = gameState.gridData[gridIdx];
-        return item && item.category === reqItem.category && item.level === reqItem.level;
-      });
+    for (const reqItem of order.items) {
+      const key = `${reqItem.category}-${reqItem.level}`;
+      const availableIndices = tempAvailableMap.get(key);
 
-      if (foundItemGridIndex !== undefined) {
-        matchCount++;
-        allocatedForThisOrder.push(foundItemGridIndex);
-        tempAvailableIndices.splice(tempAvailableIndices.indexOf(foundItemGridIndex), 1);
+      if (availableIndices && availableIndices.length > 0) {
+        const gridIndex = availableIndices.shift(); // "Берем" один предмет с поля
+        allocatedForThisOrder.push(gridIndex);
+      } else {
+        canComplete = false; // Если нужного предмета нет, заказ невыполним
+        break;
       }
-    });
+    }
 
-    order.canComplete = (matchCount === order.items.length);
+    order.canComplete = canComplete;
     order.allocatedIndices = order.canComplete ? allocatedForThisOrder : [];
-    if (order.canComplete) allAllocatedForAnyOrder.push(...order.allocatedIndices);
   });
 
   // Проверяем, появился ли новый готовый к сдаче заказ
