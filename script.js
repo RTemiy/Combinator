@@ -5,7 +5,7 @@ const GENERATORS_DATA = {
   'accessories': { icon: '💎', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'], partIcon: '✨' },
   'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'], partIcon: '🎛' },
   'alcohol': { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.', categories: ['alcohol'], partIcon: '🧊' },
-  'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где из ниток и ткани рождаются стильные наряды.', categories: ['atelier'], partIcon: '🎗️' },
+  'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где рождаются стильные наряды и эксклюзивная обувь.', categories: ['atelier', 'footwear'], isHybrid: true, partIcon: '🧶' },
   'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true, partIcon: '💡' },
   'transport': { icon: '🏠', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'], partIcon: '🛞' },
   'food_court': { icon: '🥙', name: 'Ресторанный дворик', desc: 'Место, где можно найти еду на любой вкус.', categories: ['fastfood', 'asian_food'], isHybrid: true, partIcon: '🍳' },
@@ -139,6 +139,20 @@ const CATEGORIES_CONFIG = {
       { level: 7, icon: '🧥', name: 'Дизайнерское пальто', desc: 'Вершина портновского искусства и стиля.' }
     ]
   },
+  footwear: {
+    name: 'Обувь',
+    color: '#D2691E',
+    generatorKey: 'atelier',
+    items: [
+      { level: 1, icon: '🩴', name: 'Пляжные шлепанцы', desc: 'Легкая обувь для прогулок по песку.' },
+      { level: 2, icon: '🥿', name: 'Балетки', desc: 'Удобные и элегантные туфли на плоской подошве.' },
+      { level: 3, icon: '👡', name: 'Босоножки', desc: 'Открытая летняя обувь на ремешках.' },
+      { level: 4, icon: '👠', name: 'Туфли на каблуке', desc: 'Изящная женская обувь, добавляющая роста и уверенности.' },
+      { level: 5, icon: '👞', name: 'Кожаные туфли', desc: 'Классическая мужская обувь для официальных мероприятий.' },
+      { level: 6, icon: '🥾', name: 'Туристические ботинки', desc: 'Прочная и надежная обувь для походов и путешествий.' },
+      { level: 7, icon: '👢', name: 'Дизайнерские сапоги', desc: 'Вершина обувного мастерства, сочетающая стиль и комфорт.' }
+    ]
+  },
   tools: {
     name: 'Инструменты',
     color: '#a9a9a9',
@@ -242,9 +256,10 @@ const CONFIG = {
 
   // Coinss
   COIN_MULTIPLIER: 5,
-  COINS_PER_ORDER_CANCEL: 50,
-  BLOCKED_CLEAR_COST_COINS: 25,
-  GENERATOR_RECHARGE_COST: 75,
+  COINS_PER_ORDER_CANCEL: 75,
+  BLOCKED_CLEAR_COST_COINS: 50,
+  GENERATOR_RECHARGE_COST: 100,
+  ENERGY_RECHARGE_COST_COINS: 250,
 
   // Orders
   MAX_ORDERS: 3,
@@ -264,7 +279,7 @@ const CONFIG = {
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.1.3',
+  GAME_VERSION: '1.1.4',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },
@@ -353,6 +368,7 @@ const DOMElements = {
   detailModal: {
     overlay: document.getElementById('detail-modal'),
     closeBtn: document.getElementById('d-m-close'),
+    icon: document.getElementById('d-m-icon'),
     title: document.getElementById('d-m-title'),
     body: document.getElementById('d-m-body'),
   },
@@ -410,12 +426,22 @@ function addListeners() {
   });
 
   DOMElements.energy.container.addEventListener('click', () => {
-    showModal({
+    const modalOptions = {
       icon: '⚡️',
       title: 'Энергия',
       subtitle: 'Вечный движитель',
       desc: `За каждое использование генератора тратится 1 ед. энергии. Каждые ${CONFIG.ENERGY_REGEN_INTERVAL / 1000} сек. восстанавливается ${CONFIG.ENERGY_REGEN_AMOUNT} ед. энергии. За каждый выполненный сюжетный заказ вы получаете ${CONFIG.STORY_ORDER_ENERGY_REWARD} ед. энергии.`
-    })
+    };
+
+    // Добавляем кнопку восстановления, только если энергия не полная
+    if (gameState.energy < CONFIG.MAX_ENERGY) {
+        modalOptions.actionButton = {
+            text: `Восстановить энергию (-${CONFIG.ENERGY_RECHARGE_COST_COINS}🪙)`,
+            onClick: rechargePlayerEnergyWithCoins
+        };
+    }
+
+    showModal(modalOptions);
   })
 
   DOMElements.level.container.addEventListener('click', () => {
@@ -460,8 +486,9 @@ function addListeners() {
       showCharacterById(orderId);
     } else if (orderItemTarget) {
       const category = orderItemTarget.dataset.category;
+      const icon = orderItemTarget.querySelector('.order-item-icon')?.innerHTML;
       if (category) {
-        showCategoryProgressionModal(category);
+        showCategoryProgressionModal(category, icon);
       }
     }
   });
@@ -1371,6 +1398,29 @@ function rechargeGeneratorWithCoins(index) {
   updateUI();
   showToast("📦 Энергия генератора полностью восстановлена!", "success");
 }
+
+function rechargePlayerEnergyWithCoins() {
+  if (gameState.coins < CONFIG.ENERGY_RECHARGE_COST_COINS) {
+    showToast(`🪙 Недостаточно монет (нужно ${CONFIG.ENERGY_RECHARGE_COST_COINS})!`, "error");
+    closeModal();
+    return;
+  }
+
+  if (gameState.energy >= CONFIG.MAX_ENERGY) {
+    showToast("⚡ Ваша энергия уже полная!", "error");
+    closeModal();
+    return;
+  }
+
+  gameState.coins -= CONFIG.ENERGY_RECHARGE_COST_COINS;
+  gameState.energy = CONFIG.MAX_ENERGY;
+
+  closeModal();
+  saveGame();
+  updateUI();
+  showToast("⚡ Энергия полностью восстановлена!", "success");
+}
+
 function getBlockedItemModalOptions(item, index) {
     const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
     return {
@@ -1544,12 +1594,14 @@ function showCharacterModal(order) {
   });
 }
 
-function showCategoryProgressionModal(categoryKeyOrKeys) {
+function showCategoryProgressionModal(categoryKeyOrKeys, icon = '⛓️') {
   const categoryKeys = Array.isArray(categoryKeyOrKeys) ? categoryKeyOrKeys : [categoryKeyOrKeys];
   if (categoryKeys.length === 0) return;
   const modal = DOMElements.detailModal; // Используем большой модал
   let contentHTML = '';
   let modalTitle = 'Цепочка эволюции';
+
+  modal.icon.innerHTML = icon;
 
   categoryKeys.forEach((key, index) => {
     const category = CATEGORIES_CONFIG[key];
@@ -1586,6 +1638,7 @@ function showGeneratorDetailModal(item) {
   const genInfo = GENERATORS_DATA[item.generatorKey];
   const lvl = item.genLevel || 1;
 
+  modal.icon.innerHTML = `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`;
   modal.title.innerText = `${genInfo.name} ${CONFIG.ROMAN_NUMERALS[lvl]}`;
 
   // --- Генерация контента ---
@@ -1643,6 +1696,7 @@ function showItemDetailModal(item) {
   const category = CATEGORIES_CONFIG[item.category];
   const itemInfo = category.items[item.level - 1];
 
+  modal.icon.innerHTML = itemInfo.icon;
   modal.title.innerText = itemInfo.name;
 
   let contentHTML = '';
@@ -1675,6 +1729,12 @@ function showGeneratorPartDetailModal(item) {
     const modal = DOMElements.detailModal;
     const genInfo = GENERATORS_DATA[item.generatorKey];
 
+    modal.icon.innerHTML = `
+        <div class="generator-part-icon-container">
+            <span class="part-bg-box">📦</span>
+            <span class="part-bg-icon">${genInfo.icon}</span>
+            <span class="part-fg-icon">${genInfo.partIcon}</span>
+        </div>`;
     modal.title.innerText = `Сборка: ${genInfo.name}`;
 
     let contentHTML = '';

@@ -796,14 +796,12 @@ body.is-dragging, body.is-dragging * {
   font-size: 0.9rem;
   opacity: 0.7;
   transition: opacity 0.2s;
-  background: #3a3a3a;
   border-radius: 50%;
   width: 20px;
   height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 .modal-info-btn:hover { opacity: 1; }
 
@@ -951,10 +949,30 @@ body.is-dragging, body.is-dragging * {
   flex-shrink: 0;
 }
 
+.detail-modal-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden; /* Чтобы длинный заголовок не выталкивал кнопку закрытия */
+  flex: 1; /* Занимаем доступное пространство */
+}
+
+.detail-modal-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0; /* Иконка не сжимается */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+}
+
 .detail-modal-title {
   font-size: 1.1rem;
   font-weight: bold;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .detail-modal-close {
