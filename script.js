@@ -1614,7 +1614,7 @@ function getGeneratorPartModalOptions(item, index) {
             <span class="part-bg-icon">${genInfo.icon}</span>
             <span class="part-fg-icon">${genInfo.partIcon}</span>
         </div>`;
-  const sellPrice = (item.level || 1) * 2;
+  const sellPrice = (item.level || 1) * 3;
 
   return {
     icon: iconHTML,
