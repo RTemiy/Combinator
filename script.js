@@ -489,7 +489,7 @@ function addListeners() {
       icon: '🪙',
       title: 'Монеты',
       subtitle: 'Игровая валюта',
-      desc: `Монеты зарабатываются за выполнение заказов. Их можно потратить на пропуск нежелательных заказов, заплатив ${CONFIG.COINS_PER_ORDER_CANCEL} монет.`
+      desc: `Монеты зарабатываются за выполнение заказов.`
     })
   })
 
@@ -1279,16 +1279,16 @@ function handleItemMerge(fromIdx, toIdx, source) {
     gameState.gridData[fromIdx] = null;
     gameState.gridData[toIdx] = {
       isItemGenerator: true,
-      category: source.category, // Исходная категория ('flowers')
-      level: nextLevel, // Уровень предмета (7)
-      generatedCategory: genInfo.category, // Новая категория, которую он производит ('fruits')
+      category: source.category,
+      level: nextLevel,
+      generatedCategory: genInfo.category,
       charges: genInfo.charges,
     };
 
     // Разблокируем новую категорию для заказов, если это впервые
     if (!gameState.unlockedItemGenCategories.includes(genInfo.category)) {
       gameState.unlockedItemGenCategories.push(genInfo.category);
-      showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
+      // showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
     }
 
   } else {
@@ -1620,7 +1620,7 @@ function getGeneratorPartModalOptions(item, index) {
     icon: iconHTML,
     title: `Деталь для "${genInfo.name}"`,
     subtitle: `Деталь для сборки • Уровень ${item.level}`,
-    desc: 'Часть будущего генератора. Объединяйте с такими же деталями. Ненужные детали можно продать.',
+    desc: 'Часть будущего генератора. Объединяйте с такими же деталями. ',
     dangerButtons: {
       confirmButtonText: `Продать (+${sellPrice}🪙)`,
       onConfirm: () => deleteItem(index)
@@ -1639,7 +1639,7 @@ function getRegularItemModalOptions(item, index) {
     icon: info.icon,
     title: info.name,
     subtitle: `${CATEGORIES_CONFIG[item.category].name} • Уровень ${item.level}`,
-    desc: 'Предмет для выполнения заказов и слияния. Если он не нужен, его можно продать.',
+    desc: 'Предмет для выполнения заказов и слияния.',
     dangerButtons: {
       confirmButtonText: `Продать (+${sellPrice}🪙)`,
       onConfirm: () => deleteItem(index)
@@ -1687,7 +1687,7 @@ function deleteItem(index) {
   }
 
   // Цена продажи зависит от уровня предмета. Для деталей генератора тоже есть уровень.
-  const sellPrice = (item.level || 1) * 2;
+  const sellPrice = (item.level || 1) * 3;
 
   gameState.coins += sellPrice;
   gameState.gridData[index] = null;
@@ -1695,7 +1695,6 @@ function deleteItem(index) {
   closeModal();
   saveGame();
   updateUI();
-  showToast(`Предмет продан за ${sellPrice}🪙`, "success");
 }
 
 function showCharacterModal(order) {
