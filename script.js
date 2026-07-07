@@ -302,8 +302,8 @@ const CONFIG = {
   ANIMATION: {
     FLY_DURATION: 400,
     FADE_DURATION: 400,
-    PARTICLE_DURATION: 500,
-    PARTICLE_COUNT: 12,
+    PARTICLE_DURATION: 500, // Уменьшаем количество частиц для повышения производительности
+    PARTICLE_COUNT: 6,
   },
   DRAG_THRESHOLD: 5,
 
@@ -365,6 +365,9 @@ const gameState = {
     isDragging: false,
     startX: 0,
     startY: 0,
+    // --- Новые свойства для оптимизации перетаскивания ---
+    isUpdateScheduled: false,
+    lastX: 0, lastY: 0,
   },
   lastClick: {
     index: null,
@@ -1089,11 +1092,17 @@ function startDrag(e, index) {
   gameState.dragState.isMoved = false;
   gameState.dragState.startX = clientX;
   gameState.dragState.startY = clientY;
+  // Сбрасываем флаг запланированного обновления
+  gameState.dragState.isUpdateScheduled = false;
 }
 
 function handleDragMove(clientX, clientY) {
-  const { startIndex, isMoved, startX, startY } = gameState.dragState;
+  const { startIndex, isMoved, startX, startY, isUpdateScheduled } = gameState.dragState;
   if (startIndex === null) return;
+
+  // Сохраняем последнюю позицию курсора для requestAnimationFrame
+  gameState.dragState.lastX = clientX;
+  gameState.dragState.lastY = clientY;
 
   if (!isMoved && (Math.abs(clientX - startX) > CONFIG.DRAG_THRESHOLD || Math.abs(clientY - startY) > CONFIG.DRAG_THRESHOLD)) {
     gameState.dragState.isMoved = true;
@@ -1122,10 +1131,22 @@ function handleDragMove(clientX, clientY) {
     }
   }
 
-  if (gameState.dragState.element) {
-    gameState.dragState.element.style.left = `${clientX - 27}px`;
-    gameState.dragState.element.style.top = `${clientY - 27}px`;
+  // Планируем обновление позиции, если оно еще не запланировано.
+  // Это предотвращает обновление DOM на каждый пиксель движения мыши.
+  if (gameState.dragState.element && !isUpdateScheduled) {
+    gameState.dragState.isUpdateScheduled = true;
+    requestAnimationFrame(updateDraggedElementPosition);
   }
+}
+
+function updateDraggedElementPosition() {
+  const { element, lastX, lastY } = gameState.dragState;
+  if (element) {
+    element.style.left = `${lastX - 27}px`;
+    element.style.top = `${lastY - 27}px`;
+  }
+  // Сбрасываем флаг, чтобы можно было запланировать следующее обновление
+  gameState.dragState.isUpdateScheduled = false;
 }
 
 function handleMouseMove(e) {
