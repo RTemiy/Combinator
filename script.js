@@ -302,8 +302,8 @@ const CONFIG = {
   ANIMATION: {
     FLY_DURATION: 400,
     FADE_DURATION: 400,
-    PARTICLE_DURATION: 500, // Уменьшаем количество частиц для повышения производительности
-    PARTICLE_COUNT: 6,
+    PARTICLE_DURATION: 500,
+    PARTICLE_COUNT: 12,
   },
   DRAG_THRESHOLD: 5,
 
@@ -365,9 +365,6 @@ const gameState = {
     isDragging: false,
     startX: 0,
     startY: 0,
-    // --- Новые свойства для оптимизации перетаскивания ---
-    isUpdateScheduled: false,
-    lastX: 0, lastY: 0,
   },
   lastClick: {
     index: null,
@@ -900,12 +897,52 @@ function createParticleEffectHTML() {
   return html + '</div>';
 }
 
+/**
+ * Генерирует уникальный ключ для состояния ячейки, чтобы определить, нужно ли ее перерисовывать.
+ * Ключ должен учитывать все данные, которые влияют на внешний вид ячейки.
+ * @param {object | null} item - Предмет в ячейке.
+ * @returns {string} Уникальный ключ состояния.
+ */
+function generateCellKey(item) {
+  if (!item) return 'empty';
+
+  const allocated = item.isAllocatedToOrder ? '-alloc' : '';
+
+  if (item.isBlocked) return `blocked-${item.category}-${item.level}`;
+  if (item.isGenerator) {
+    const lvl = item.genLevel || 1;
+    if (item.generatorKey === 'bonus_chest') {
+      return `gen-bonus-${lvl}-${item.genCharges}`;
+    }
+    return `gen-${item.generatorKey}-${lvl}-${item.genEnergy}`;
+  }
+  if (item.isItemGenerator) {
+    return `itemgen-${item.category}-${item.level}-${item.charges}${allocated}`;
+  }
+  if (item.isGeneratorPart) {
+    return `part-${item.generatorKey}-${item.level}`;
+  }
+  if (item.isUpgradePart) return 'booster-upgrade';
+  if (item.isMagicTool) return 'booster-magic';
+
+  return `item-${item.category}-${item.level}${allocated}`;
+}
+
 function renderGrid() {
   const cells = document.querySelectorAll('.cell');
   cells.forEach((cell, idx) => {
     const item = gameState.gridData[idx];
-    cell.innerHTML = '';
-    cell.className = 'cell';
+    const newKey = generateCellKey(item);
+
+    // Оптимизация: если визуальное состояние ячейки не изменилось, пропускаем ее перерисовку.
+    if (cell.dataset.cellKey === newKey) {
+      return;
+    }
+
+    // Состояние изменилось, перерисовываем ячейку.
+    cell.dataset.cellKey = newKey;
+    cell.innerHTML = ''; // Очищаем перед заполнением
+    cell.className = 'cell'; // Сбрасываем классы
 
     if (item) {
       if (item.isBlocked) {
@@ -1092,17 +1129,11 @@ function startDrag(e, index) {
   gameState.dragState.isMoved = false;
   gameState.dragState.startX = clientX;
   gameState.dragState.startY = clientY;
-  // Сбрасываем флаг запланированного обновления
-  gameState.dragState.isUpdateScheduled = false;
 }
 
 function handleDragMove(clientX, clientY) {
-  const { startIndex, isMoved, startX, startY, isUpdateScheduled } = gameState.dragState;
+  const { startIndex, isMoved, startX, startY } = gameState.dragState;
   if (startIndex === null) return;
-
-  // Сохраняем последнюю позицию курсора для requestAnimationFrame
-  gameState.dragState.lastX = clientX;
-  gameState.dragState.lastY = clientY;
 
   if (!isMoved && (Math.abs(clientX - startX) > CONFIG.DRAG_THRESHOLD || Math.abs(clientY - startY) > CONFIG.DRAG_THRESHOLD)) {
     gameState.dragState.isMoved = true;
@@ -1131,22 +1162,10 @@ function handleDragMove(clientX, clientY) {
     }
   }
 
-  // Планируем обновление позиции, если оно еще не запланировано.
-  // Это предотвращает обновление DOM на каждый пиксель движения мыши.
-  if (gameState.dragState.element && !isUpdateScheduled) {
-    gameState.dragState.isUpdateScheduled = true;
-    requestAnimationFrame(updateDraggedElementPosition);
+  if (gameState.dragState.element) {
+    gameState.dragState.element.style.left = `${clientX - 27}px`;
+    gameState.dragState.element.style.top = `${clientY - 27}px`;
   }
-}
-
-function updateDraggedElementPosition() {
-  const { element, lastX, lastY } = gameState.dragState;
-  if (element) {
-    element.style.left = `${lastX - 27}px`;
-    element.style.top = `${lastY - 27}px`;
-  }
-  // Сбрасываем флаг, чтобы можно было запланировать следующее обновление
-  gameState.dragState.isUpdateScheduled = false;
 }
 
 function handleMouseMove(e) {

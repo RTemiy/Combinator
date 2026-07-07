@@ -1281,21 +1281,44 @@ body.is-dragging, body.is-dragging * {
 
 .cell.booster-cell {
   position: relative;
+  overflow: hidden; /* Важно, чтобы рамка не вылезала за пределы */
   background: #2d2d2d; /* Немного другой фон для контраста */
-  /* Заменяем ресурсоемкую анимацию рамки на более производительный box-shadow */
-  animation: booster-shadow-pulse 2s infinite ease-in-out;
 }
 
-/* Отключаем старые псевдоэлементы, которые создавали сложную рамку */
-.cell.booster-cell::before,
+.cell.booster-cell::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%; /* Больше ячейки, чтобы вращение было видно */
+  height: 150%;
+  background: conic-gradient(
+          from 0deg,
+          #ffb703,
+          #ff5cf1,
+          #4cc9f0,
+          #06d6a0,
+          #ffb703
+  );
+  animation: spin-border 4s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
 .cell.booster-cell::after {
-  content: none;
+  content: '';
+  position: absolute;
+  inset: 2px; /* Отступ для создания рамки */
+  background: var(--cell-color);
+  border-radius: 4px;
 }
 
-@keyframes booster-shadow-pulse {
-  0% { box-shadow: 0 0 7px rgba(255, 183, 3, 0.7), inset 0 2px 4px rgba(0,0,0,0.4); }
-  50% { box-shadow: 0 0 15px rgba(76, 201, 240, 0.8), inset 0 2px 4px rgba(0,0,0,0.4); }
-  100% { box-shadow: 0 0 7px rgba(255, 183, 3, 0.7), inset 0 2px 4px rgba(0,0,0,0.4); }
+@keyframes spin-border {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 @keyframes star-pulse {
