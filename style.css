@@ -33,6 +33,10 @@ body {
   -webkit-user-select: none;
 }
 
+button {
+  font-family: inherit;
+}
+
 body.is-dragging, body.is-dragging * {
   cursor: grabbing !important;
 }
@@ -111,7 +115,7 @@ body.is-dragging, body.is-dragging * {
 }
 .energy-text span { color: var(--energy-color); font-weight: bold; }
 
-.reset-btn {
+.menu-btn {
   background: var(--panel-color);
   border: 2px solid #444;
   color: var(--text-color);
@@ -126,8 +130,8 @@ body.is-dragging, body.is-dragging * {
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   transition: transform 0.2s, background-color 0.2s;
 }
-.reset-btn:hover { background: #3a3a3a; transform: rotate(45deg); }
-.reset-btn:active { transform: scale(0.95); }
+.menu-btn:hover { background: #3a3a3a; transform: scale(1.1); }
+.menu-btn:active { transform: scale(0.95); }
 
 #toast-container {
   position: fixed;
@@ -729,16 +733,18 @@ body.is-dragging, body.is-dragging * {
 .flying-reward {
   position: fixed;
   pointer-events: none;
-  z-index: 10000;
+  z-index: 26000; /* Выше модальных окон */
   transition: transform 0.7s cubic-bezier(0.2, 0, 0.8, 0.6), opacity 0.7s ease-out;
 }
 .flying-reward.coin {
   font-size: 1.4rem;
   color: #ffd700;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); /* Тень для лучшей видимости */
 }
 .flying-reward.energy {
   font-size: 1.2rem;
   color: var(--energy-color);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); /* Тень для лучшей видимости */
 }
 
 .modal-overlay {
@@ -752,6 +758,11 @@ body.is-dragging, body.is-dragging * {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
+}
+
+.modal-overlay#info-modal {
+  /* z-index выше, чтобы окна подтверждения (и другие info) были поверх меню */
+  z-index: 21000;
 }
 
 .modal-overlay.active { opacity: 1; }
@@ -861,6 +872,69 @@ body.is-dragging, body.is-dragging * {
   color: #666;
 }
 
+.progression-item-square.undiscovered {
+  background-color: #2c2c2c;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+}
+
+.progression-item-square.undiscovered .progression-item-icon {
+  color: #666;
+  font-weight: bold;
+}
+
+.progression-item-square.undiscovered .progression-item-level {
+  display: none;
+}
+
+.progression-item-square.bonus-unclaimed {
+  cursor: pointer;
+  box-shadow: 0 0 8px #ffd700, inset 0 1px 3px rgba(0,0,0,0.4);
+  border: 1px solid #ffb703;
+  transition: transform 0.2s;
+}
+
+.progression-item-square.bonus-unclaimed:hover {
+  transform: scale(1.05);
+}
+
+.unclaimed-bonus-icon {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.6rem;
+  font-weight: bold;
+  background: rgba(0,0,0,0.7);
+  color: #ffd700;
+  padding: 1px 3px;
+  border-radius: 3px;
+  animation: star-pulse 2s infinite;
+}
+
+.progression-item-square.bonus-claiming {
+  animation: bonus-claim-pop 0.4s ease-out;
+}
+
+.unclaimed-bonus-icon.exploding {
+  animation: bonus-explode 0.4s ease-out forwards;
+}
+
+@keyframes bonus-claim-pop {
+  0% { transform: scale(1.05); } /* Начинаем с состояния ховера */
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes bonus-explode {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
 .modal-action-btn {
   grid-column: span 2;
   background: #28a745;
@@ -907,8 +981,74 @@ body.is-dragging, body.is-dragging * {
 }
 .modal-btn-cancel:active { background: #444; }
 
+/* --- Menu Modal --- */
+.modal-overlay#menu-modal {
+  align-items: center;
+}
+
+.menu-modal-content {
+  background: var(--modal-bg);
+  border-radius: 16px;
+  border-top: 3px solid var(--energy-color);
+  width: 90%;
+  max-width: 350px;
+  padding: 16px 20px 24px;
+  box-shadow: 0 0 25px rgba(255, 183, 3, 0.25), 0 8px 35px rgba(0,0,0,0.8);
+  position: relative;
+  box-sizing: border-box;
+  pointer-events: auto;
+  transform: scale(0.9);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.1, 0.76, 0.55, 0.94), opacity 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center; /* Центрируем содержимое модального окна меню */
+}
+
+.modal-overlay.active .menu-modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.menu-modal-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+  color: var(--energy-color);
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.menu-btn-item {
+  background: #333;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+.menu-btn-item:hover { background-color: #444; }
+.menu-btn-item:active { background-color: #222; }
+
+.menu-btn-icon { font-size: 1.5rem; }
+
 /* --- Detail Modal --- */
-#detail-modal {
+#detail-modal,
+#collection-modal {
   z-index: 25000; /* Выше, чем обычный модал */
   align-items: flex-end; /* По-прежнему внизу */
   background: rgba(0, 0, 0, 0.7); /* Более темный фон */
@@ -916,7 +1056,8 @@ body.is-dragging, body.is-dragging * {
   transition: background 0.3s ease, opacity 0.3s ease;
 }
 
-#detail-modal:not(.active) {
+#detail-modal:not(.active),
+#collection-modal:not(.active) {
   background: rgba(0, 0, 0, 0);
 }
 
@@ -936,7 +1077,8 @@ body.is-dragging, body.is-dragging * {
   max-height: 85vh; /* Ограничиваем максимальную высоту */
 }
 
-#detail-modal.active .detail-modal-content {
+#detail-modal.active .detail-modal-content,
+#collection-modal.active .detail-modal-content {
   transform: translateY(0);
 }
 
@@ -987,6 +1129,31 @@ body.is-dragging, body.is-dragging * {
   padding: 16px;
   overflow-y: auto;
   flex-grow: 1;
+}
+
+.collection-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #444;
+  flex-shrink: 0;
+}
+
+#claim-collection-bonus-btn {
+  width: 100%;
+  background: linear-gradient(to right, #ffb703, #fb8500);
+  border: none;
+  color: #111;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+#claim-collection-bonus-btn:disabled {
+  background: #555;
+  color: #999;
+  cursor: not-allowed;
 }
 
 @keyframes merge-pop {
@@ -1169,7 +1336,7 @@ body.is-dragging, body.is-dragging * {
   .level-text, .energy-text {
     font-size: 0.75rem;
   }
-  .reset-btn { width: 40px; height: 40px; font-size: 1.1rem; }
+  .menu-btn { width: 40px; height: 40px; font-size: 1.1rem; }
   .modal-content { padding: 12px 12px 16px 12px; }
 }
 
