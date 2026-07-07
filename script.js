@@ -267,6 +267,57 @@ const STORY_CHARACTERS = [
   { icon: '🐉', name: 'Дракон', desc: 'Древнее и мудрое существо. Его запросы редки, но всегда имеют огромное значение для всего мира.' }
 ];
 
+const ACHIEVEMENTS_DATA = {
+  totalMerges: {
+    id: 'totalMerges',
+    name: 'Мастер комбинаций',
+    desc: 'Совершите определенное количество слияний.',
+    icon: '✨',
+    tiers: [
+      { goal: 50, reward: 100 },
+      { goal: 250, reward: 250 },
+      { goal: 1000, reward: 500 },
+      { goal: 5000, reward: 1000 },
+    ]
+  },
+  totalOrdersCompleted: {
+    id: 'totalOrdersCompleted',
+    name: 'Надежный поставщик',
+    desc: 'Выполните определенное количество заказов.',
+    icon: '📦',
+    tiers: [
+      { goal: 10, reward: 150 },
+      { goal: 50, reward: 300 },
+      { goal: 100, reward: 600 },
+      { goal: 250, reward: 1200 },
+    ]
+  },
+  totalCoinsEarned: {
+    id: 'totalCoinsEarned',
+    name: 'Богач',
+    desc: 'Заработайте определенное количество монет за все время.',
+    icon: '💰',
+    tiers: [
+      { goal: 1000, reward: 100 },
+      { goal: 5000, reward: 250 },
+      { goal: 20000, reward: 500 },
+      { goal: 100000, reward: 1000 },
+    ]
+  },
+  totalEnergySpent: {
+    id: 'totalEnergySpent',
+    name: 'Энерджайзер',
+    desc: 'Потратьте определенное количество энергии.',
+    icon: '⚡',
+    tiers: [
+      { goal: 500, reward: 50 },
+      { goal: 2000, reward: 150 },
+      { goal: 10000, reward: 400 },
+      { goal: 50000, reward: 800 },
+    ]
+  }
+};
+
 const CONFIG = {
   // Grid and Board
   GRID_COLS: 5,
@@ -357,6 +408,7 @@ const gameState = {
   unlockedItemGenCategories: [],
   lockedCategories: [],
   discoveredItems: {},
+  claimedAchievements: {},
   claimedCollectionBonuses: {},
   dragState: {
     element: null,
@@ -369,6 +421,18 @@ const gameState = {
   lastClick: {
     index: null,
   }
+};
+
+const playerProfile = {
+  name: 'Игрок',
+  icon: '🧑‍🚀',
+  startDate: Date.now(),
+  timePlayed: 0, // в миллисекундах
+  totalMerges: 0,
+  totalOrdersCompleted: 0,
+  totalCoinsEarned: 0,
+  totalEnergySpent: 0,
+  mergeCounts: {},
 };
 
 // --- Проверка версии игры ---
@@ -413,6 +477,22 @@ const DOMElements = {
     closeBtn: document.querySelector('#menu-modal .modal-close'),
     resetBtn: document.getElementById('reset-game-btn'),
     collectionBtn: document.getElementById('collection-btn'),
+    profileBtn: document.getElementById('profile-btn'),
+    achievementsBtn: document.getElementById('achievements-btn'),
+    collectionNotificationDot: document.getElementById('collection-notification-dot'),
+    achievementsNotificationDot: document.getElementById('achievements-notification-dot'),
+  },
+  profileModal: {
+    overlay: document.getElementById('profile-modal'),
+    closeBtn: document.getElementById('p-m-close'),
+    icon: document.getElementById('p-m-icon'),
+    title: document.getElementById('p-m-title'),
+    body: document.getElementById('p-m-body'),
+  },
+  achievementsModal: {
+    overlay: document.getElementById('achievements-modal'),
+    closeBtn: document.getElementById('ach-m-close'),
+    body: document.getElementById('ach-m-body'),
   },
   collectionModal: {
     overlay: document.getElementById('collection-modal'),
@@ -435,6 +515,7 @@ const DOMElements = {
     container: document.querySelector('.coins-container'),
   },
   menuBtn: document.querySelector('.menu-btn'),
+  menuNotificationDot: document.getElementById('menu-notification-dot'),
   ordersList: document.getElementById('orders-list'),
   rewardQueuePanel: document.getElementById('reward-queue-panel'),
 };
@@ -451,6 +532,9 @@ function initGame() {
   addListeners();
   setInterval(() => {
     // Этот интервал отвечает за онлайн-регенерацию
+    if (!document.hidden) {
+      playerProfile.timePlayed += CONFIG.ENERGY_REGEN_INTERVAL;
+    }
     regenerateEnergy();
     restoreGeneratorsEnergy();
     updateEnergyUI();
@@ -471,6 +555,12 @@ function addListeners() {
   window.addEventListener('beforeunload', () => {
     localStorage.setItem(CONFIG.LAST_LOGIN_KEY, Date.now());
     saveGame();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // При сворачивании вкладки сохраняем игру, чтобы учесть время
+      saveGame();
+    }
   });
 
   DOMElements.energy.container.addEventListener('click', () => {
@@ -516,7 +606,11 @@ function addListeners() {
   DOMElements.menuModal.closeBtn.addEventListener('click', closeMenuModal);
   DOMElements.menuModal.resetBtn.addEventListener('click', () => { closeMenuModal(); confirmReset(); });
   DOMElements.menuModal.collectionBtn.addEventListener('click', () => { closeMenuModal(); showCollectionModal(); });
+  DOMElements.menuModal.profileBtn.addEventListener('click', () => { closeMenuModal(); openProfileModal(); });
+  DOMElements.menuModal.achievementsBtn.addEventListener('click', () => { closeMenuModal(); openAchievementsModal(); });
+  DOMElements.profileModal.closeBtn.addEventListener('click', closeProfileModal);
   DOMElements.detailModal.closeBtn.addEventListener('click', closeDetailModal);
+  DOMElements.achievementsModal.closeBtn.addEventListener('click', closeAchievementsModal);
   DOMElements.collectionModal.closeBtn.addEventListener('click', closeCollectionModal);
 
   // Event delegation for dynamic order cards
@@ -594,7 +688,18 @@ function startNewGame() {
   gameState.newlyUnlockedCategories = [];
   gameState.unlockedItemGenCategories = [];
   gameState.discoveredItems = {};
+  gameState.claimedAchievements = {};
   gameState.claimedCollectionBonuses = {};
+  // Сброс профиля
+  playerProfile.name = 'Игрок';
+  playerProfile.icon = '🧑‍🚀';
+  playerProfile.startDate = Date.now();
+  playerProfile.timePlayed = 0;
+  playerProfile.totalMerges = 0;
+  playerProfile.totalOrdersCompleted = 0;
+  playerProfile.totalCoinsEarned = 0;
+  playerProfile.totalEnergySpent = 0;
+  playerProfile.mergeCounts = {};
 
   // --- Новая логика генерации стартовых генераторов ---
   const allGeneratorKeys = Object.keys(GENERATORS_DATA).filter(k => k !== 'bonus_chest');
@@ -671,7 +776,9 @@ function saveGame() {
     newlyUnlockedCategories: gameState.newlyUnlockedCategories,
     unlockedItemGenCategories: gameState.unlockedItemGenCategories,
     lockedCategories: gameState.lockedCategories,
-    discoveredItems: gameState.discoveredItems,
+    discoveredItems: gameState.discoveredItems, // Данные профиля
+    claimedAchievements: gameState.claimedAchievements,
+    profile: playerProfile,
     claimedCollectionBonuses: gameState.claimedCollectionBonuses,
     thresholds: UNLOCK_THRESHOLDS.map(t => ({ score: t.score, unlocked: t.unlocked, level: t.level }))
   };
@@ -704,7 +811,19 @@ function loadGame() {
     gameState.newlyUnlockedCategories = loaded.newlyUnlockedCategories || [];
     gameState.unlockedItemGenCategories = loaded.unlockedItemGenCategories || [];
     gameState.discoveredItems = loaded.discoveredItems || {};
+    gameState.claimedAchievements = loaded.claimedAchievements || {};
     gameState.claimedCollectionBonuses = loaded.claimedCollectionBonuses || {};
+    // Загрузка профиля с проверкой на случай старых сохранений
+    const loadedProfile = loaded.profile || {};
+    playerProfile.name = loadedProfile.name || 'Игрок';
+    playerProfile.icon = loadedProfile.icon || '🧑‍🚀';
+    playerProfile.startDate = loadedProfile.startDate || Date.now();
+    playerProfile.timePlayed = loadedProfile.timePlayed || 0;
+    playerProfile.totalMerges = loadedProfile.totalMerges || 0;
+    playerProfile.totalOrdersCompleted = loadedProfile.totalOrdersCompleted || 0;
+    playerProfile.totalCoinsEarned = loadedProfile.totalCoinsEarned || 0;
+    playerProfile.totalEnergySpent = loadedProfile.totalEnergySpent || 0;
+    playerProfile.mergeCounts = loadedProfile.mergeCounts || {};
 
     if (energyToRestore > 0) {
       gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
@@ -808,6 +927,14 @@ function regenerateEnergy() {
   }
 }
 
+function updateMenuNotification() {
+    if (hasUnclaimedAchievements() || hasUnclaimedCollectionBonuses()) {
+        DOMElements.menuNotificationDot.style.display = 'block';
+    } else {
+        DOMElements.menuNotificationDot.style.display = 'none';
+    }
+}
+
 function updateUI() {
   checkOrdersAvailability();
   renderGrid();
@@ -817,6 +944,7 @@ function updateUI() {
   DOMElements.energy.value.innerText = gameState.energy;
   DOMElements.level.text.innerText = getCurrentPlayerLevel();
   updateLevelProgressBar();
+  updateMenuNotification();
 }
 
 function renderRewardQueue() {
@@ -1423,6 +1551,36 @@ function executeMergeOrSwap(fromIdx, toIdx) {
   for (const handler of MERGE_HANDLERS) {
     if (handler.canHandle(source, target)) {
       handler.execute(fromIdx, toIdx, source, target);
+      playerProfile.totalMerges++;
+
+      // --- NEW LOGIC FOR MERGE COUNTS ---
+      let mergeCategory;
+      // Case 1: Merging two regular items, or a regular item with a blocked one.
+      if (source.category && !source.isGenerator && !source.isGeneratorPart && !source.isMagicTool && !source.isUpgradePart) {
+        mergeCategory = source.category;
+      }
+      // Case 2: Merging two generators or two generator parts.
+      else if ((source.isGenerator || source.isGeneratorPart) && target && (target.isGenerator || target.isGeneratorPart)) {
+        mergeCategory = GENERATORS_DATA[source.generatorKey].categories[0];
+      }
+      // Case 3: Upgrading a generator with a part.
+      else if (source.isUpgradePart && target && target.isGenerator) {
+        mergeCategory = GENERATORS_DATA[target.generatorKey].categories[0];
+      } else if (target && target.isUpgradePart && source.isGenerator) {
+        mergeCategory = GENERATORS_DATA[source.generatorKey].categories[0];
+      }
+      // Case 4: Upgrading an item with a tool.
+      else if (source.isMagicTool && target && target.category) {
+        mergeCategory = target.category;
+      } else if (target && target.isMagicTool && source.category) {
+        mergeCategory = source.category;
+      }
+
+      if (mergeCategory) {
+        playerProfile.mergeCounts[mergeCategory] = (playerProfile.mergeCounts[mergeCategory] || 0) + 1;
+      }
+      // --- END NEW LOGIC ---
+
       saveGame();
       updateUI();
       return;
@@ -1741,6 +1899,7 @@ function deleteItem(index) {
   const sellPrice = (item.level || 1) * 3;
 
   gameState.coins += sellPrice;
+  playerProfile.totalCoinsEarned += sellPrice;
   gameState.gridData[index] = null;
 
   closeModal();
@@ -1796,7 +1955,7 @@ function showCategoryProgressionModal(categoryKeyOrKeys, icon = '⛓️') {
 
   modal.title.innerText = modalTitle;
   modal.body.innerHTML = contentHTML;
-  modal.overlay.classList.add('active');
+  modal.overlay.classList.add('active', 'blocking');
 }
 
 function showGeneratorDetailModal(item) {
@@ -1857,7 +2016,7 @@ function showGeneratorDetailModal(item) {
   });
 
   modal.body.innerHTML = contentHTML;
-  modal.overlay.classList.add('active');
+  modal.overlay.classList.add('active', 'blocking');
 }
 
 function showItemDetailModal(item) {
@@ -1911,7 +2070,7 @@ function showItemDetailModal(item) {
   }
 
   modal.body.innerHTML = contentHTML;
-  modal.overlay.classList.add('active');
+  modal.overlay.classList.add('active', 'blocking');
 }
 
 function showGeneratorPartDetailModal(item) {
@@ -1966,7 +2125,7 @@ function showGeneratorPartDetailModal(item) {
   contentHTML += '</div>';
 
   modal.body.innerHTML = contentHTML;
-  modal.overlay.classList.add('active');
+  modal.overlay.classList.add('active', 'blocking');
 }
 
 
@@ -2026,30 +2185,199 @@ function openMenuModal() {
   closeModal();
   closeDetailModal();
   closeCollectionModal();
+  closeProfileModal();
+
+  // Закрываем новое окно достижений
+  closeAchievementsModal();
+
+  // Обновляем точки-уведомления внутри меню
+  DOMElements.menuModal.achievementsNotificationDot.style.display = hasUnclaimedAchievements() ? 'block' : 'none';
+  DOMElements.menuModal.collectionNotificationDot.style.display = hasUnclaimedCollectionBonuses() ? 'block' : 'none';
 
   DOMElements.menuModal.overlay.classList.add('active', 'blocking');
 }
 
+function openProfileModal() {
+  renderProfile();
+  DOMElements.profileModal.overlay.classList.add('active', 'blocking');
+}
 function closeMenuModal() {
   DOMElements.menuModal.overlay.classList.remove('active', 'blocking');
 }
 
 function closeDetailModal() {
   const modal = DOMElements.detailModal;
-  modal.overlay.classList.remove('active');
+  modal.overlay.classList.remove('active', 'blocking');
   // Очищаем контент после скрытия, чтобы не было "мелькания" при следующем открытии
   setTimeout(() => {
     modal.body.innerHTML = '';
   }, 300); // Должно совпадать с transition-duration
 }
 
+function closeProfileModal() {
+  const modal = DOMElements.profileModal;
+  modal.overlay.classList.remove('active', 'blocking');
+}
+
+function openAchievementsModal() {
+  renderAchievementsModal();
+  DOMElements.achievementsModal.overlay.classList.add('active', 'blocking');
+}
+
+function closeAchievementsModal() {
+  const modal = DOMElements.achievementsModal;
+  modal.overlay.classList.remove('active', 'blocking');
+}
+
 function closeCollectionModal() {
   const modal = DOMElements.collectionModal;
-  modal.overlay.classList.remove('active');
+  modal.overlay.classList.remove('active', 'blocking');
   setTimeout(() => {
     modal.body.innerHTML = '';
     modal.footer.innerHTML = '';
   }, 300);
+}
+function formatTimePlayed(ms) {
+  if (!ms || ms < 1000) return "меньше минуты";
+
+  const seconds = Math.floor((ms / 1000) % 60);
+  const minutes = Math.floor((ms / (1000 * 60)) % 60);
+  const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+
+  let parts = [];
+  if (days > 0) parts.push(`${days} д`);
+  if (hours > 0) parts.push(`${hours} ч`);
+  if (minutes > 0) parts.push(`${minutes} м`);
+
+  if (parts.length === 0 && seconds > 0) return `${seconds} сек`;
+
+  return parts.slice(0, 2).join(' '); // Показываем только 2 самых крупных единицы времени
+}
+
+function renderProfile() {
+  const modal = DOMElements.profileModal;
+  const profile = playerProfile;
+
+  modal.icon.innerText = profile.icon;
+
+  // --- NEW LOGIC for favorite category ---
+  let favoriteCategoryName = 'Нет';
+  if (profile.mergeCounts && Object.keys(profile.mergeCounts).length > 0) {
+    const favoriteCategoryKey = Object.keys(profile.mergeCounts).reduce((a, b) => profile.mergeCounts[a] > profile.mergeCounts[b] ? a : b);
+    if (CATEGORIES_CONFIG[favoriteCategoryKey]) {
+      favoriteCategoryName = CATEGORIES_CONFIG[favoriteCategoryKey].name;
+    }
+  }
+  // --- END NEW LOGIC ---
+
+  const timePlayedStr = formatTimePlayed(profile.timePlayed);
+  const startDateStr = new Date(profile.startDate).toLocaleDateString('ru-RU');
+
+  modal.body.innerHTML = `
+    <div class="profile-header">
+        <div class="profile-avatar">${profile.icon}</div>
+        <input type="text" class="profile-name-input" value="${profile.name}" id="profile-name-input" maxlength="20" placeholder="Введите имя">
+    </div>
+    <div class="profile-stats">
+        <div class="stat-item"><span>Комбинаций сделано:</span> <strong>${profile.totalMerges.toLocaleString('ru-RU')}</strong></div>
+        <div class="stat-item"><span>Заказов выполнено:</span> <strong>${profile.totalOrdersCompleted.toLocaleString('ru-RU')}</strong></div>
+        <div class="stat-item"><span>Всего потрачено энергии:</span> <strong>${(profile.totalEnergySpent || 0).toLocaleString('ru-RU')} ⚡</strong></div>
+        <div class="stat-item"><span>Всего заработано:</span> <strong>${(profile.totalCoinsEarned || 0).toLocaleString('ru-RU')} 🪙</strong></div>
+        <div class="stat-item"><span>Любимая категория:</span> <strong>${favoriteCategoryName}</strong></div>
+        <div class="stat-item"><span>Время в игре:</span> <strong>${timePlayedStr}</strong></div>
+        <div class="stat-item"><span>Дата начала:</span> <strong>${startDateStr}</strong></div>
+    </div>
+  `;
+
+  // Добавляем обработчик для сохранения имени при потере фокуса
+  const nameInput = modal.body.querySelector('#profile-name-input');
+  nameInput.addEventListener('blur', () => {
+    playerProfile.name = nameInput.value.trim() || 'Игрок';
+    saveGame(); // Сохраняем игру после изменения имени
+  });
+}
+
+function hasUnclaimedCollectionBonuses() {
+  for (const catKey in CATEGORIES_CONFIG) {
+    const category = CATEGORIES_CONFIG[catKey];
+    for (const item of category.items) {
+      const itemKey = `${catKey}-${item.level}`;
+      const discovered = isDiscovered(catKey, item.level);
+      const bonusClaimed = !!gameState.claimedCollectionBonuses[itemKey];
+      if (discovered && !bonusClaimed) {
+        return true; // Нашли одно!
+      }
+    }
+  }
+  return false;
+}
+
+function hasUnclaimedAchievements() {
+  for (const key in ACHIEVEMENTS_DATA) {
+    const achievement = ACHIEVEMENTS_DATA[key];
+    const progress = playerProfile[key] || 0;
+    for (let i = 0; i < achievement.tiers.length; i++) {
+      const tier = achievement.tiers[i];
+      const isUnlocked = progress >= tier.goal;
+      const isClaimed = gameState.claimedAchievements[`${achievement.id}_${i}`];
+      if (isUnlocked && !isClaimed) {
+        return true; // Нашли одно!
+      }
+    }
+  }
+  return false;
+}
+
+function renderAchievementsModal() {
+  const body = DOMElements.achievementsModal.body;
+  let contentHTML = '';
+
+  for (const key in ACHIEVEMENTS_DATA) {
+    const achievement = ACHIEVEMENTS_DATA[key];
+    const progress = playerProfile[key] || 0;
+
+    contentHTML += `
+      <div class="achievement-item">
+        <div class="achievement-icon">${achievement.icon}</div>
+        <div class="achievement-details">
+          <h4 class="achievement-title">${achievement.name}</h4>
+          <p class="achievement-desc">${achievement.desc}</p>
+          <div class="achievement-tiers">
+    `;
+
+    achievement.tiers.forEach((tier, index) => {
+      const isClaimed = !!gameState.claimedAchievements[`${achievement.id}_${index}`];
+      const canClaim = progress >= tier.goal && !isClaimed;
+      const percentage = Math.min(100, (progress / tier.goal) * 100);
+
+      let btnHTML;
+      if (isClaimed) {
+        btnHTML = `<button class="achievement-claim-btn claimed" disabled>✔️</button>`;
+      } else {
+        btnHTML = `<button class="achievement-claim-btn" ${!canClaim ? 'disabled' : ''} onclick="claimAchievementReward('${achievement.id}', ${index}, this)">+${tier.reward}🪙</button>`;
+      }
+
+      contentHTML += `
+        <div class="achievement-tier">
+          <div class="achievement-progress-container">
+            <div class="achievement-progress-text">${progress.toLocaleString('ru-RU')} / ${tier.goal.toLocaleString('ru-RU')}</div>
+            <div class="achievement-progress-bar-bg">
+              <div class="achievement-progress-bar-fill" style="width: ${percentage}%;"></div>
+            </div>
+          </div>
+          ${btnHTML}
+        </div>
+      `;
+    });
+
+    contentHTML += `
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  body.innerHTML = contentHTML;
 }
 
 function claimItemBonus(category, level, element) {
@@ -2065,6 +2393,7 @@ function claimItemBonus(category, level, element) {
   // Добавляем монеты
   const bonusAmount = level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
   gameState.coins += bonusAmount;
+  playerProfile.totalCoinsEarned += bonusAmount;
 
   // Анимация полета монетки
   animateRewardFly(element, DOMElements.coins.container, '🪙', 1, 'coin');
@@ -2082,6 +2411,7 @@ function claimItemBonus(category, level, element) {
   // Обновляем счетчик монет (можно сделать чуть раньше, чем закончится полет)
   setTimeout(() => {
     DOMElements.coins.value.innerText = gameState.coins;
+    updateMenuNotification();
     saveGame();
   }, 300);
 
@@ -2090,6 +2420,35 @@ function claimItemBonus(category, level, element) {
     if (bonusIcon) bonusIcon.remove();
     element.classList.remove('bonus-claiming');
   }, 400); // Должно совпадать с длительностью анимаций
+}
+
+function claimAchievementReward(achievementId, tierIndex, buttonElement) {
+  const achievement = ACHIEVEMENTS_DATA[achievementId];
+  if (!achievement) return;
+
+  const tier = achievement.tiers[tierIndex];
+  const progress = playerProfile[achievementId] || 0;
+  const key = `${achievementId}_${tierIndex}`;
+
+  if (progress >= tier.goal && !gameState.claimedAchievements[key]) {
+    // Добавляем награду
+    gameState.coins += tier.reward;
+    // Отмечаем как полученную
+    gameState.claimedAchievements[key] = true;
+
+    // Анимация
+    animateRewardFly(buttonElement, DOMElements.coins.container, '🪙', 5, 'coin');
+
+    // Обновляем UI
+    buttonElement.classList.add('claimed');
+    buttonElement.disabled = true;
+    buttonElement.innerHTML = '✔️';
+    buttonElement.onclick = null;
+
+    DOMElements.coins.value.innerText = gameState.coins;
+    updateMenuNotification();
+    saveGame();
+  }
 }
 
 function showCollectionModal() {
@@ -2149,7 +2508,7 @@ function showCollectionModal() {
   modal.body.innerHTML = contentHTML;
   modal.footer.innerHTML = ''; // Очищаем футер, кнопка больше не нужна
 
-  modal.overlay.classList.add('active');
+  modal.overlay.classList.add('active', 'blocking');
 }
 
 function findClosestEmptyCell(fromIndex, emptyCells) {
@@ -2224,6 +2583,7 @@ function triggerItemGenerator(generator, fromIndex) {
   }
 
   gameState.energy--;
+  playerProfile.totalEnergySpent++;
   generator.charges--;
 
   const targetCellIndex = findClosestEmptyCell(fromIndex, emptyCells);
@@ -2274,6 +2634,7 @@ function triggerRegularGenerator(generator, fromIndex) {
   }
   generator.genEnergy--;
   gameState.energy--;
+  playerProfile.totalEnergySpent++;
 
   const targetCellIndex = findClosestEmptyCell(fromIndex, emptyCells);
   gameState.lockedCells.push(targetCellIndex);
@@ -2914,6 +3275,8 @@ function completeOrder(id) {
   // After all items have flown to the card
   Promise.all(animationPromises).then(() => {
     const coinsEarned = elementsToAnimate.reduce((sum, el) => sum + el.level * CONFIG.COIN_MULTIPLIER, 0);
+    playerProfile.totalCoinsEarned += coinsEarned;
+    playerProfile.totalOrdersCompleted++;
     const energyReward = order.isStory ? CONFIG.STORY_ORDER_ENERGY_REWARD : CONFIG.ORDER_ENERGY_REWARD;
 
     // Анимация полета наград

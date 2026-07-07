@@ -41,6 +41,16 @@
             <button id="collection-btn" class="menu-btn-item">
                 <span class="menu-btn-icon">📚</span>
                 <span class="menu-btn-text">Коллекция</span>
+                <span class="notification-dot menu-item-dot" id="collection-notification-dot" style="display: none;"></span>
+            </button>
+            <button id="achievements-btn" class="menu-btn-item">
+                <span class="menu-btn-icon">🏆</span>
+                <span class="menu-btn-text">Достижения</span>
+                <span class="notification-dot menu-item-dot" id="achievements-notification-dot" style="display: none;"></span>
+            </button>
+            <button id="profile-btn" class="menu-btn-item">
+                <span class="menu-btn-icon">🧑‍🚀</span>
+                <span class="menu-btn-text">Профиль</span>
             </button>
             <button id="reset-game-btn" class="menu-btn-item">
                 <span class="menu-btn-icon">🚫</span>
@@ -83,6 +93,38 @@
     </div>
 </div>
 
+<!-- Новый модал для профиля -->
+<div class="modal-overlay" id="profile-modal">
+    <div class="detail-modal-content">
+        <div class="detail-modal-header">
+            <div class="detail-modal-header-content">
+                <div id="p-m-icon" class="detail-modal-icon">🧑‍🚀</div>
+                <h3 class="detail-modal-title" id="p-m-title">Профиль игрока</h3>
+            </div>
+            <span class="detail-modal-close" id="p-m-close">&times;</span>
+        </div>
+        <div class="detail-modal-body" id="p-m-body">
+            <!-- Сюда будет вставляться контент профиля -->
+        </div>
+    </div>
+</div>
+
+<!-- Новый модал для достижений -->
+<div class="modal-overlay" id="achievements-modal">
+    <div class="detail-modal-content">
+        <div class="detail-modal-header">
+            <div class="detail-modal-header-content">
+                <div id="ach-m-icon" class="detail-modal-icon">🏆</div>
+                <h3 class="detail-modal-title" id="ach-m-title">Достижения</h3>
+            </div>
+            <span class="detail-modal-close" id="ach-m-close">&times;</span>
+        </div>
+        <div class="detail-modal-body" id="ach-m-body">
+            <!-- Сюда будет вставляться контент достижений -->
+        </div>
+    </div>
+</div>
+
 <div class="header-controls">
     <div class="stats-container">
 
@@ -102,7 +144,10 @@
             <div class="energy-text">⚡ <span id="energy-val">100</span></div>
         </div>
     </div>
-    <button class="menu-btn" title="Меню">☰</button>
+    <button class="menu-btn" title="Меню">
+        ☰
+        <span class="notification-dot" id="menu-notification-dot" style="display: none;"></span>
+    </button>
 </div>
 
 <div class="game-container">
