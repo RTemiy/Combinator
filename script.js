@@ -897,52 +897,12 @@ function createParticleEffectHTML() {
   return html + '</div>';
 }
 
-/**
- * Генерирует уникальный ключ для состояния ячейки, чтобы определить, нужно ли ее перерисовывать.
- * Ключ должен учитывать все данные, которые влияют на внешний вид ячейки.
- * @param {object | null} item - Предмет в ячейке.
- * @returns {string} Уникальный ключ состояния.
- */
-function generateCellKey(item) {
-  if (!item) return 'empty';
-
-  const allocated = item.isAllocatedToOrder ? '-alloc' : '';
-
-  if (item.isBlocked) return `blocked-${item.category}-${item.level}`;
-  if (item.isGenerator) {
-    const lvl = item.genLevel || 1;
-    if (item.generatorKey === 'bonus_chest') {
-      return `gen-bonus-${lvl}-${item.genCharges}`;
-    }
-    return `gen-${item.generatorKey}-${lvl}-${item.genEnergy}`;
-  }
-  if (item.isItemGenerator) {
-    return `itemgen-${item.category}-${item.level}-${item.charges}${allocated}`;
-  }
-  if (item.isGeneratorPart) {
-    return `part-${item.generatorKey}-${item.level}`;
-  }
-  if (item.isUpgradePart) return 'booster-upgrade';
-  if (item.isMagicTool) return 'booster-magic';
-
-  return `item-${item.category}-${item.level}${allocated}`;
-}
-
 function renderGrid() {
   const cells = document.querySelectorAll('.cell');
   cells.forEach((cell, idx) => {
     const item = gameState.gridData[idx];
-    const newKey = generateCellKey(item);
-
-    // Оптимизация: если визуальное состояние ячейки не изменилось, пропускаем ее перерисовку.
-    if (cell.dataset.cellKey === newKey) {
-      return;
-    }
-
-    // Состояние изменилось, перерисовываем ячейку.
-    cell.dataset.cellKey = newKey;
-    cell.innerHTML = ''; // Очищаем перед заполнением
-    cell.className = 'cell'; // Сбрасываем классы
+    cell.innerHTML = '';
+    cell.className = 'cell';
 
     if (item) {
       if (item.isBlocked) {
