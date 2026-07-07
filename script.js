@@ -111,6 +111,22 @@ function addListeners() {
   DOMElements.achievementsModal.closeBtn.addEventListener('click', closeAchievementsModal);
   DOMElements.collectionModal.closeBtn.addEventListener('click', closeCollectionModal);
 
+  DOMElements.collectionModal.body.addEventListener('click', e => {
+    const claimButton = e.target.closest('[data-action="claim-bonus"]');
+    if (claimButton) {
+      const { category, level } = claimButton.dataset;
+      claimItemBonus(category, parseInt(level, 10), claimButton);
+    }
+  });
+
+  DOMElements.achievementsModal.body.addEventListener('click', e => {
+    const claimButton = e.target.closest('[data-action="claim-achievement"]');
+    if (claimButton) {
+      const { id, index } = claimButton.dataset;
+      claimAchievementReward(id, parseInt(index, 10), claimButton);
+    }
+  });
+
   // Event delegation for dynamic order cards
   DOMElements.ordersList.addEventListener('click', (e) => {
     const target = e.target;
@@ -1853,7 +1869,7 @@ function renderAchievementsModal() {
       if (isClaimed) {
         btnHTML = `<button class="achievement-claim-btn claimed" disabled>✔️</button>`;
       } else {
-        btnHTML = `<button class="achievement-claim-btn" ${!canClaim ? 'disabled' : ''} onclick="claimAchievementReward('${achievement.id}', ${index}, this)">+${tier.reward}🪙</button>`;
+        btnHTML = `<button class="achievement-claim-btn" ${!canClaim ? 'disabled' : ''} data-action="claim-achievement" data-id="${achievement.id}" data-index="${index}">+${tier.reward}🪙</button>`;
       }
 
       contentHTML += `
@@ -1979,7 +1995,8 @@ function showCollectionModal() {
           if (!bonusClaimed) {
             itemClasses += ' bonus-unclaimed';
             const bonusAmount = item.level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
-            clickHandler = `onclick="claimItemBonus('${key}', ${item.level}, this)"`;
+            clickHandler = `data-action="claim-bonus" data-category="${key}" data-level="${item.level}"`;
+
             bonusIconHTML = `<div class="unclaimed-bonus-icon" title="Собрать бонус">+${bonusAmount}🪙</div>`;
           }
         } else {

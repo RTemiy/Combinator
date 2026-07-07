@@ -890,12 +890,11 @@ body.is-dragging, body.is-dragging * {
 .progression-item-square.bonus-unclaimed {
   cursor: pointer;
   box-shadow: 0 0 8px #ffd700, inset 0 1px 3px rgba(0,0,0,0.4);
-  border: 1px solid #ffb703;
-  transition: transform 0.2s;
+  border-color: #ffb703; /* Теперь меняем только цвет рамки */
 }
 
 .progression-item-square.bonus-unclaimed:hover {
-  transform: scale(1.05);
+  box-shadow: 0 0 12px #ffd700, 0 0 8px #fff, inset 0 1px 3px rgba(0,0,0,0.4);
 }
 
 .unclaimed-bonus-icon {
@@ -911,18 +910,8 @@ body.is-dragging, body.is-dragging * {
   animation: star-pulse 2s infinite;
 }
 
-.progression-item-square.bonus-claiming {
-  animation: bonus-claim-pop 0.4s ease-out;
-}
-
 .unclaimed-bonus-icon.exploding {
   animation: bonus-explode 0.4s ease-out forwards;
-}
-
-@keyframes bonus-claim-pop {
-  0% { transform: scale(1.05); } /* Начинаем с состояния ховера */
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
 }
 
 @keyframes bonus-explode {
