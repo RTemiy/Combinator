@@ -705,7 +705,7 @@ function loadGame() {
     gameState.unlockedItemGenCategories = loaded.unlockedItemGenCategories || [];
     gameState.discoveredItems = loaded.discoveredItems || {};
     gameState.claimedCollectionBonuses = loaded.claimedCollectionBonuses || {};
-    
+
     if (energyToRestore > 0) {
       gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
       showToast(`Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100}⚡ энергии!`, "success");
@@ -2027,11 +2027,11 @@ function openMenuModal() {
   closeDetailModal();
   closeCollectionModal();
 
-  DOMElements.menuModal.overlay.className = 'modal-overlay active blocking';
+  DOMElements.menuModal.overlay.classList.add('active', 'blocking');
 }
 
 function closeMenuModal() {
-  DOMElements.menuModal.overlay.className = 'modal-overlay';
+  DOMElements.menuModal.overlay.classList.remove('active', 'blocking');
 }
 
 function closeDetailModal() {

@@ -31,6 +31,7 @@ body {
   user-select: none;
   box-sizing: border-box;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent; /* Убирает синюю подсветку при нажатии на мобильных */
 }
 
 button {
@@ -996,7 +997,6 @@ body.is-dragging, body.is-dragging * {
   box-shadow: 0 0 25px rgba(255, 183, 3, 0.25), 0 8px 35px rgba(0,0,0,0.8);
   position: relative;
   box-sizing: border-box;
-  pointer-events: auto;
   transform: scale(0.9);
   opacity: 0;
   transition: transform 0.25s cubic-bezier(0.1, 0.76, 0.55, 0.94), opacity 0.2s ease;
