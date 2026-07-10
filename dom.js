@@ -26,10 +26,16 @@ export const DOMElements = {
     closeBtn: document.querySelector('#menu-modal .modal-close'),
     resetBtn: document.getElementById('reset-game-btn'),
     collectionBtn: document.getElementById('collection-btn'),
+    settingsBtn: document.getElementById('settings-btn'),
     profileBtn: document.getElementById('profile-btn'),
     achievementsBtn: document.getElementById('achievements-btn'),
     collectionNotificationDot: document.getElementById('collection-notification-dot'),
     achievementsNotificationDot: document.getElementById('achievements-notification-dot'),
+  },
+  settingsModal: {
+    overlay: document.getElementById('settings-modal'),
+    closeBtn: document.getElementById('s-m-close'),
+    body: document.getElementById('s-m-body'),
   },
   profileModal: {
     overlay: document.getElementById('profile-modal'),
@@ -67,4 +73,10 @@ export const DOMElements = {
   menuNotificationDot: document.getElementById('menu-notification-dot'),
   ordersList: document.getElementById('orders-list'),
   rewardQueuePanel: document.getElementById('reward-queue-panel'),
+  bgMusic: document.getElementById('bg-music'),
+  sfxMerge: document.getElementById('sfx-merge'),
+  sfxSwap: document.getElementById('sfx-swap'),
+  sfxSpawn: document.getElementById('sfx-spawn'),
+  sfxOrderComplete: document.getElementById('sfx-order-complete'),
+  sfxCoin: document.getElementById('sfx-coin'),
 };

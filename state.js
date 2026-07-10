@@ -27,6 +27,11 @@ export const gameState = {
   }
 };
 
+export const gameSettings = {
+  musicVolume: 0.2,
+  sfxVolume: 0.5,
+};
+
 export const playerProfile = {
   name: 'Игрок12345',
   icon: '👤',

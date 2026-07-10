@@ -1,270 +1,143 @@
 export const GENERATORS_DATA = {
-  'stationery': { icon: '✏️', name: 'Склад канцелярии', desc: 'Хранилище писчих принадлежностей.', categories: ['stationery'], partIcon: '🧷' },
-  'flowers': { icon: '🌱', name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'], partIcon: '🌿' },
-  'sweets': { icon: '🧁', name: 'Кондитерская', desc: 'Уютное место, где создаются сладости и свежая выпечка.', categories: ['sweets', 'bakery'], isHybrid: true, partIcon: '🥣' },
-  'accessories': { icon: '💎', name: 'Сокровищница', desc: 'Кованый ларь с ценными украшениями.', categories: ['accessories'], partIcon: '✨' },
-  'gadgets': { icon: '⚙️', name: 'Завод электроники', desc: 'Конвейер высокотехнологичных микросхем.', categories: ['gadgets'], partIcon: '🎛' },
-  'alcohol': { icon: '🍸', name: 'Барная стойка', desc: 'Место, где профессиональный бармен смешивает изысканные напитки.', categories: ['alcohol'], partIcon: '🧊' },
-  'atelier': { icon: '🪡', name: 'Ателье', desc: 'Мастерская, где рождаются стильные наряды и эксклюзивная обувь.', categories: ['atelier', 'footwear'], isHybrid: true, partIcon: '🧶' },
-  'household': { icon: '🧰', name: 'Хозяйственный склад', desc: 'Место, где хранятся инструменты и электроприборы.', categories: ['tools', 'electricity'], isHybrid: true, partIcon: '💡' },
-  'transport': { icon: '🏠', name: 'Гараж', desc: 'Парк разнообразных транспортных средств.', categories: ['transport'], partIcon: '🛞' },
-  'food_court': { icon: '🥙', name: 'Ресторанный дворик', desc: 'Место, где можно найти еду на любой вкус.', categories: ['fastfood', 'asian_food'], isHybrid: true, partIcon: '🍳' },
-  'bonus_chest': { icon: '🎁', name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true },
+  'flowers': {
+    name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'],
+    partIcons: [
+      'assets/icons/categories/flowers/part_lvl_01.png',
+      'assets/icons/categories/flowers/part_lvl_02.png',
+      'assets/icons/categories/flowers/part_lvl_03.png',
+    ],
+    icons: [
+      'assets/icons/categories/flowers/generator_lvl_01.png',
+      'assets/icons/categories/flowers/generator_lvl_02.png',
+      'assets/icons/categories/flowers/generator_lvl_03.png',
+      'assets/icons/categories/flowers/generator_lvl_04.png',
+      'assets/icons/categories/flowers/generator_lvl_05.png',
+    ]
+  },
+  'coffee': {
+    name: 'Кофейник', desc: 'Источник ароматного кофе. Чем выше уровень, тем сложнее и изысканнее напитки он может приготовить.', categories: ['coffee'],
+    partIcons: [
+      'assets/icons/categories/coffee/part_lvl_01.png',
+      'assets/icons/categories/coffee/part_lvl_02.png',
+      'assets/icons/categories/coffee/part_lvl_03.png',
+    ],
+    icons: [
+      'assets/icons/categories/coffee/generator_lvl_01.png',
+      'assets/icons/categories/coffee/generator_lvl_02.png',
+      'assets/icons/categories/coffee/generator_lvl_03.png',
+      'assets/icons/categories/coffee/generator_lvl_04.png',
+      'assets/icons/categories/coffee/generator_lvl_05.png',
+    ]
+  },
+  'stationery': {
+    name: 'Канцелярский шкафчик', desc: 'Источник всего, что нужно для учебы и творчества. От простого карандаша до целой библиотеки.', categories: ['books', 'writings'], isHybrid: true,
+    partIcons: [
+      'assets/icons/categories/writings/part_lvl_01.png',
+      'assets/icons/categories/writings/part_lvl_02.png',
+      'assets/icons/categories/writings/part_lvl_03.png',
+    ],
+    icons: [
+      'assets/icons/categories/writings/generator_lvl_01.png',
+      'assets/icons/categories/writings/generator_lvl_02.png',
+      'assets/icons/categories/writings/generator_lvl_03.png',
+      'assets/icons/categories/writings/generator_lvl_04.png',
+      'assets/icons/categories/writings/generator_lvl_05.png',
+    ]
+  },
+  'bonus_chest': {
+    name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true,
+    icons: [
+      'assets/icons/bonus_chest_lvl1.png',
+      'assets/icons/bonus_chest_lvl2.png',
+    ]
+  },
 };
 
 export const CATEGORIES_CONFIG = {
-  stationery: {
-    name: 'Канцелярия',
-    color: '#8a1b0b',
-    generatorKey: 'stationery',
-    items: [
-      { level: 1, icon: '✏️', name: 'Простой карандаш', desc: 'Оставляет тонкий след на бумаге. Базовый инструмент художника.' },
-      { level: 2, icon: '✒️', name: 'Гелевая ручка', desc: 'Пишет четко и ярко. Чернила сохнут мгновенно.' },
-      { level: 3, icon: '✂️', name: 'Ножницы', desc: 'Острые стальные лезвия. Легко режут картон и бумагу.' },
-      { level: 4, icon: '📔', name: 'Записная книжка', desc: 'Плотные листы в линейку. Хранит важные наброски сюжета.' },
-      { level: 5, icon: '📚', name: 'Стопка учебников', desc: 'Сборник древних и современных знаний по всем наукам.' },
-      { level: 6, icon: '🎒', name: 'Школьный рюкзак', desc: 'Вмещает в себя кучу тетрадей, учебников и пенал.' },
-      { level: 7, icon: '🗄', name: 'Стеллаж с книгами', desc: 'Тут собраны все учебники, которые проходят в школе. ' }
-    ]
-  },
   flowers: {
     name: 'Растения',
     color: '#06d6a0',
     generatorKey: 'flowers',
     items: [
-      { level: 1, icon: '🍃', name: 'Семена растений', desc: 'Маленькие спящие зерна. Посадите их в землю, чтобы дать жизнь.' },
-      { level: 2, icon: '🌱', name: 'Зеленый росток', desc: 'Юный и хрупкий стебелек. Требует заботы, солнца и полива.' },
-      { level: 3, icon: '🌿', name: 'Веточка мяты', desc: 'Свежие зеленые листочки. Источают приятный расслабляющий аромат.' },
-      { level: 4, icon: '🪴', name: 'Растение в горшке', desc: 'Ухоженный цветок в керамике. Идеально подходит для украшения интерьера.' },
-      { level: 5, icon: '🌹', name: 'Алая роза', desc: 'Прекрасный и гордый цветок с острыми защитными шипами.' },
-      { level: 6, icon: '💐', name: 'Праздничный букет', desc: 'Красивая композиция из лучших цветов в подарочной упаковке.' },
-      { level: 7, icon: '🌳', name: 'Раскидистое дерево', desc: 'Могучий вековой исполин. Может приносить плоды.', becomesGenerator: { category: 'fruits', charges: 7 } }
-    ]
-  },
-  sweets: {
-    name: 'Сладости',
-    color: '#0353ff',
-    generatorKey: 'sweets',
-    items: [
-      { level: 1, icon: '🍬', name: 'Мятная конфета', desc: 'Маленький леденец в шуршащей обертке.' },
-      { level: 2, icon: '🍭', name: 'Леденец на палочке', desc: 'Сладкий карамельный кругляш.' },
-      { level: 3, icon: '🍪', name: 'Овсяное печенье', desc: 'Ароматное печенье с кусочками шоколада.' },
-      { level: 4, icon: '🍫', name: 'Плитка шоколада', desc: 'Настоящий темный шоколад.' },
-      { level: 5, icon: '🍩', name: 'Глазированный пончик', desc: 'Пышное тесто с яркой посыпкой.' },
-      { level: 6, icon: '🍰', name: 'Кусочек торта', desc: 'Бисквит с нежным ягодным кремом.' },
-      { level: 7, icon: '🎂', name: 'Праздничный торт', desc: 'Шедевр со свечами — пик кондитерского искусства!' }
-    ]
-  },
-  bakery: {
-    name: 'Выпечка',
-    color: '#d4a373',
-    generatorKey: 'sweets',
-    items: [
-      { level: 1, icon: '🥠', name: 'Печенье с предсказанием', desc: 'Хрустящее лакомство с загадочной запиской внутри.' },
-      { level: 2, icon: '🥨', name: 'Соленый крендель', desc: 'Классическая закуска с крупными кристаллами соли.' },
-      { level: 3, icon: '🥐', name: 'Свежий круассан', desc: 'Воздушное слоеное тесто, тающее во рту.' },
-      { level: 4, icon: '🥯', name: 'Бейгл с кунжутом', desc: 'Плотный бублик, идеально подходящий для сэндвичей.' },
-      { level: 5, icon: '🥖', name: 'Французский багет', desc: 'Длинный хлеб с хрустящей корочкой и мягкой сердцевиной.' },
-      { level: 6, icon: '🍞', name: 'Буханка хлеба', desc: 'Домашний пышный хлеб, основа любого стола.' },
-      { level: 7, icon: '🥮', name: 'Каравай', desc: 'Традиционный большой хлеб на всю семью.' }
-    ]
-  },
-  fruits: {
-    name: 'Фрукты',
-    color: '#ff8a5c',
-    generatorKey: null,
-    isItemGenerated: true,
-    items: [
-      { level: 1, icon: '🍋‍🟩', name: 'Лайм', desc: 'Кислый и освежающий, идеален для коктейлей.' },
-      { level: 2, icon: '🍏', name: 'Зеленое яблоко', desc: 'Хрустящее и сочное, с легкой кислинкой.' },
-      { level: 3, icon: '🍐', name: 'Груша', desc: 'Сладкая и ароматная, с нежной мякотью.' },
-      { level: 4, icon: '🍊', name: 'Мандарин', desc: 'Символ праздника, легко чистится и вкусно пахнет.' },
-      { level: 5, icon: '🍋', name: 'Лимон', desc: 'Ярко-желтый и кислый, богат витамином C.' },
-      { level: 6, icon: '🍑', name: 'Персик', desc: 'Бархатистый и сочный, с неповторимым ароматом лета.' },
-      { level: 7, icon: '🥭', name: 'Манго', desc: 'Король тропических фруктов, сладкий и экзотический.' }
-    ]
-  },
-  accessories: {
-    name: 'Драгоценности',
-    color: '#e0aaff',
-    generatorKey: 'accessories',
-    items: [
-      { level: 1, icon: '🪨', name: 'Необработанный камень', desc: 'Простой булыжник, в котором скрыт потенциал.' },
-      { level: 2, icon: '🗝', name: 'Серебряный ключ', desc: 'Изящный ключ от шкатулки с драгоценностями.' },
-      { level: 3, icon: '💍', name: 'Драгоценное кольцо', desc: 'Базовая заготовка для ювелирного изделия.' },
-      { level: 4, icon: '💎', name: 'Ограненный алмаз', desc: 'Драгоценный камень, засиявший после обработки.' },
-      { level: 5, icon: '👑', name: 'Золотая корона', desc: 'Корона, украшенная вставками из драгоценных камней.' },
-      { level: 6, icon: '💰', name: 'Сундук с сокровищами', desc: 'Полная коллекция богатств, собранная старателем.' },
-      { level: 7, icon: '🏆', name: 'Артефакт власти', desc: 'Легендарная реликвия, венчающая мастерство создателя.' }
-    ]
-  },
-  gadgets: {
-    name: 'Гаджеты',
-    color: '#4cc9f0',
-    generatorKey: 'gadgets',
-    items: [
-      { level: 1, icon: '📼', name: 'Видеокассета', desc: 'Старая магнитная лента с записью памятных моментов.' },
-      { level: 2, icon: '💽', name: 'Компакт-диск', desc: 'Цифровой носитель информации начала эры технологий.' },
-      { level: 3, icon: '🎧', name: 'Проводные наушники', desc: 'Классический аксессуар для погружения в мир музыки.' },
-      { level: 4, icon: '⌚️', name: 'Смарт-часы', desc: 'Первый шаг в объединении стиля и умных технологий.' },
-      { level: 5, icon: '📱', name: 'Смартфон', desc: 'Карманный центр управления всей вашей цифровой жизнью.' },
-      { level: 6, icon: '🖥', name: 'Персональный компьютер', desc: 'Мощная рабочая станция для создания контента.' },
-      { level: 7, icon: '💻', name: 'Ультрабук', desc: 'Вершина мобильных технологий и производительности.' }
-    ]
-  },
-  fastfood: {
-    name: 'Фастфуд',
-    color: '#ff8a5c',
-    generatorKey: 'food_court',
-    items : [
-      { level: 1, icon: '🥓', name: 'Хрустящий бекон', desc: 'Тонко нарезанные и хорошо прожаренные ломтики бекона.' },
-      { level: 2, icon: '🍟', name: 'Картофель фри', desc: 'Хрустящие золотистые палочки.' },
-      { level: 3, icon: '🥪', name: 'Сэндвич', desc: 'Классический сэндвич с ветчиной и сыром.' },
-      { level: 4, icon: '🌭', name: 'Хот-дог', desc: 'Сочная сосиска в свежей булке.' },
-      { level: 5, icon: '🍔', name: 'Двойной чизбургер', desc: 'Две котлеты с сыром в свежей булке.' },
-      { level: 6, icon: '🌯', name: 'Сытный ролл', desc: 'Большая порция с овощами и мясом в лаваше.' },
-      { level: 7, icon: '🍗', name: 'Куриный сет', desc: 'Целое ведерко горячих и хрустящих крылышек.' }
-    ]
-  },
-  alcohol: {
-    name: 'Алкоголь',
-    color: '#ff5cf1',
-    generatorKey: 'alcohol',
-    items : [
-      { level: 1, icon: '🍺', name: 'Светлое пиво', desc: 'Классическое холодное пиво в кружке.' },
-      { level: 2, icon: '🍻', name: 'Две кружки', desc: 'Пара бокалов для приятной компании.' },
-      { level: 3, icon: '🍷', name: 'Бокал вина', desc: 'Изысканное красное вино.' },
-      { level: 4, icon: '🥂', name: 'Игристое вино', desc: 'Бокалы с шампанским для тоста.' },
-      { level: 5, icon: '🍾', name: 'Бутылка шампанского', desc: 'Праздничное игристое в охлажденной бутылке.' },
-      { level: 6, icon: '🥃', name: 'Виски', desc: 'Крепкий благородный напиток в стакане.' },
-      { level: 7, icon: '🍹', name: 'Авторский коктейль', desc: 'Сложный напиток с украшениями. Может содержать экзотические ингредиенты.', becomesGenerator: { category: 'berries', charges: 7 } }
+      { level: 1, icon: 'assets/icons/categories/flowers/seeds.png', name: 'Семена растений', desc: 'Маленькие спящие зерна. Посадите их в землю, чтобы дать жизнь.' },
+      { level: 2, icon: 'assets/icons/categories/flowers/sprout.png', name: 'Зеленый росток', desc: 'Юный и хрупкий стебелек, который только-только пробился из земли.' },
+      { level: 3, icon: 'assets/icons/categories/flowers/mint.png', name: 'Небольшое растение', desc: 'Растение окрепло и обзавелось несколькими листочками.' },
+      { level: 4, icon: 'assets/icons/categories/flowers/potted_plant.png', name: 'Большое в горшке', desc: 'Ухоженный цветок в керамике. Идеально подходит для украшения интерьера.' },
+      { level: 5, icon: 'assets/icons/categories/flowers/rose.png', name: 'Алая роза', desc: 'Прекрасный и гордый цветок с острыми защитными шипами.' },
+      { level: 6, icon: 'assets/icons/categories/flowers/bouquet.png', name: 'Праздничный букет', desc: 'Красивая композиция из лучших цветов в подарочной упаковке.' },
+      { level: 7, icon: 'assets/icons/categories/flowers/tree.png', name: 'Раскидистое дерево', desc: 'Могучий вековой исполин. Может приносить плоды.', becomesGenerator: { category: 'berries', charges: 7 } }
     ]
   },
   berries: {
-    name: 'Ягоды и экзотика',
-    color: '#8c1eff',
+    name: 'Смородина',
+    color: '#c9184a',
     generatorKey: null,
     isItemGenerated: true,
     items: [
-      { level: 1, icon: '🫒', name: 'Оливка', desc: 'Маленький соленый плод, идеальная закуска.' },
-      { level: 2, icon: '🍒', name: 'Вишня', desc: 'Сочная и сладкая ягода с косточкой.' },
-      { level: 3, icon: '🍓', name: 'Клубника', desc: 'Ароматная красная ягода, любимица многих.' },
-      { level: 4, icon: '🍇', name: 'Гроздь винограда', desc: 'Сладкие ягоды, собранные в гроздь.' },
-      { level: 5, icon: '🥝', name: 'Киви', desc: 'Пушистый снаружи, ярко-зеленый и кислый внутри.' },
-      { level: 6, icon: '🍌', name: 'Банан', desc: 'Мягкий и питательный тропический фрукт.' },
-      { level: 7, icon: '🥥', name: 'Кокос', desc: 'Твердый орех с молоком и вкусной мякотью внутри.' }
+      { level: 1, icon: 'assets/icons/categories/berries/single_berry.png', name: 'Ягодка смородины', desc: 'Одна-единственная спелая и блестящая ягодка.' },
+      { level: 2, icon: 'assets/icons/categories/berries/bunch.png', name: 'Гроздь смородины', desc: 'Целая веточка, усыпанная кисло-сладкими ягодами.' },
+      { level: 3, icon: 'assets/icons/categories/berries/handful.png', name: 'Горсть смородины', desc: 'Несколько ягод, которых хватит, чтобы распробовать вкус лета.' },
+      { level: 4, icon: 'assets/icons/categories/berries/bowl.png', name: 'Миска со смородиной', desc: 'Полная миска свежесобранных ягод, посыпанных сахаром.' },
+      { level: 5, icon: 'assets/icons/categories/berries/basket.png', name: 'Корзинка смородины', desc: 'Небольшая плетеная корзинка, доверху наполненная урожаем.' },
+      { level: 6, icon: 'assets/icons/categories/berries/jam_jar.png', name: 'Банка варенья', desc: 'Густое и сладкое смородиновое варенье, заготовленное на зиму.' },
+      { level: 7, icon: 'assets/icons/categories/berries/pie.png', name: 'Пирог со смородиной', desc: 'Домашний пирог с ароматной ягодной начинкой.' },
     ]
   },
-  atelier: {
-    name: 'Ателье',
-    color: '#00ffd0',
-    generatorKey: 'atelier',
+  coffee: {
+    name: 'Кофе',
+    color: '#5e3b2b',
+    generatorKey: 'coffee',
     items: [
-      { level: 1, icon: '🪡', name: 'Игла', desc: 'Острый инструмент для начала большой работы.' },
-      { level: 2, icon: '🧵', name: 'Катушка ниток', desc: 'Прочная нить для соединения деталей.' },
-      { level: 3, icon: '🧤', name: 'Вязаные перчатки', desc: 'Первый результат рукоделия для защиты от холода.' },
-      { level: 4, icon: '🧣', name: 'Теплый шарф', desc: 'Мягкий аксессуар, связанный с любовью.' },
-      { level: 5, icon: '👚', name: 'Блузка', desc: 'Элегантный предмет повседневного гардероба.' },
-      { level: 6, icon: '👗', name: 'Вечернее платье', desc: 'Изысканный наряд для особого случая.' },
-      { level: 7, icon: '🧥', name: 'Дизайнерское пальто', desc: 'Вершина портновского искусства и стиля.' }
+      { level: 1, icon: 'assets/icons/categories/coffee/empty_cup.png', name: 'Пустой стаканчик', desc: 'Бумажный стаканчик, готовый к наполнению.' },
+      { level: 2, icon: 'assets/icons/categories/coffee/cup_coffee.png', name: 'Стаканчик с кофе', desc: 'Горячий эспрессо в простом стаканчике.' },
+      { level: 3, icon: 'assets/icons/categories/coffee/ready_cup.png', name: 'Стаканчик навынос', desc: 'Кофе с крышкой, который удобно взять с собой.' },
+      { level: 4, icon: 'assets/icons/categories/coffee/ceramic.png', name: 'Пустая керамическая чашка', desc: 'Элегантная чашка для настоящих ценителей.' },
+      { level: 5, icon: 'assets/icons/categories/coffee/ceramic_coffee.png', name: 'Чашка с кофе', desc: 'Ароматный американо в керамической чашке.' },
+      { level: 6, icon: 'assets/icons/categories/coffee/cappuccino.png', name: 'Капучино', desc: 'Нежный кофе с пышной молочной пенкой.' },
+      { level: 7, icon: 'assets/icons/categories/coffee/best_coffee.png', name: 'Сладкий кофе с допингами', desc: 'Авторский напиток с сиропом, сливками и маршмеллоу.' },
     ]
   },
-  footwear: {
-    name: 'Обувь',
-    color: '#D2691E',
-    generatorKey: 'atelier',
+  writings: {
+    name: 'Письменные принадлежности',
+    color: '#2b5e55',
+    generatorKey: 'stationery',
     items: [
-      { level: 1, icon: '🩴', name: 'Пляжные шлепанцы', desc: 'Легкая обувь для прогулок по песку.' },
-      { level: 2, icon: '🥿', name: 'Балетки', desc: 'Удобные и элегантные туфли на плоской подошве.' },
-      { level: 3, icon: '👡', name: 'Босоножки', desc: 'Открытая летняя обувь на ремешках.' },
-      { level: 4, icon: '👠', name: 'Туфли на каблуке', desc: 'Изящная женская обувь, добавляющая роста и уверенности.' },
-      { level: 5, icon: '👞', name: 'Кожаные туфли', desc: 'Классическая мужская обувь для официальных мероприятий.' },
-      { level: 6, icon: '🥾', name: 'Туристические ботинки', desc: 'Прочная и надежная обувь для походов и путешествий.' },
-      { level: 7, icon: '👢', name: 'Дизайнерские сапоги', desc: 'Вершина обувного мастерства, сочетающая стиль и комфорт.' }
+      { level: 1, icon: 'assets/icons/categories/writings/clip.png', name: 'Скрепка', desc: 'Маленький металлический помощник, удерживающий листы вместе.' },
+      { level: 2, icon: 'assets/icons/categories/writings/eraser.png', name: 'Ластик', desc: 'Стирает ошибки и неудачные наброски, давая второй шанс.' },
+      { level: 3, icon: 'assets/icons/categories/writings/pencil.png', name: 'Карандаш', desc: 'Простой инструмент для письма и рисования, основа творчества.' },
+      { level: 4, icon: 'assets/icons/categories/writings/pen.png', name: 'Ручка', desc: 'Оставляет четкий и уверенный след, идеальна для важных записей.' },
+      { level: 5, icon: 'assets/icons/categories/writings/scissors.png', name: 'Ножницы', desc: 'Острые лезвия для точной резки бумаги и картона.' },
+      { level: 6, icon: 'assets/icons/categories/writings/pencil_case.png', name: 'Пенал', desc: 'Вместилище для всех письменных сокровищ, поддерживает порядок.' },
+      { level: 7, icon: 'assets/icons/categories/writings/organizer.png', name: 'Подставка для письменных принадлежностей', desc: 'Органайзер, который собирает все инструменты в одном месте.' },
     ]
   },
-  tools: {
-    name: 'Инструменты',
-    color: '#a9a9a9',
-    generatorKey: 'household',
+  books: {
+    name: 'Книги',
+    color: '#5e562b',
+    generatorKey: 'stationery',
     items: [
-      { level: 1, icon: '⚙️', name: 'Болт', desc: 'Простейший крепежный элемент.' },
-      { level: 2, icon: '🔧', name: 'Гаечный ключ', desc: 'Инструмент для закручивания гаек.' },
-      { level: 3, icon: '🔨', name: 'Молоток', desc: 'Надежный помощник для забивания гвоздей.' },
-      { level: 4, icon: '🪚', name: 'Ручная пила', desc: 'Позволяет работать с деревом.' },
-      { level: 5, icon: '🪓', name: 'Топор', desc: 'Тяжелый инструмент для рубки дров.' },
-      { level: 6, icon: '🪏', name: 'Лопата', desc: 'Надежное приспособление для выкапывания земли.' },
-      { level: 7, icon: '🧰', name: 'Ящик с инструментами', desc: 'Полный набор для любого ремонта.' }
-    ]
-  },
-  electricity: {
-    name: 'Электричество',
-    color: '#ffc300',
-    generatorKey: 'household',
-    items: [
-      { level: 1, icon: '⛓️‍💥', name: 'Провода', desc: 'Спутанные провода.' },
-      { level: 2, icon: '🔌', name: 'Электрическая вилка', desc: 'Соединяет прибор с сетью.' },
-      { level: 3, icon: '🔋', name: 'Батарейка', desc: 'Портативный источник энергии.' },
-      { level: 4, icon: '🔦', name: 'Карманный фонарик', desc: 'Освещает путь в темноте.' },
-      { level: 5, icon: '📻', name: 'Портативное радио', desc: 'Ловит сигналы из эфира.' },
-      { level: 6, icon: '📺', name: 'Старый телевизор', desc: 'Показывает черно-белые фильмы.' },
-      { level: 7, icon: '📡', name: 'Спутниковая тарелка', desc: 'Принимает сигналы из космоса.' }
-    ]
-  },
-  transport: {
-    name: 'Транспорт',
-    color: '#74c69d',
-    generatorKey: 'transport',
-    items: [
-      { level: 1, icon: '🛼', name: 'Ролики', desc: 'Простой способ быстро передвигаться по парку.' },
-      { level: 2, icon: '🛴', name: 'Самокат', desc: 'Легкий и маневренный городской транспорт.' },
-      { level: 3, icon: '🚲', name: 'Велосипед', desc: 'Экологичный транспорт для прогулок и поездок на работу.' },
-      { level: 4, icon: '🛻', name: 'Пикап', desc: 'Небольшой грузовичок для перевозки малогабаритных грузов.' },
-      { level: 5, icon: '🚗', name: 'Автомобиль', desc: 'Комфортное средство передвижения для всей семьи.' },
-      { level: 6, icon: '🚚', name: 'Грузовик', desc: 'Мощная машина для транспортировки серьезных грузов.' },
-      { level: 7, icon: '🚛', name: 'Фура', desc: 'Огромный автопоезд для междугородних перевозок.' }
-    ]
-  },
-  asian_food: {
-    name: 'Азиатская еда',
-    color: '#e63946',
-    generatorKey: 'food_court',
-    items: [
-      { level: 1, icon: '🥢', name: 'Палочки для еды', desc: 'Главный столовый прибор в Азии.' },
-      { level: 2, icon: '🍚', name: 'Миска риса', desc: 'Основа для любого азиатского блюда.' },
-      { level: 3, icon: '🍙', name: 'Онигири', desc: 'Треугольный рисовый шарик с начинкой.' },
-      { level: 4, icon: '🍣', name: 'Суши', desc: 'Ломтик свежей рыбы на подушке из риса.' },
-      { level: 5, icon: '🍛', name: 'Карри с рисом', desc: 'Пряное и сытное блюдо с густым соусом.' },
-      { level: 6, icon: '🍲', name: 'Суп-лапша', desc: 'Насыщенный азиатский суп с лапшой и добавками.' },
-      { level: 7, icon: '🍱', name: 'Бенто-бокс', desc: 'Коробочка с полноценным японским обедом.' }
+      { level: 1, icon: 'assets/icons/categories/books/sticker.png', name: 'Липучая наклейка', desc: 'Маленький листок для быстрых заметок и напоминаний.' },
+      { level: 2, icon: 'assets/icons/categories/books/paper.png', name: 'Листок', desc: 'Чистый лист бумаги, готовый принять любые идеи.' },
+      { level: 3, icon: 'assets/icons/categories/books/spiral_notebook.png', name: 'Блокнот на пружине', desc: 'Удобный блокнот для конспектов и зарисовок.' },
+      { level: 4, icon: 'assets/icons/categories/books/notebook.png', name: 'Блокнот', desc: 'Надежный спутник для записи мыслей и планов в твердой обложке.' },
+      { level: 5, icon: 'assets/icons/categories/books/book.png', name: 'Книжка', desc: 'Источник знаний или увлекательная история в переплете.' },
+      { level: 6, icon: 'assets/icons/categories/books/books_stack.png', name: 'Стопка книг', desc: 'Коллекция мудрости и приключений, ожидающая своего читателя.' },
+      { level: 7, icon: 'assets/icons/categories/books/bookshelf.png', name: 'Книжный шкаф', desc: 'Целая библиотека, хранящая в себе миры и эпохи.' },
     ]
   }
 };
 
 export const CHARACTERS = [
-  { icon: '🐱', name: 'Кот Том', desc: 'Местный пушистый сибарит. Ценит комфорт и уют, всегда в поисках чего-то приятного.' },
-  { icon: '🦊', name: 'Лиса Алиса', desc: 'Хитрая авантюристка. Всегда в движении, ищет что-то необычное для своих приключений.' },
-  { icon: '🐻', name: 'Мишка По', desc: 'Добродушный любитель природы. Ценит простые радости и всё, что приносит хорошее настроение.' },
-  { icon: '🐸', name: 'Жабка Пепе', desc: 'Философ и ценитель мемов. Постоянно в раздумьях, ищет вдохновение в самых разных вещах.' },
-  { icon: '🧙‍♂️', name: 'Маг Гендальф', desc: 'Древний волшебник. Ищет знания и артефакты, чтобы поддерживать баланс в мире.' },
-  { icon: '🧝‍♀️', name: 'Эльфийка Лия', desc: 'Хранительница лесного спокойствия. Ценит красоту и гармонию, всегда рада новым открытиям.' },
-  { icon: '🧛‍♂️', name: 'Граф Влад', desc: 'Загадочный аристократ из замка неподалеку. Предпочитает изысканные вещи, подчеркивающие его статус.' },
-  { icon: '🦝', name: 'Енот Рокки', desc: 'Завзятый изобретатель и мастер на все руки. Постоянно ищет материалы для своих новых проектов.' },
-  { icon: '🐼', name: 'Панда Мэй', desc: 'Милая любительница уюта и чаепитий. Всегда рада поднять настроение чем-то вкусным и приятным.' },
-  { icon: '🦉', name: 'Сова Оливия', desc: 'Мудрая исследовательница местной академии. Собирает информацию и ценит всё, что способствует обучению.' },
-  { icon: '👩‍🍳', name: 'Шеф-повар Анна', desc: 'Талантливый кулинар, который постоянно ищет новые ингредиенты для своих гастрономических шедевров.' },
-  { icon: '👨‍🌾', name: 'Фермер Джон', desc: 'Трудолюбивый земледелец. Ему всегда нужны инструменты и материалы для своей фермы.' },
-  { icon: '👨‍🚀', name: 'Астронавт Алекс', desc: 'Исследователь космоса. Собирает припасы и оборудование для долгой миссии на орбите.' },
-  { icon: '🧜‍♀️', name: 'Русалка Ариэль', desc: 'Загадочная обитательница морских глубин. Интересуется всем, что связано с миром людей.' }
+  { icon: 'assets/icons/characters/simple_man_01.png', name: 'Студент', desc: 'Вечно занят учебой, но всегда находит время для чашечки кофе.' },
+  { icon: 'assets/icons/characters/simple_man_02.png', name: 'Офисный работник', desc: 'Его день состоит из отчетов и таблиц. Любит, когда все разложено по полочкам.' },
+  { icon: 'assets/icons/characters/simple_man_03.png', name: 'Джентльмен', desc: 'Ценитель классики и хороших манер. Часто заказывает что-то для своей подруги.' },
+  { icon: 'assets/icons/characters/simple_woman_01.png', name: 'Художница', desc: 'Ищет вдохновение в мелочах. Ей постоянно нужны новые материалы для творчества.' },
+  { icon: 'assets/icons/characters/simple_woman_02.png', name: 'Молодая мама', desc: 'Вся в заботах, но не забывает радовать себя и близких небольшими подарками.' },
+  { icon: 'assets/icons/characters/simple_woman_03.png', name: 'Садовод-любитель', desc: 'Обожает все, что связано с растениями. Ее балкон похож на маленький ботанический сад.' },
 ];
 
 export const STORY_CHARACTERS = [
-  { icon: '🕵️‍♂️', name: 'Незнакомец', desc: 'Секретный агент под прикрытием. Его запросы всегда важны и окутаны тайной.' },
-  { icon: '🦸‍♂️', name: 'Супергерой', desc: 'Защитник города. Ему экстренно требуются ресурсы для борьбы со вселенским злом.' },
-  { icon: '👽', name: 'Пришелец', desc: 'Гость с далеких звезд. Изучает земную культуру через самые необычные запросы.' },
-  { icon: '🤖', name: 'Киборг X-100', desc: 'Робот из будущего. Его алгоритмы требуют четких поставок для выполнения миссии.' },
-  { icon: '👑', name: 'Королева', desc: 'Правительница далекого королевства. Ее указы требуют немедленного исполнения и лучших ресурсов.' },
-  { icon: '🐉', name: 'Дракон', desc: 'Древнее и мудрое существо. Его запросы редки, но всегда имеют огромное значение для всего мира.' }
+  { icon: 'assets/icons/characters/special_01.png', name: 'Незнакомец', desc: 'Секретный агент под прикрытием. Его запросы всегда важны и окутаны тайной.' }
 ];
 
 export const ACHIEVEMENTS_DATA = {
@@ -272,7 +145,7 @@ export const ACHIEVEMENTS_DATA = {
     id: 'totalMerges',
     name: 'Мастер комбинаций',
     desc: 'Совершите определенное количество слияний.',
-    icon: '✨',
+    icon: 'assets/icons/achievements/merge_achievement.png',
     tiers: [
       { goal: 50, reward: 100 },
       { goal: 250, reward: 250 },
@@ -284,7 +157,7 @@ export const ACHIEVEMENTS_DATA = {
     id: 'totalOrdersCompleted',
     name: 'Надежный поставщик',
     desc: 'Выполните определенное количество заказов.',
-    icon: '📦',
+    icon: 'assets/icons/achievements/order_achievement.png',
     tiers: [
       { goal: 10, reward: 150 },
       { goal: 50, reward: 300 },
@@ -296,7 +169,7 @@ export const ACHIEVEMENTS_DATA = {
     id: 'totalCoinsEarned',
     name: 'Богач',
     desc: 'Заработайте определенное количество монет за все время.',
-    icon: '💰',
+    icon: 'assets/icons/achievements/coins_achievement.png',
     tiers: [
       { goal: 1000, reward: 100 },
       { goal: 5000, reward: 250 },
@@ -308,7 +181,7 @@ export const ACHIEVEMENTS_DATA = {
     id: 'totalEnergySpent',
     name: 'Энерджайзер',
     desc: 'Потратьте определенное количество энергии.',
-    icon: '⚡',
+    icon: 'assets/icons/achievements/energy_achievement.png',
     tiers: [
       { goal: 500, reward: 50 },
       { goal: 2000, reward: 150 },

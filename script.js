@@ -2,7 +2,7 @@ import {
   GENERATORS_DATA, CATEGORIES_CONFIG, CHARACTERS, STORY_CHARACTERS, ACHIEVEMENTS_DATA,
   CONFIG, GEN_ENERGY_CONFIG, SPAWN_CHANCES, UNLOCK_THRESHOLDS
 } from './config.js';
-import { gameState, playerProfile } from './state.js';
+import { gameState, playerProfile, gameSettings } from './state.js';
 import { DOMElements } from './dom.js';
 
 // --- Проверка версии игры ---
@@ -18,6 +18,22 @@ import { DOMElements } from './dom.js';
   }
 })();
 
+function initAudio() {
+  DOMElements.bgMusic.play().catch(e => {
+    console.warn("Audio autoplay failed. User interaction may be needed.", e);
+  });
+}
+
+function playSound(soundElement) {
+  if (!soundElement || gameSettings.sfxVolume === 0) return;
+  soundElement.volume = gameSettings.sfxVolume;
+  soundElement.currentTime = 0; // Rewind to start to allow for rapid playback
+  soundElement.play().catch(e => {
+    // This can happen if the user hasn't interacted with the page yet.
+    // It's less of an issue for SFX which are triggered by user actions.
+  });
+}
+
 function initGame() {
   createGrid();
   if (localStorage.getItem(CONFIG.SAVE_KEY)) {
@@ -25,6 +41,9 @@ function initGame() {
   } else {
     startNewGame();
   }
+  // Apply loaded settings
+  DOMElements.bgMusic.volume = gameSettings.musicVolume;
+
   restoreGeneratorsEnergy();
   updateUI();
   addListeners();
@@ -45,11 +64,16 @@ function initGame() {
 }
 
 function addListeners() {
+  // Add a general listener to the body to catch the first interaction for audio
+  document.body.addEventListener('pointerdown', initAudio, { once: true });
+
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
   window.addEventListener('blur', cleanDragState);
+  document.body.addEventListener('mouseleave', handleMouseLeave);
   window.addEventListener('touchmove', handleTouchMove, { passive: false });
   window.addEventListener('touchend', handleTouchEnd);
+  window.addEventListener('touchcancel', handleTouchCancel);
   window.addEventListener('beforeunload', () => {
     localStorage.setItem(CONFIG.LAST_LOGIN_KEY, Date.now());
     saveGame();
@@ -63,7 +87,7 @@ function addListeners() {
 
   DOMElements.energy.container.addEventListener('click', () => {
     const modalOptions = {
-      icon: '⚡️',
+      icon: 'assets/icons/energy.png',
       title: 'Энергия',
       subtitle: 'Вечный движитель',
       desc: `За каждое использование генератора тратится 1 ед. энергии. Каждые ${CONFIG.ENERGY_REGEN_INTERVAL / 1000} сек. восстанавливается ${CONFIG.ENERGY_REGEN_AMOUNT} ед. энергии. За каждый выполненный сюжетный заказ вы получаете ${CONFIG.STORY_ORDER_ENERGY_REWARD} ед. энергии.`
@@ -72,7 +96,7 @@ function addListeners() {
     // Добавляем кнопку восстановления, только если энергия не полная
     if (gameState.energy < CONFIG.MAX_ENERGY) {
       modalOptions.actionButton = {
-        text: `Восстановить энергию (-${CONFIG.ENERGY_RECHARGE_COST_COINS}🪙)`,
+        text: `Восстановить энергию (-${CONFIG.ENERGY_RECHARGE_COST_COINS}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
         onClick: rechargePlayerEnergyWithCoins
       };
     }
@@ -82,7 +106,7 @@ function addListeners() {
 
   DOMElements.level.container.addEventListener('click', () => {
     showModal({
-      icon: '🚥',
+      icon: 'assets/icons/level.png',
       title: 'Уровень',
       subtitle: 'Главный показатель эффективности',
       desc: 'За сдачу заказов выдаются очки. Чем сложнее заказ, тем больше очков получается. При получении определенного количества очков, уровень повышается.'
@@ -91,7 +115,7 @@ function addListeners() {
 
   DOMElements.coins.container.addEventListener('click', () => {
     showModal({
-      icon: '🪙',
+      icon: 'assets/icons/coin.png',
       title: 'Монеты',
       subtitle: 'Игровая валюта',
       desc: `Монеты зарабатываются за выполнение заказов.`
@@ -106,10 +130,12 @@ function addListeners() {
   DOMElements.menuModal.collectionBtn.addEventListener('click', () => { closeMenuModal(); showCollectionModal(); });
   DOMElements.menuModal.profileBtn.addEventListener('click', () => { closeMenuModal(); openProfileModal(); });
   DOMElements.menuModal.achievementsBtn.addEventListener('click', () => { closeMenuModal(); openAchievementsModal(); });
+  DOMElements.menuModal.settingsBtn.addEventListener('click', () => { closeMenuModal(); openSettingsModal(); });
   DOMElements.profileModal.closeBtn.addEventListener('click', closeProfileModal);
   DOMElements.detailModal.closeBtn.addEventListener('click', closeDetailModal);
   DOMElements.achievementsModal.closeBtn.addEventListener('click', closeAchievementsModal);
   DOMElements.collectionModal.closeBtn.addEventListener('click', closeCollectionModal);
+  DOMElements.settingsModal.closeBtn.addEventListener('click', closeSettingsModal);
 
   DOMElements.collectionModal.body.addEventListener('click', e => {
     const claimButton = e.target.closest('[data-action="claim-bonus"]');
@@ -142,11 +168,11 @@ function addListeners() {
       confirmCancelOrder(orderId);
     } else if (target.closest('.complete-btn')) {
       completeOrder(orderId);
-    } else if (target.closest('.order-header-info')) {
-      showCharacterById(orderId);
+    } else if (target.closest('.order-avatar-container')) {
+      showCharacterById(orderId); // Теперь клик по аватару
     } else if (orderItemTarget) {
       const category = orderItemTarget.dataset.category;
-      const icon = orderItemTarget.querySelector('.order-item-icon')?.innerHTML;
+      const icon = orderItemTarget.querySelector('.order-item-icon img')?.src;
       if (category) {
         showCategoryProgressionModal(category, icon);
       }
@@ -171,14 +197,20 @@ function claimReward(rewardIndex, startElement) {
 
   let icon = '';
   if (reward.isGenerator) {
-    icon = GENERATORS_DATA[reward.generatorKey].icon;
+    const genInfo = GENERATORS_DATA[reward.generatorKey];
+    const lvl = reward.genLevel || 1;
+    const iconPath = genInfo.icons[lvl - 1];
+    icon = `<img src="${iconPath}" alt="">`;
   } else if (reward.isUpgradePart) {
-    icon = '🔩';
+    icon = `<img src="assets/icons/upgrade_part.png" alt="">`;
   } else if (reward.isMagicTool) {
-    icon = '⚒️';
+    icon = `<img src="assets/icons/magic_tool.png" alt="">`;
   }
   else if (reward.isGeneratorPart) {
-    icon = GENERATORS_DATA[reward.generatorKey].partIcon;
+    const genInfo = GENERATORS_DATA[reward.generatorKey];
+    const lvl = reward.level || 1;
+    const iconPath = genInfo.partIcons[lvl - 1];
+    icon = `<img src="${iconPath}" alt="">`;
   }
 
   moveItem3D(startElement, targetCellElement, icon).then(() => {
@@ -189,6 +221,7 @@ function claimReward(rewardIndex, startElement) {
     saveGame();
     updateUI(); // Перерисовывает и очередь, и поле
     animateCellPop(targetCellIndex);
+    playSound(DOMElements.sfxSpawn);
   });
 }
 
@@ -204,9 +237,14 @@ function startNewGame() {
   gameState.discoveredItems = {};
   gameState.claimedAchievements = {};
   gameState.claimedCollectionBonuses = {};
+  // Reset settings
+  gameSettings.musicVolume = 0.2;
+  gameSettings.sfxVolume = 0.5;
+  DOMElements.bgMusic.volume = gameSettings.musicVolume;
+
   // Сброс профиля
   playerProfile.name = 'Игрок';
-  playerProfile.icon = '🧑‍🚀';
+  playerProfile.icon = 'assets/icons/profile.png';
   playerProfile.startDate = Date.now();
   playerProfile.timePlayed = 0;
   playerProfile.totalMerges = 0;
@@ -294,6 +332,7 @@ function saveGame() {
     claimedAchievements: gameState.claimedAchievements,
     profile: playerProfile,
     claimedCollectionBonuses: gameState.claimedCollectionBonuses,
+    settings: gameSettings,
     thresholds: UNLOCK_THRESHOLDS.map(t => ({ score: t.score, unlocked: t.unlocked, level: t.level }))
   };
   localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(saveData));
@@ -327,10 +366,15 @@ function loadGame() {
     gameState.discoveredItems = loaded.discoveredItems || {};
     gameState.claimedAchievements = loaded.claimedAchievements || {};
     gameState.claimedCollectionBonuses = loaded.claimedCollectionBonuses || {};
+    // Load settings
+    const loadedSettings = loaded.settings || {};
+    gameSettings.musicVolume = loadedSettings.musicVolume !== undefined ? loadedSettings.musicVolume : 0.2;
+    gameSettings.sfxVolume = loadedSettings.sfxVolume !== undefined ? loadedSettings.sfxVolume : 0.5;
+
     // Загрузка профиля с проверкой на случай старых сохранений
     const loadedProfile = loaded.profile || {};
     playerProfile.name = loadedProfile.name || 'Игрок';
-    playerProfile.icon = loadedProfile.icon || '🧑‍🚀';
+    playerProfile.icon = loadedProfile.icon || 'assets/icons/profile.png';
     playerProfile.startDate = loadedProfile.startDate || Date.now();
     playerProfile.timePlayed = loadedProfile.timePlayed || 0;
     playerProfile.totalMerges = loadedProfile.totalMerges || 0;
@@ -341,7 +385,7 @@ function loadGame() {
 
     if (energyToRestore > 0) {
       gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
-      showToast(`Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100}⚡ энергии!`, "success");
+      showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100} энергии!`, "success");
     }
 
     if (loaded.thresholds) {
@@ -387,7 +431,10 @@ function createGrid() {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     cell.dataset.index = i;
-    cell.addEventListener('mousedown', (e) => startDrag(e, i));
+    cell.addEventListener('mousedown', (e) => {
+      e.preventDefault(); // Предотвращаем выделение текста и стандартное перетаскивание браузера
+      startDrag(e, i);
+    });
     cell.addEventListener('touchstart', (e) => {
       e.preventDefault();
       startDrag(e, i);
@@ -442,11 +489,11 @@ function regenerateEnergy() {
 }
 
 function updateMenuNotification() {
-    if (hasUnclaimedAchievements() || hasUnclaimedCollectionBonuses()) {
-        DOMElements.menuNotificationDot.style.display = 'block';
-    } else {
-        DOMElements.menuNotificationDot.style.display = 'none';
-    }
+  if (hasUnclaimedAchievements() || hasUnclaimedCollectionBonuses()) {
+    DOMElements.menuNotificationDot.style.display = 'block';
+  } else {
+    DOMElements.menuNotificationDot.style.display = 'none';
+  }
 }
 
 function updateUI() {
@@ -489,25 +536,24 @@ function renderRewardQueue() {
 
     if (reward.isGenerator) {
       const genInfo = GENERATORS_DATA[reward.generatorKey];
+      const lvl = reward.genLevel || 1;
+      const iconPath = genInfo.icons[lvl - 1];
       rewardElem.classList.add('generator');
       rewardElem.title = `Забрать: ${genInfo.name}`;
-      rewardElem.innerHTML = `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`;
+      rewardElem.innerHTML = `<img src="${iconPath}" alt="${genInfo.name}" style="width: 2.5rem; height: 2.5rem;">`;
     } else if (reward.isUpgradePart) {
-      rewardElem.innerHTML = '🔩';
+      rewardElem.innerHTML = `<img src="assets/icons/upgrade_part.png" alt="Новая деталь" style="width: 1.5rem; height: 1.5rem;">`;
       rewardElem.title = 'Забрать: Новая деталь';
     } else if (reward.isMagicTool) {
-      rewardElem.innerHTML = '⚒️';
+      rewardElem.innerHTML = `<img src="assets/icons/magic_tool.png" alt="Магические инструменты" style="width: 1.5rem; height: 1.5rem;">`;
       rewardElem.title = 'Забрать: Магические инструменты';
     } else if (reward.isGeneratorPart) {
       const genInfo = GENERATORS_DATA[reward.generatorKey];
       rewardElem.classList.add('generator-part');
       rewardElem.title = `Забрать: Деталь для "${genInfo.name}"`;
-      rewardElem.innerHTML = `
-          <div class="generator-part-icon-container">
-              <span class="part-bg-box">📦</span>
-              <span class="part-bg-icon">${genInfo.icon}</span>
-              <span class="part-fg-icon">${genInfo.partIcon}</span>
-          </div>`;
+      const lvl = reward.level || 1;
+      const iconPath = genInfo.partIcons[lvl - 1];
+      rewardElem.innerHTML = `<img src="${iconPath}" alt="Деталь для ${genInfo.name}" style="width: 2.5rem; height: 2.5rem;">`;
     }
 
     panel.appendChild(rewardElem);
@@ -562,30 +608,19 @@ function renderGrid() {
         const lvl = item.genLevel || 1;
         cell.classList.add('generator-slot');
 
-        const container = document.createElement('div');
-        container.classList.add('generator-icon-container');
-
-        const bgBox = document.createElement('span');
-        bgBox.classList.add('generator-box-bg');
-        bgBox.innerText = '📦';
-
-        const fgItem = document.createElement('span');
-        fgItem.classList.add('generator-item-fg');
         const genInfo = GENERATORS_DATA[item.generatorKey];
-        fgItem.innerText = genInfo.icon;
+        const iconPath = genInfo.icons[lvl - 1];
+        wrapper.innerHTML = `<img src="${iconPath}" alt="${genInfo.name}">`;
 
-        container.appendChild(bgBox);
-        container.appendChild(fgItem);
-        wrapper.appendChild(container);
         renderGeneratorBadges(cell, item);
       } else if (item.isItemGenerator) {
         const itemInfo = CATEGORIES_CONFIG[item.category].items[item.level - 1];
-        wrapper.innerHTML = itemInfo.icon;
+        wrapper.innerHTML = `<img src="${itemInfo.icon}" alt="">`;
 
         // Добавляем значок заряда
         const chargeBadge = document.createElement('span');
         chargeBadge.classList.add('gen-energy-badge', 'charges'); // Переиспользуем существующие стили
-        chargeBadge.innerHTML = `🍃 ${item.charges}`; // Кастомная иконка
+        chargeBadge.innerHTML = `<img src="assets/icons/energy.png" class="badge-icon" alt=""> ${item.charges}`; // Кастомная иконка
         if (item.charges === 0) {
           chargeBadge.classList.add('gen-energy-badge-no-energy');
         }
@@ -594,7 +629,7 @@ function renderGrid() {
         // Добавляем звезду и частицы, так как предмет достиг максимального уровня в своей ветке
         const starBadge = document.createElement('span');
         starBadge.classList.add('max-level-star');
-        starBadge.innerText = '⭐';
+        starBadge.innerHTML = `<img src="assets/icons/star.png" alt="max level">`;
         cell.appendChild(starBadge);
         // Вставляем частицы перед звездочкой, чтобы звезда была поверх
         starBadge.insertAdjacentHTML('beforebegin', createParticleEffectHTML());
@@ -608,12 +643,9 @@ function renderGrid() {
         }
       } else if (item.isGeneratorPart) {
         const genInfo = GENERATORS_DATA[item.generatorKey];
-        wrapper.innerHTML = `
-            <div class="generator-part-icon-container">
-                <span class="part-bg-box">📦</span>
-                <span class="part-bg-icon">${genInfo.icon}</span>
-                <span class="part-fg-icon">${genInfo.partIcon}</span>
-            </div>`;
+        const lvl = item.level || 1;
+        const iconPath = genInfo.partIcons[lvl - 1];
+        wrapper.innerHTML = `<img src="${iconPath}" alt="Деталь для ${genInfo.name}">`;
 
         const levelBadge = document.createElement('span');
         levelBadge.classList.add('item-level');
@@ -621,12 +653,12 @@ function renderGrid() {
         cell.appendChild(levelBadge);
       } else if (item.isUpgradePart || item.isMagicTool) {
         // Общая логика для деталей и инструментов
-        wrapper.innerHTML = item.isUpgradePart ? '🔩' : '⚒️';
+        wrapper.innerHTML = item.isUpgradePart ? `<img src="assets/icons/upgrade_part.png" alt="">` : `<img src="assets/icons/magic_tool.png" alt="">`;
 
         // Добавляем звездочку, так как их нельзя улучшить
         const starBadge = document.createElement('span');
         starBadge.classList.add('max-level-star');
-        starBadge.innerText = '⭐';
+        starBadge.innerHTML = `<img src="assets/icons/star.png" alt="max level">`;
         cell.appendChild(starBadge);
 
         // Добавляем эффект частиц
@@ -634,13 +666,13 @@ function renderGrid() {
         // Вставляем частицы перед звездочкой, чтобы звезда была поверх
         starBadge.insertAdjacentHTML('beforebegin', particleHTML);
       } else {
-        wrapper.innerHTML = CATEGORIES_CONFIG[item.category].items[item.level - 1].icon;
+        wrapper.innerHTML = `<img src="${CATEGORIES_CONFIG[item.category].items[item.level - 1].icon}" alt="">`;
 
         // Добавляем эффект частиц для предметов максимального уровня
         if (item.level === CONFIG.MAX_ITEM_LEVEL) {
           const starBadge = document.createElement('span');
           starBadge.classList.add('max-level-star');
-          starBadge.innerText = '⭐';
+          starBadge.innerHTML = `<img src="assets/icons/star.png" alt="max level">`;
           cell.appendChild(starBadge);
           // Вставляем частицы перед звездочкой, чтобы звезда была поверх
           starBadge.insertAdjacentHTML('beforebegin', createParticleEffectHTML());
@@ -679,13 +711,13 @@ function renderGeneratorBadges(cell, item) {
   energyBadge.classList.add('gen-energy-badge');
 
   if (item.generatorKey === 'bonus_chest') {
-    energyBadge.innerText = `🎁 ${item.genCharges}`;
+    energyBadge.innerHTML = `<img src="assets/icons/energy.png" class="badge-icon" alt=""> ${item.genCharges}`;
     energyBadge.classList.add('charges');
     if (item.genCharges === 0) {
       energyBadge.classList.add('gen-energy-badge-no-energy');
     }
   } else {
-    energyBadge.innerText = `⚡${item.genEnergy}`;
+    energyBadge.innerHTML = `<img src="assets/icons/energy.png" class="badge-icon" alt="">${item.genEnergy}`;
     // Обновляем классы ячейки в зависимости от энергии
     cell.classList.remove('generator-slot-no-energy', 'generator-slot-low-energy');
     energyBadge.classList.remove('gen-energy-badge-no-energy');
@@ -715,7 +747,7 @@ function renderGeneratorBadges(cell, item) {
   if (lvl === CONFIG.MAX_GENERATOR_LEVEL) {
     const starBadge = document.createElement('span');
     starBadge.classList.add('max-level-star');
-    starBadge.innerText = '⭐';
+    starBadge.innerHTML = `<img src="assets/icons/star.png" alt="max level">`;
     cell.appendChild(starBadge);
   }
 }
@@ -771,11 +803,20 @@ function handleDragMove(clientX, clientY) {
 }
 
 function handleMouseMove(e) {
+  if (!gameState.dragState.isDragging) return;
   handleDragMove(e.clientX, e.clientY);
 }
 
 function handleTouchMove(e) {
   handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+}
+
+function handleMouseLeave() {
+  // Если мышь покидает окно во время перетаскивания, отменяем его,
+  // чтобы избежать "залипания" предмета, если mouseup произойдет вне окна.
+  if (gameState.dragState.isDragging) {
+    endDrag(-1, -1);
+  }
 }
 
 function handleMouseUp(e) {
@@ -787,6 +828,14 @@ function handleTouchEnd(e) {
   if (gameState.dragState.startIndex === null) return;
   const changedTouch = e.changedTouches[0];
   endDrag(changedTouch.clientX, changedTouch.clientY);
+}
+
+function handleTouchCancel() {
+  // Событие touchcancel может произойти, если палец уходит за пределы экрана.
+  // Отменяем перетаскивание, чтобы избежать "залипания".
+  if (gameState.dragState.isDragging) {
+    endDrag(-1, -1);
+  }
 }
 
 function endDrag(clientX, clientY) {
@@ -1064,6 +1113,7 @@ function executeMergeOrSwap(fromIdx, toIdx) {
 
   for (const handler of MERGE_HANDLERS) {
     if (handler.canHandle(source, target)) {
+      playSound(DOMElements.sfxMerge);
       handler.execute(fromIdx, toIdx, source, target);
       playerProfile.totalMerges++;
 
@@ -1103,6 +1153,9 @@ function executeMergeOrSwap(fromIdx, toIdx) {
 
   // Если ни один обработчик слияния не сработал, выполняем перемещение
   const wasSwapped = handleSwap(fromIdx, toIdx, source, target);
+  if (wasSwapped) {
+    playSound(DOMElements.sfxSwap);
+  }
   saveGame();
   updateUI();
 
@@ -1166,7 +1219,7 @@ function triggerMergeEffects(idx, category) {
 
 function clearBlockedItemWithCoins(index) {
   if (gameState.coins < CONFIG.BLOCKED_CLEAR_COST_COINS) {
-    showToast(`🪙 Недостаточно монет для расчистки (нужно ${CONFIG.BLOCKED_CLEAR_COST_COINS})!`, "error");
+    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет для расчистки (нужно ${CONFIG.BLOCKED_CLEAR_COST_COINS})!`, "error");
     closeModal();
     return;
   }
@@ -1187,7 +1240,7 @@ function rechargeGeneratorWithCoins(index) {
   }
 
   if (gameState.coins < CONFIG.GENERATOR_RECHARGE_COST) {
-    showToast(`🪙 Недостаточно монет (нужно ${CONFIG.GENERATOR_RECHARGE_COST})!`, "error");
+    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.GENERATOR_RECHARGE_COST})!`, "error");
     closeModal();
     return;
   }
@@ -1202,18 +1255,18 @@ function rechargeGeneratorWithCoins(index) {
   closeModal();
   saveGame();
   updateUI();
-  showToast("📦 Энергия генератора полностью восстановлена!", "success");
+  showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Энергия генератора полностью восстановлена!`, "success");
 }
 
 function rechargePlayerEnergyWithCoins() {
   if (gameState.coins < CONFIG.ENERGY_RECHARGE_COST_COINS) {
-    showToast(`🪙 Недостаточно монет (нужно ${CONFIG.ENERGY_RECHARGE_COST_COINS})!`, "error");
+    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.ENERGY_RECHARGE_COST_COINS})!`, "error");
     closeModal();
     return;
   }
 
   if (gameState.energy >= CONFIG.MAX_ENERGY) {
-    showToast("⚡ Ваша энергия уже полная!", "error");
+    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Ваша энергия уже полная!`, "error");
     closeModal();
     return;
   }
@@ -1224,18 +1277,18 @@ function rechargePlayerEnergyWithCoins() {
   closeModal();
   saveGame();
   updateUI();
-  showToast("⚡ Энергия полностью восстановлена!", "success");
+  showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Энергия полностью восстановлена!`, "success");
 }
 
 function getBlockedItemModalOptions(item, index) {
   const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
   return {
-    icon: '🕸️',
+    icon: 'assets/icons/web.png',
     title: `Заблокированный: ${info.name}`,
     subtitle: 'В паутине',
     desc: 'Этот предмет в паутине. Чтобы его освободить, перетащите на него точно такой же предмет с поля, либо расчистите завал за монеты.',
     actionButton: {
-      text: `Расчистить завал (-${CONFIG.BLOCKED_CLEAR_COST_COINS}🪙)`,
+      text: `Расчистить завал (-${CONFIG.BLOCKED_CLEAR_COST_COINS}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
       onClick: () => clearBlockedItemWithCoins(index)
     },
     isBlocking: false
@@ -1247,8 +1300,10 @@ function getGeneratorModalOptions(item, index) {
   const lvl = item.genLevel || 1;
 
   if (item.generatorKey === 'bonus_chest') {
+    const lvl = item.genLevel || 1;
+    const iconPath = genInfo.icons[lvl - 1];
     return {
-      icon: '🎁',
+      icon: iconPath,
       title: `Подарочная коробка ${CONFIG.ROMAN_NUMERALS[lvl]}`,
       subtitle: 'Особый генератор',
       desc: `Этот генератор содержит редкие предметы. У него осталось ${item.genCharges} заряд(ов). Когда заряды закончатся, он исчезнет. Перетащите на него такую же коробку, чтобы улучшить и получить больше предметов.`,
@@ -1259,8 +1314,9 @@ function getGeneratorModalOptions(item, index) {
   const config = GEN_ENERGY_CONFIG[lvl];
   const desc = `Создает предметы из своей категории.`;
 
+  const iconPath = genInfo.icons[lvl - 1];
   const modalOptions = {
-    icon: `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`,
+    icon: iconPath,
     title: `${genInfo.name} ${CONFIG.ROMAN_NUMERALS[lvl]}`,
     subtitle: `Генератор • Уровень ${CONFIG.ROMAN_NUMERALS[lvl]}`,
     desc: desc,
@@ -1271,7 +1327,7 @@ function getGeneratorModalOptions(item, index) {
 
   if (item.genEnergy < config.max) {
     modalOptions.actionButton = {
-      text: `Восстановить (-${CONFIG.GENERATOR_RECHARGE_COST}🪙)`,
+      text: `Восстановить (-${CONFIG.GENERATOR_RECHARGE_COST}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
       onClick: () => rechargeGeneratorWithCoins(index),
     };
   }
@@ -1297,7 +1353,7 @@ function getItemGeneratorModalOptions(item, index) {
 function getBoosterModalOptions(item) {
   if (item.isUpgradePart) {
     return {
-      icon: '🔩',
+      icon: 'assets/icons/upgrade_part.png',
       title: 'Новая деталь',
       subtitle: 'Универсальный улучшитель',
       desc: 'Редкая деталь, полученная за выполнение особого заказа. Перетащите ее на любой генератор (кроме подарочных коробок), чтобы повысить его уровень.',
@@ -1306,7 +1362,7 @@ function getBoosterModalOptions(item) {
   }
   if (item.isMagicTool) {
     return {
-      icon: '⚒️',
+      icon: 'assets/icons/magic_tool.png',
       title: 'Магические инструменты',
       subtitle: 'Универсальный улучшитель',
       desc: 'Волшебные инструменты, способные улучшить любой предмет на один уровень. Перетащите их на предмет, который хотите улучшить.',
@@ -1318,21 +1374,17 @@ function getBoosterModalOptions(item) {
 
 function getGeneratorPartModalOptions(item, index) {
   const genInfo = GENERATORS_DATA[item.generatorKey];
-  const iconHTML = `
-        <div class="generator-part-icon-container">
-            <span class="part-bg-box">📦</span>
-            <span class="part-bg-icon">${genInfo.icon}</span>
-            <span class="part-fg-icon">${genInfo.partIcon}</span>
-        </div>`;
+  const lvl = item.level || 1;
+  const iconPath = genInfo.partIcons[lvl - 1];
   const sellPrice = (item.level || 1) * 3;
 
   return {
-    icon: iconHTML,
+    icon: iconPath,
     title: `Деталь для "${genInfo.name}"`,
     subtitle: `Деталь для сборки • Уровень ${item.level}`,
     desc: 'Часть будущего генератора. Объединяйте с такими же деталями. ',
     dangerButtons: {
-      confirmButtonText: `Продать (+${sellPrice}🪙)`,
+      confirmButtonText: `Продать (+${sellPrice}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
       onConfirm: () => deleteItem(index)
     },
     infoButton: {
@@ -1351,7 +1403,7 @@ function getRegularItemModalOptions(item, index) {
     subtitle: `${CATEGORIES_CONFIG[item.category].name} • Уровень ${item.level}`,
     desc: 'Предмет для выполнения заказов и слияния.',
     dangerButtons: {
-      confirmButtonText: `Продать (+${sellPrice}🪙)`,
+      confirmButtonText: `Продать (+${sellPrice}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
       onConfirm: () => deleteItem(index)
     },
     infoButton: {
@@ -1413,6 +1465,7 @@ function deleteItem(index) {
   const sellPrice = (item.level || 1) * 3;
 
   gameState.coins += sellPrice;
+  playSound(DOMElements.sfxCoin);
   playerProfile.totalCoinsEarned += sellPrice;
   gameState.gridData[index] = null;
 
@@ -1423,21 +1476,21 @@ function deleteItem(index) {
 
 function showCharacterModal(order) {
   showModal({
-    icon: order.character.icon,
+    icon: `<img src="${order.character.icon}" alt="">`,
     title: order.character.name,
-    subtitle: order.isStory ? "🔥 Важный гость (Сюжет)" : "Постоянный клиент",
+    subtitle: order.isStory ? `Важный гость (Сюжет)` : "Постоянный клиент",
     desc: order.character.desc || "Заглянул за покупками.",
   });
 }
 
-function showCategoryProgressionModal(categoryKeyOrKeys, icon = '⛓️') {
+function showCategoryProgressionModal(categoryKeyOrKeys, icon = 'assets/icons/chain.png') {
   const categoryKeys = Array.isArray(categoryKeyOrKeys) ? categoryKeyOrKeys : [categoryKeyOrKeys];
   if (categoryKeys.length === 0) return;
   const modal = DOMElements.detailModal; // Используем большой модал
   let contentHTML = '';
   let modalTitle = 'Цепочка эволюции';
 
-  modal.icon.innerHTML = icon;
+  modal.icon.innerHTML = `<img src="${icon}" alt="Иконка цепочки">`;
 
   categoryKeys.forEach((key, index) => {
     const category = CATEGORIES_CONFIG[key];
@@ -1453,7 +1506,7 @@ function showCategoryProgressionModal(categoryKeyOrKeys, icon = '⛓️') {
     category.items.forEach((item, itemIndex) => {
       const discovered = isDiscovered(key, item.level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
-      const itemIcon = discovered ? item.icon : '?';
+      const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
       contentHTML += `
         <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? item.name : 'Не открыто'}">
           <div class="progression-item-icon">${itemIcon}</div>
@@ -1477,7 +1530,8 @@ function showGeneratorDetailModal(item) {
   const genInfo = GENERATORS_DATA[item.generatorKey];
   const lvl = item.genLevel || 1;
 
-  modal.icon.innerHTML = `<div class="generator-icon-container"><span class="generator-box-bg">📦</span><span class="generator-item-fg">${genInfo.icon}</span></div>`;
+  const iconPath = genInfo.icons[lvl - 1];
+  modal.icon.innerHTML = `<img src="${iconPath}" alt="${genInfo.name}">`;
   modal.title.innerText = `${genInfo.name} ${CONFIG.ROMAN_NUMERALS[lvl]}`;
 
   // --- Генерация контента ---
@@ -1515,7 +1569,7 @@ function showGeneratorDetailModal(item) {
     category.items.forEach((item, itemIndex) => {
       const discovered = isDiscovered(key, item.level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
-      const itemIcon = discovered ? item.icon : '?';
+      const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
       contentHTML += `
               <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? item.name : 'Не открыто'}">
                   <div class="progression-item-icon">${itemIcon}</div>
@@ -1538,7 +1592,7 @@ function showItemDetailModal(item) {
   const category = CATEGORIES_CONFIG[item.category];
   const itemInfo = category.items[item.level - 1];
 
-  modal.icon.innerHTML = itemInfo.icon;
+  modal.icon.innerHTML = `<img src="${itemInfo.icon}" alt="">`;
   modal.title.innerText = itemInfo.name;
 
   let contentHTML = '';
@@ -1553,7 +1607,7 @@ function showItemDetailModal(item) {
     cat.items.forEach((progItem, itemIndex) => {
       const discovered = isDiscovered(categoryKey, progItem.level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
-      const itemIcon = discovered ? progItem.icon : '?';
+      const itemIcon = discovered ? `<img src="${progItem.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
       chainHTML += `
           <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? progItem.name : 'Не открыто'}">
               <div class="progression-item-icon">${itemIcon}</div>
@@ -1590,13 +1644,10 @@ function showItemDetailModal(item) {
 function showGeneratorPartDetailModal(item) {
   const modal = DOMElements.detailModal;
   const genInfo = GENERATORS_DATA[item.generatorKey];
+  const lvl = item.level || 1;
+  const iconPath = genInfo.partIcons[lvl - 1];
 
-  modal.icon.innerHTML = `
-        <div class="generator-part-icon-container">
-            <span class="part-bg-box">📦</span>
-            <span class="part-bg-icon">${genInfo.icon}</span>
-            <span class="part-fg-icon">${genInfo.partIcon}</span>
-        </div>`;
+  modal.icon.innerHTML = `<img src="${iconPath}" alt="Деталь для ${genInfo.name}">`;
   modal.title.innerText = `Сборка: ${genInfo.name}`;
 
   let contentHTML = '';
@@ -1604,26 +1655,21 @@ function showGeneratorPartDetailModal(item) {
   contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Цепочка сборки</h4>`;
   contentHTML += `<div class="progression-container">`;
 
-  const partHTML = (level) => `
+  const partHTML = (level) => {
+    const currentPartIconPath = genInfo.partIcons[level - 1];
+    return `
         <div class="progression-item-square" title="Деталь, Ур. ${level}">
             <div class="progression-item-icon">
-                <div class="generator-part-icon-container">
-                    <span class="part-bg-box">📦</span>
-                    <span class="part-bg-icon">${genInfo.icon}</span>
-                    <span class="part-fg-icon">${genInfo.partIcon}</span>
-                </div>
+                <img src="${currentPartIconPath}" alt="Деталь для ${genInfo.name}">
             </div>
             <div class="progression-item-level">${level}</div>
         </div>
-    `;
+    `};
 
   const generatorHTML = `
         <div class="progression-item-square" title="${genInfo.name}, Ур. I">
             <div class="progression-item-icon">
-                 <div class="generator-icon-container">
-                    <span class="generator-box-bg">📦</span>
-                    <span class="generator-item-fg">${genInfo.icon}</span>
-                </div>
+                <img src="${genInfo.icons[0]}" alt="${genInfo.name}">
             </div>
             <div class="progression-item-level">I</div>
         </div>
@@ -1663,7 +1709,7 @@ function showModal(options) {
   const { icon, title, subtitle, desc, actionButton, dangerButtons, infoButton, isBlocking } = options;
   const modal = DOMElements.infoModal;
 
-  modal.icon.innerHTML = icon;
+  modal.icon.innerHTML = icon.startsWith('assets/') ? `<img src="${icon}" alt="">` : icon;
   modal.title.innerText = title;
   modal.subtitle.innerText = subtitle;
   modal.desc.innerText = desc;
@@ -1677,13 +1723,13 @@ function showModal(options) {
   }
   modal.actionBtn.style.display = actionButton ? 'block' : 'none';
   if (actionButton) {
-    modal.actionBtn.innerText = actionButton.text;
+    modal.actionBtn.innerHTML = actionButton.text;
     modal.actionBtn.onclick = actionButton.onClick;
   }
 
   modal.dangerGroup.style.display = dangerButtons ? 'flex' : 'none';
   if (dangerButtons) {
-    modal.confirmBtn.innerText = dangerButtons.confirmButtonText;
+    modal.confirmBtn.innerHTML = dangerButtons.confirmButtonText;
     modal.confirmBtn.onclick = dangerButtons.onConfirm;
   }
 
@@ -1700,6 +1746,7 @@ function openMenuModal() {
   closeDetailModal();
   closeCollectionModal();
   closeProfileModal();
+  closeSettingsModal();
 
   // Закрываем новое окно достижений
   closeAchievementsModal();
@@ -1743,6 +1790,16 @@ function closeAchievementsModal() {
   modal.overlay.classList.remove('active', 'blocking');
 }
 
+function openSettingsModal() {
+  renderSettingsModal();
+  DOMElements.settingsModal.overlay.classList.add('active', 'blocking');
+}
+
+function closeSettingsModal() {
+  const modal = DOMElements.settingsModal;
+  modal.overlay.classList.remove('active', 'blocking');
+}
+
 function closeCollectionModal() {
   const modal = DOMElements.collectionModal;
   modal.overlay.classList.remove('active', 'blocking');
@@ -1773,7 +1830,7 @@ function renderProfile() {
   const modal = DOMElements.profileModal;
   const profile = playerProfile;
 
-  modal.icon.innerText = profile.icon;
+  modal.icon.innerHTML = `<img src="${profile.icon}" alt="${profile.name}">`;
 
   // --- NEW LOGIC for favorite category ---
   let favoriteCategoryName = 'Нет';
@@ -1788,16 +1845,20 @@ function renderProfile() {
   const timePlayedStr = formatTimePlayed(profile.timePlayed);
   const startDateStr = new Date(profile.startDate).toLocaleDateString('ru-RU');
 
+  const profileIconHTML = `<img src="${profile.icon}" alt="${profile.name}">`;
+  const energyIcon = `<img src="assets/icons/energy.png" class="inline-icon" alt="энергия">`;
+  const coinIcon = `<img src="assets/icons/coin.png" class="inline-icon" alt="монета">`;
+
   modal.body.innerHTML = `
     <div class="profile-header">
-        <div class="profile-avatar">${profile.icon}</div>
+        <div class="profile-avatar">${profileIconHTML}</div>
         <input type="text" class="profile-name-input" value="${profile.name}" id="profile-name-input" maxlength="20" placeholder="Введите имя">
     </div>
     <div class="profile-stats">
         <div class="stat-item"><span>Комбинаций сделано:</span> <strong>${profile.totalMerges.toLocaleString('ru-RU')}</strong></div>
         <div class="stat-item"><span>Заказов выполнено:</span> <strong>${profile.totalOrdersCompleted.toLocaleString('ru-RU')}</strong></div>
-        <div class="stat-item"><span>Всего потрачено энергии:</span> <strong>${(profile.totalEnergySpent || 0).toLocaleString('ru-RU')} ⚡</strong></div>
-        <div class="stat-item"><span>Всего заработано:</span> <strong>${(profile.totalCoinsEarned || 0).toLocaleString('ru-RU')} 🪙</strong></div>
+        <div class="stat-item"><span>Всего потрачено энергии:</span> <strong>${(profile.totalEnergySpent || 0).toLocaleString('ru-RU')} ${energyIcon}</strong></div>
+        <div class="stat-item"><span>Всего заработано:</span> <strong>${(profile.totalCoinsEarned || 0).toLocaleString('ru-RU')} ${coinIcon}</strong></div>
         <div class="stat-item"><span>Любимая категория:</span> <strong>${favoriteCategoryName}</strong></div>
         <div class="stat-item"><span>Время в игре:</span> <strong>${timePlayedStr}</strong></div>
         <div class="stat-item"><span>Дата начала:</span> <strong>${startDateStr}</strong></div>
@@ -1809,6 +1870,54 @@ function renderProfile() {
   nameInput.addEventListener('blur', () => {
     playerProfile.name = nameInput.value.trim() || 'Игрок';
     saveGame(); // Сохраняем игру после изменения имени
+  });
+}
+
+function renderSettingsModal() {
+  const body = DOMElements.settingsModal.body;
+  body.innerHTML = `
+    <div class="settings-item">
+      <label for="music-volume-slider" class="settings-label">Громкость музыки</label>
+      <div class="settings-control">
+        <input type="range" id="music-volume-slider" min="0" max="1" step="0.05" value="${gameSettings.musicVolume}">
+      </div>
+    </div>
+    <div class="settings-item">
+      <label for="sfx-volume-slider" class="settings-label">Громкость звуков</label>
+      <div class="settings-control">
+        <input type="range" id="sfx-volume-slider" min="0" max="1" step="0.05" value="${gameSettings.sfxVolume}">
+      </div>
+    </div>
+    <!-- Future settings can go here -->
+  `;
+
+  const musicSlider = body.querySelector('#music-volume-slider');
+  musicSlider.addEventListener('input', (e) => {
+    const volume = parseFloat(e.target.value);
+    gameSettings.musicVolume = volume;
+    DOMElements.bgMusic.volume = volume;
+    // If user interacts with slider, it's a good time to try starting audio
+    if (DOMElements.bgMusic.paused && volume > 0) {
+      initAudio();
+    }
+  });
+
+  // Save when user stops sliding
+  musicSlider.addEventListener('change', () => {
+    saveGame();
+  });
+
+  const sfxSlider = body.querySelector('#sfx-volume-slider');
+  sfxSlider.addEventListener('input', (e) => {
+    const volume = parseFloat(e.target.value);
+    gameSettings.sfxVolume = volume;
+  });
+
+  // Save when user stops sliding
+  sfxSlider.addEventListener('change', () => {
+    // Play a sample sound to give feedback
+    playSound(DOMElements.sfxSwap);
+    saveGame();
   });
 }
 
@@ -1853,7 +1962,7 @@ function renderAchievementsModal() {
 
     contentHTML += `
       <div class="achievement-item">
-        <div class="achievement-icon">${achievement.icon}</div>
+        <div class="achievement-icon"><img src="${achievement.icon}" alt="${achievement.name}"></div>
         <div class="achievement-details">
           <h4 class="achievement-title">${achievement.name}</h4>
           <p class="achievement-desc">${achievement.desc}</p>
@@ -1864,12 +1973,13 @@ function renderAchievementsModal() {
       const isClaimed = !!gameState.claimedAchievements[`${achievement.id}_${index}`];
       const canClaim = progress >= tier.goal && !isClaimed;
       const percentage = Math.min(100, (progress / tier.goal) * 100);
+      const coinIcon = `<img src="assets/icons/coin.png" class="inline-icon" alt="монета">`;
 
       let btnHTML;
       if (isClaimed) {
-        btnHTML = `<button class="achievement-claim-btn claimed" disabled>✔️</button>`;
+        btnHTML = `<button class="achievement-claim-btn claimed" disabled><img src="assets/icons/checkmark.png" alt="Выполнено"></button>`;
       } else {
-        btnHTML = `<button class="achievement-claim-btn" ${!canClaim ? 'disabled' : ''} data-action="claim-achievement" data-id="${achievement.id}" data-index="${index}">+${tier.reward}🪙</button>`;
+        btnHTML = `<button class="achievement-claim-btn" ${!canClaim ? 'disabled' : ''} data-action="claim-achievement" data-id="${achievement.id}" data-index="${index}">+${tier.reward}${coinIcon}</button>`;
       }
 
       contentHTML += `
@@ -1907,10 +2017,11 @@ function claimItemBonus(category, level, element) {
   // Добавляем монеты
   const bonusAmount = level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
   gameState.coins += bonusAmount;
+  playSound(DOMElements.sfxCoin);
   playerProfile.totalCoinsEarned += bonusAmount;
 
   // Анимация полета монетки
-  animateRewardFly(element, DOMElements.coins.container, '🪙', 1, 'coin');
+  animateRewardFly(element, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, 1, 'coin');
 
   // Обновляем вид элемента в модалке и запускаем анимации
   element.classList.remove('bonus-unclaimed');
@@ -1947,16 +2058,17 @@ function claimAchievementReward(achievementId, tierIndex, buttonElement) {
   if (progress >= tier.goal && !gameState.claimedAchievements[key]) {
     // Добавляем награду
     gameState.coins += tier.reward;
+    playSound(DOMElements.sfxCoin);
     // Отмечаем как полученную
     gameState.claimedAchievements[key] = true;
 
     // Анимация
-    animateRewardFly(buttonElement, DOMElements.coins.container, '🪙', 5, 'coin');
+    animateRewardFly(buttonElement, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, 5, 'coin');
 
     // Обновляем UI
     buttonElement.classList.add('claimed');
     buttonElement.disabled = true;
-    buttonElement.innerHTML = '✔️';
+    buttonElement.innerHTML = '<img src="assets/icons/checkmark.png" alt="Выполнено">';
     buttonElement.onclick = null;
 
     DOMElements.coins.value.innerText = gameState.coins;
@@ -1995,15 +2107,16 @@ function showCollectionModal() {
           if (!bonusClaimed) {
             itemClasses += ' bonus-unclaimed';
             const bonusAmount = item.level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
+            const coinIcon = `<img src="assets/icons/coin.png" class="inline-icon" alt="монета">`;
             clickHandler = `data-action="claim-bonus" data-category="${key}" data-level="${item.level}"`;
 
-            bonusIconHTML = `<div class="unclaimed-bonus-icon" title="Собрать бонус">+${bonusAmount}🪙</div>`;
+            bonusIconHTML = `<div class="unclaimed-bonus-icon" title="Собрать бонус">+${bonusAmount}${coinIcon}</div>`;
           }
         } else {
           itemClasses += ' undiscovered';
         }
 
-        const itemIcon = discovered ? item.icon : '?';
+        const itemIcon = discovered ? `<img src="${item.icon}" alt="${item.name}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
 
         contentHTML += `
           <div class="${itemClasses}" title="${title}" ${clickHandler}>
@@ -2067,9 +2180,9 @@ function triggerSpecialGenerator(generator, fromIndex) {
   gameState.lockedCells.push(targetCellIndex);
 
   const rand = Math.random();
-  const newItem = rand < 0.5 ? { isUpgradePart: true, icon: '🔩', name: 'Новая деталь' } : { isMagicTool: true, icon: '⚒️', name: 'Магические инструменты' };
+  const newItem = rand < 0.5 ? { isUpgradePart: true, icon: 'assets/icons/upgrade_part.png', name: 'Новая деталь' } : { isMagicTool: true, icon: 'assets/icons/magic_tool.png', name: 'Магические инструменты' };
 
-  moveItem3D(DOMElements.grid.children[fromIndex], DOMElements.grid.children[targetCellIndex], newItem.icon).then(() => {
+  moveItem3D(DOMElements.grid.children[fromIndex], DOMElements.grid.children[targetCellIndex], `<img src="${newItem.icon}" alt="">`).then(() => {
     markItemAsDiscovered(newItem.isUpgradePart ? 'upgrade_part' : 'magic_tool', 1);
     gameState.gridData[targetCellIndex] = newItem;
     gameState.lockedCells = gameState.lockedCells.filter(idx => idx !== targetCellIndex);
@@ -2079,6 +2192,7 @@ function triggerSpecialGenerator(generator, fromIndex) {
     saveGame();
     updateUI();
     animateCellPop(targetCellIndex);
+    playSound(DOMElements.sfxSpawn);
   });
 }
 
@@ -2088,7 +2202,7 @@ function triggerItemGenerator(generator, fromIndex) {
     return;
   }
   if (gameState.energy <= 0) {
-    showToast("⚡ Упс! Недостаточно энергии игрока!", "error");
+    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
     return;
   }
   const emptyCells = getAvailableEmptyCells();
@@ -2107,7 +2221,7 @@ function triggerItemGenerator(generator, fromIndex) {
   const newItemCategory = generator.generatedCategory;
   const itemInfo = CATEGORIES_CONFIG[newItemCategory].items[0]; // Всегда создаем 1-й уровень
 
-  moveItem3D(DOMElements.grid.children[fromIndex], DOMElements.grid.children[targetCellIndex], itemInfo.icon).then(() => {
+  moveItem3D(DOMElements.grid.children[fromIndex], DOMElements.grid.children[targetCellIndex], `<img src="${itemInfo.icon}" alt="">`).then(() => {
     markItemAsDiscovered(newItemCategory, 1);
     gameState.gridData[targetCellIndex] = { category: newItemCategory, level: 1 };
     gameState.lockedCells = gameState.lockedCells.filter(idx => idx !== targetCellIndex);
@@ -2119,6 +2233,7 @@ function triggerItemGenerator(generator, fromIndex) {
     saveGame();
     updateUI();
     animateCellPop(targetCellIndex);
+    playSound(DOMElements.sfxSpawn);
   });
 }
 
@@ -2130,11 +2245,11 @@ function triggerRegularGenerator(generator, fromIndex) {
   if (generator.genEnergy === undefined) generator.genEnergy = config.max;
 
   if (generator.genEnergy <= 0) {
-    showToast("📦 Генератор истощен! Подождите, пока накопятся заряды.", "error");
+    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Генератор истощен! Подождите, пока накопятся заряды.`, "error");
     return;
   }
   if (gameState.energy <= 0) {
-    showToast("⚡ Упс! Недостаточно энергии игрока!", "error");
+    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
     return;
   }
 
@@ -2169,13 +2284,14 @@ function triggerRegularGenerator(generator, fromIndex) {
 
   const itemInfo = CATEGORIES_CONFIG[spawnCategory].items[spawnLevel - 1];
 
-  moveItem3D(DOMElements.grid.children[fromIndex], DOMElements.grid.children[targetCellIndex], itemInfo.icon).then(() => {
+  moveItem3D(DOMElements.grid.children[fromIndex], DOMElements.grid.children[targetCellIndex], `<img src="${itemInfo.icon}" alt="">`).then(() => {
     markItemAsDiscovered(spawnCategory, spawnLevel);
     gameState.gridData[targetCellIndex] = { category: spawnCategory, level: spawnLevel };
     gameState.lockedCells = gameState.lockedCells.filter(idx => idx !== targetCellIndex);
     saveGame();
     updateUI();
     animateCellPop(targetCellIndex);
+    playSound(DOMElements.sfxSpawn);
   });
 }
 
@@ -2262,7 +2378,7 @@ function animateRewardFly(startElement, endElement, icon, count = 5, className =
 
 function confirmReset() {
   showModal({
-    icon: '⚠️',
+    icon: `<img src="assets/icons/warning.png" alt="Внимание">`,
     title: 'Сбросить весь прогресс?',
     subtitle: 'Полное обнуление',
     desc: 'Вы потеряете все свои открытые предметы, генераторы, очки уровня и текущие заказы. Это действие нельзя отменить.',
@@ -2317,10 +2433,10 @@ function checkProgressiveUnlocks() {
           lastRegenTime: Date.now()
         });
         markItemAsDiscovered(genKey, 'generator');
-        showToast(`🎉 Уровень ${threshold.level}! Новый генератор: ${generatorData.name}!`, "success");
+        showToast(`<img src="assets/icons/level.png" class="toast-icon" alt=""> Уровень ${threshold.level}! Новый генератор: ${generatorData.name}!`, "success");
       } else {
         spawnUpgradePart();
-        showToast(`🎉 Уровень ${threshold.level}! Бонус: получена Новая деталь 🔩!`, "success");
+        showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Уровень ${threshold.level}! Бонус: получена Новая деталь!`, "success");
       }
       updateUI(); // Обновляем UI, чтобы показать награду в очереди
     }
@@ -2361,11 +2477,11 @@ function spawnBonusGenerator() {
       lastRegenTime: Date.now()
     });
     markItemAsDiscovered(genKey, 'generator');
-    showToast(`🎁 Сюжет завершен! Вы открыли новый генератор: ${generatorData.name}!`, "story");
+    showToast(`<img src="assets/icons/generators/bonus_chest.png" class="toast-icon" alt=""> Сюжет завершен! Вы открыли новый генератор: ${generatorData.name}!`, "story");
   } else {
     // Если все генераторы уже открыты, даем вместо этого деталь для улучшения
     spawnUpgradePart();
-    showToast(`🎁 Сюжет завершен! Бонус: получена Новая деталь 🔩!`, "story");
+    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получена Новая деталь!`, "story");
   }
 }
 
@@ -2390,18 +2506,18 @@ function spawnRandomExistingGenerator() {
       lastRegenTime: Date.now()
     });
     markItemAsDiscovered(randomGenKey, 'generator');
-    showToast(`🎁 Сюжет завершен! Бонус: получен генератор "${generatorData.name}"!`, "story");
+    showToast(`<img src="assets/icons/generators/bonus_chest.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получен генератор "${generatorData.name}"!`, "story");
   } else {
     // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
     spawnUpgradePart();
-    showToast(`🎁 Сюжет завершен! Бонус: получена Новая деталь 🔩!`, "story");
+    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получена Новая деталь!`, "story");
   }
 }
 
 function spawnUpgradePart() {
   gameState.rewardQueue.push({
     isUpgradePart: true,
-    icon: '🔩',
+    icon: 'assets/icons/upgrade_part.png',
     name: 'Новая деталь'
   });
   markItemAsDiscovered('upgrade_part', 1);
@@ -2410,7 +2526,7 @@ function spawnUpgradePart() {
 function spawnMagicTool() {
   gameState.rewardQueue.push({
     isMagicTool: true,
-    icon: '⚒️',
+    icon: 'assets/icons/magic_tool.png',
     name: 'Магические инструменты'
   });
   markItemAsDiscovered('magic_tool', 1);
@@ -2442,7 +2558,7 @@ function spawnGeneratorPart() {
 function showToast(text, type = "success") {
   const toast = document.createElement('div');
   toast.classList.add('game-toast', type);
-  toast.innerText = text;
+  toast.innerHTML = text;
 
   DOMElements.toastContainer.appendChild(toast);
 
@@ -2553,7 +2669,7 @@ function generateStoryOrder(step, fixedChar = null) {
   });
 
   if (step === 1 && !fixedChar) {
-    showToast(`🕵️‍♂️ Появился сюжетный персонаж с особым заказом!`, "story");
+    showToast(`<img src="assets/icons/detective.png" class="toast-icon" alt=""> Появился сюжетный персонаж с особым заказом!`, "story");
   }
 }
 
@@ -2682,21 +2798,25 @@ function renderOrders() {
       }
 
       const fulfilledClass = isFulfilled ? 'fulfilled' : '';
-      itemsHTML += `<div class="order-target ${fulfilledClass}" title="${itemInfo.name}" data-category="${item.category}"><span class="order-item-icon">${itemInfo.icon}</span></div>`;
+      const itemIconHTML = `<img src="${itemInfo.icon}" alt="${itemInfo.name}">`;
+      itemsHTML += `<div class="order-target ${fulfilledClass}" title="${itemInfo.name}" data-category="${item.category}"><span class="order-item-icon">${itemIconHTML}</span></div>`;
     });
     itemsHTML += '</div>';
 
+    const avatarHTML = `<div class="order-avatar-container" title="${order.character.name}"><img src="${order.character.icon}" alt="${order.character.name}"></div>`;
+
     card.innerHTML = `
-                    <div class="order-header">
-                        <div class="order-header-info" title="${order.character.name}">
-                            <span class="character-avatar">${order.character.icon}</span>
-                            <span style="font-weight:bold; overflow:hidden; text-overflow:ellipsis;">${order.character.name}</span>
-                        </div>
-                        ${!order.isStory ? `<button class="cancel-btn" title="Отменить заказ">&times;</button>` : `<span style="font-size:0.65rem; color:#ffb703; font-weight:bold;">⚡Сюжет ${order.storyStep}/3</span>`}
-                    </div>
-                    ${itemsHTML}
-                    <button class="complete-btn ${order.canComplete ? 'visible' : ''}">Сдать заказ</button>
-                `;
+      <div class="order-header">
+          ${!order.isStory ? `<button class="cancel-btn" title="Отменить заказ">&times;</button>` : `<span class="story-badge">⚡Сюжет ${order.storyStep}/3</span>`}
+      </div>
+      <div class="order-body">
+          ${avatarHTML}
+          <div class="order-content">
+              ${itemsHTML}
+              <button class="complete-btn ${order.canComplete ? 'visible' : ''}">Сдать заказ</button>
+          </div>
+      </div>
+    `;
   });
 
   // Удаляем карточки, которых больше нет в логике игры
@@ -2718,14 +2838,14 @@ function confirmCancelOrder(id) {
   if (!order || order.isStory) return;
 
   showModal({
-    icon: '❓',
+    icon: `<img src="assets/icons/question.png" alt="Вопрос">`,
     title: 'Отменить заказ?',
     subtitle: 'Подтверждение действия',
     desc: `Вы уверены, что хотите отменить этот заказ? Это будет стоить ${CONFIG.COINS_PER_ORDER_CANCEL} монет.`,
     dangerButtons: {
-      confirmButtonText: `Да, отменить (-${CONFIG.COINS_PER_ORDER_CANCEL}🪙)`,
+      confirmButtonText: `Да, отменить (-${CONFIG.COINS_PER_ORDER_CANCEL}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
       onConfirm: () => {
-        if (gameState.coins < CONFIG.COINS_PER_ORDER_CANCEL) { showToast(`🪙 Недостаточно монет для отмены (нужно ${CONFIG.COINS_PER_ORDER_CANCEL})!`, "error"); closeModal(); return; }
+        if (gameState.coins < CONFIG.COINS_PER_ORDER_CANCEL) { showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет для отмены (нужно ${CONFIG.COINS_PER_ORDER_CANCEL})!`, "error"); closeModal(); return; }
 
         gameState.coins -= CONFIG.COINS_PER_ORDER_CANCEL;
         const idx = gameState.orders.findIndex(o => o.id === id);
@@ -2754,21 +2874,17 @@ function completeOrder(id) {
     return;
   }
 
-  // Находим карточку в DOM для запуска анимации испарения
+  // Находим карточку в DOM
   const cardElement = DOMElements.ordersList.querySelector(`#order-card-${id}`);
-  if (cardElement) {
-    cardElement.classList.add('fade-out');
-  }
-
   const cellElements = document.querySelectorAll('.cell');
-  const targetAvatarElement = cardElement ? cardElement.querySelector('.character-avatar') : null;
+  const targetAvatarElement = cardElement ? cardElement.querySelector('.order-avatar-container') : null;
 
   // Используем предварительно рассчитанные индексы из checkOrdersAvailability
   const elementsToAnimate = order.allocatedIndices.map(idx => {
     const item = gameState.gridData[idx];
     return {
       idx: idx,
-      icon: CATEGORIES_CONFIG[item.category].items[item.level - 1].icon,
+      icon: `<img src="${CATEGORIES_CONFIG[item.category].items[item.level - 1].icon}" alt="">`,
       level: item.level
     };
   });
@@ -2789,14 +2905,23 @@ function completeOrder(id) {
 
   // After all items have flown to the card
   Promise.all(animationPromises).then(() => {
+    // Теперь, когда предметы долетели, запускаем анимацию исчезновения карточки
+    if (cardElement) {
+      cardElement.classList.add('fade-out');
+    }
+
     const coinsEarned = elementsToAnimate.reduce((sum, el) => sum + el.level * CONFIG.COIN_MULTIPLIER, 0);
     playerProfile.totalCoinsEarned += coinsEarned;
     playerProfile.totalOrdersCompleted++;
     const energyReward = order.isStory ? CONFIG.STORY_ORDER_ENERGY_REWARD : CONFIG.ORDER_ENERGY_REWARD;
 
+    // Воспроизводим звук успешной сдачи заказа
+    playSound(DOMElements.sfxOrderComplete);
+    playSound(DOMElements.sfxCoin);
+
     // Анимация полета наград
-    animateRewardFly(targetAvatarElement, DOMElements.coins.value, '🪙', Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
-    if (energyReward > 0) animateRewardFly(targetAvatarElement, DOMElements.energy.value, '⚡', energyReward, 'energy');
+    animateRewardFly(targetAvatarElement, DOMElements.coins.value, `<img src="assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
+    if (energyReward > 0) animateRewardFly(targetAvatarElement, DOMElements.energy.value, `<img src="assets/icons/energy.png" alt="энергия">`, energyReward, 'energy');
 
     // Wait for the card fade-out animation to complete
     setTimeout(() => {
@@ -2810,7 +2935,7 @@ function completeOrder(id) {
       if (wasStory) {
         if (currentStep < 3) {
           generateStoryOrder(currentStep + 1, storyChar);
-          showToast(`🔮 Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
+          showToast(`Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
         } else {
           const rand = Math.random();
           if (rand < 0.3) {
@@ -2820,7 +2945,7 @@ function completeOrder(id) {
               generatorKey: 'bonus_chest',
               genLevel: 1, genCharges: 1
             });
-            showToast(`🎁 Сюжет завершен! Вы получили Подарочную коробку!`, "story");
+            showToast(`<img src="assets/icons/generators/bonus_chest.png" class="toast-icon" alt=""> Сюжет завершен! Вы получили Подарочную коробку!`, "story");
           } else if (rand < 0.6) {
             // 30% шанс на новый генератор (или деталь, если все открыто)
             spawnBonusGenerator();
