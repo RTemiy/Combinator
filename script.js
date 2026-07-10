@@ -82,6 +82,13 @@ function addListeners() {
     if (document.hidden) {
       // При сворачивании вкладки сохраняем игру, чтобы учесть время
       saveGame();
+      DOMElements.bgMusic.pause();
+    } else {
+      // При возвращении на вкладку, возобновляем музыку, если она не на нуле
+      if (gameSettings.musicVolume > 0) {
+        // play() может не сработать, если не было взаимодействия, но это нормально
+        DOMElements.bgMusic.play().catch(() => {});
+      }
     }
   });
 
@@ -1896,9 +1903,13 @@ function renderSettingsModal() {
     const volume = parseFloat(e.target.value);
     gameSettings.musicVolume = volume;
     DOMElements.bgMusic.volume = volume;
-    // If user interacts with slider, it's a good time to try starting audio
-    if (DOMElements.bgMusic.paused && volume > 0) {
-      initAudio();
+
+    if (volume > 0 && DOMElements.bgMusic.paused && !document.hidden) {
+      // Взаимодействие с ползунком — это пользовательская активность,
+      // поэтому мы можем запустить музыку.
+      DOMElements.bgMusic.play().catch(() => {});
+    } else if (volume === 0) {
+      DOMElements.bgMusic.pause();
     }
   });
 
