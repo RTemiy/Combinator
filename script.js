@@ -2680,7 +2680,7 @@ function generateStoryOrder(step, fixedChar = null) {
   });
 
   if (step === 1 && !fixedChar) {
-    showToast(`<img src="assets/icons/detective.png" class="toast-icon" alt=""> Появился сюжетный персонаж с особым заказом!`, "story");
+    showToast(`Появился сюжетный персонаж с особым заказом!`, "story");
   }
 }
 
