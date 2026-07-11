@@ -2538,7 +2538,7 @@ function spawnBonusGenerator() {
       lastRegenTime: Date.now()
     });
     markItemAsDiscovered(genKey, 'generator');
-    showToast(`<img src="assets/icons/generators/bonus_chest.png" class="toast-icon" alt=""> Сюжет завершен! Вы открыли новый генератор: ${generatorData.name}!`, "story");
+    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Сюжет завершен! Вы открыли новый генератор: ${generatorData.name}!`, "story");
   } else {
     // Если все генераторы уже открыты, даем вместо этого деталь для улучшения
     spawnUpgradePart();
@@ -3006,7 +3006,7 @@ function completeOrder(id) {
               generatorKey: 'bonus_chest',
               genLevel: 1, genCharges: 1
             });
-            showToast(`<img src="assets/icons/bonus_chest_lvl1.png" class="toast-icon" alt=""> Сюжет завершен! Вы получили Подарочную коробку!`, "story");
+            showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Сюжет завершен! Вы получили Подарочную коробку!`, "story");
           } else if (rand < 0.5) {
             // 25% шанс на новый генератор (или деталь, если все открыто)
             spawnBonusGenerator();
