@@ -54,6 +54,15 @@ function playSound(soundElement) {
   });
 }
 
+function playMergeSound(level) {
+  const soundElement = DOMElements.sfxMergeLevels[level];
+  if (soundElement) {
+    playSound(soundElement);
+  } else {
+    playSound(DOMElements.sfxMerge); // Fallback to default
+  }
+}
+
 function initGame() {
   createGrid();
   if (localStorage.getItem(CONFIG.SAVE_KEY)) {
@@ -970,6 +979,8 @@ function handleCellClick(index) {
 
 function handleUnblockMerge(fromIdx, toIdx, source) {
   if (source.level >= CONFIG.MAX_ITEM_LEVEL) return false;
+  const nextLevel = source.level + 1;
+  playMergeSound(nextLevel);
   gameState.gridData[fromIdx] = null;
   markItemAsDiscovered(source.category, source.level + 1);
   gameState.gridData[toIdx] = { ...source, level: source.level + 1, isBlocked: false };
@@ -981,6 +992,7 @@ function handleUnblockMerge(fromIdx, toIdx, source) {
 function handleGeneratorUpgrade(partIdx, genIdx, generator) {
   const lvl = generator.genLevel || 1;
   if (lvl >= CONFIG.MAX_GENERATOR_LEVEL) return false;
+  playSound(DOMElements.sfxMerge);
   const nextLvl = lvl + 1;
   gameState.gridData[partIdx] = null;
   gameState.gridData[genIdx] = {
@@ -996,6 +1008,7 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
 }
 
 function handleGeneratorPartMerge(fromIdx, toIdx, source) {
+  playSound(DOMElements.sfxMerge);
   if (source.level >= 3) { // Max level for parts is 3. Merging two L3 parts.
     gameState.gridData[fromIdx] = null;
     // Create a new L1 generator
@@ -1021,6 +1034,7 @@ function handleGeneratorPartMerge(fromIdx, toIdx, source) {
 function handleItemUpgradeWithTool(toolIdx, itemIdx, regularItem) {
   if (regularItem.level >= CONFIG.MAX_ITEM_LEVEL) return false;
   const nextLvl = regularItem.level + 1;
+  playMergeSound(nextLvl);
   gameState.gridData[toolIdx] = null;
   markItemAsDiscovered(regularItem.category, nextLvl);
   gameState.gridData[itemIdx] = { ...regularItem, level: nextLvl };
@@ -1033,6 +1047,7 @@ function handleItemMerge(fromIdx, toIdx, source) {
   if (source.level >= CONFIG.MAX_ITEM_LEVEL) return false;
 
   const nextLevel = source.level + 1;
+  playMergeSound(nextLevel);
   const newItemInfo = CATEGORIES_CONFIG[source.category].items[nextLevel - 1];
 
   markItemAsDiscovered(source.category, nextLevel);
@@ -1065,6 +1080,7 @@ function handleItemMerge(fromIdx, toIdx, source) {
 }
 
 function handleGeneratorMerge(fromIdx, toIdx, source) {
+  playSound(DOMElements.sfxMerge);
   if (source.generatorKey === 'bonus_chest') {
     if (source.genLevel !== 1) return false;
     gameState.gridData[fromIdx] = null;
@@ -1138,7 +1154,7 @@ const MERGE_HANDLERS = [
   },
   // Слияние двух обычных предметов (включая предметы-генераторы)
   {
-    canHandle: (s, t) => t && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && s.category === t.category && s.level === t.level,
+    canHandle: (s, t) => t && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && !s.isMagicTool && !t.isMagicTool && s.category === t.category && s.level === t.level,
     execute: (from, to, src) => handleItemMerge(from, to, src)
   },
 ];
@@ -1149,44 +1165,40 @@ function executeMergeOrSwap(fromIdx, toIdx) {
 
   for (const handler of MERGE_HANDLERS) {
     if (handler.canHandle(source, target)) {
-      const wasMerged = handler.execute(fromIdx, toIdx, source, target);
+      handler.execute(fromIdx, toIdx, source, target);
+      playerProfile.totalMerges++;
 
-      if (wasMerged) {
-        playSound(DOMElements.sfxMerge);
-        playerProfile.totalMerges++;
-
-        // --- NEW LOGIC FOR MERGE COUNTS ---
-        let mergeCategory;
-        // Case 1: Merging two regular items, or a regular item with a blocked one.
-        if (source.category && !source.isGenerator && !source.isGeneratorPart && !source.isMagicTool && !source.isUpgradePart) {
-          mergeCategory = source.category;
-        }
-        // Case 2: Merging two generators or two generator parts.
-        else if ((source.isGenerator || source.isGeneratorPart) && target && (target.isGenerator || target.isGeneratorPart)) {
-          mergeCategory = GENERATORS_DATA[source.generatorKey].categories[0];
-        }
-        // Case 3: Upgrading a generator with a part.
-        else if (source.isUpgradePart && target && target.isGenerator) {
-          mergeCategory = GENERATORS_DATA[target.generatorKey].categories[0];
-        } else if (target && target.isUpgradePart && source.isGenerator) {
-          mergeCategory = GENERATORS_DATA[source.generatorKey].categories[0];
-        }
-        // Case 4: Upgrading an item with a tool.
-        else if (source.isMagicTool && target && target.category) {
-          mergeCategory = target.category;
-        } else if (target && target.isMagicTool && source.category) {
-          mergeCategory = source.category;
-        }
-
-        if (mergeCategory) {
-          playerProfile.mergeCounts[mergeCategory] = (playerProfile.mergeCounts[mergeCategory] || 0) + 1;
-        }
-        // --- END NEW LOGIC ---
-
-        saveGame();
-        updateUI();
-        return;
+      // --- NEW LOGIC FOR MERGE COUNTS ---
+      let mergeCategory;
+      // Case 1: Merging two regular items, or a regular item with a blocked one.
+      if (source.category && !source.isGenerator && !source.isGeneratorPart && !source.isMagicTool && !source.isUpgradePart) {
+        mergeCategory = source.category;
       }
+      // Case 2: Merging two generators or two generator parts.
+      else if ((source.isGenerator || source.isGeneratorPart) && target && (target.isGenerator || target.isGeneratorPart)) {
+        mergeCategory = GENERATORS_DATA[source.generatorKey].categories[0];
+      }
+      // Case 3: Upgrading a generator with a part.
+      else if (source.isUpgradePart && target && target.isGenerator) {
+        mergeCategory = GENERATORS_DATA[target.generatorKey].categories[0];
+      } else if (target && target.isUpgradePart && source.isGenerator) {
+        mergeCategory = GENERATORS_DATA[source.generatorKey].categories[0];
+      }
+      // Case 4: Upgrading an item with a tool.
+      else if (source.isMagicTool && target && target.category) {
+        mergeCategory = target.category;
+      } else if (target && target.isMagicTool && source.category) {
+        mergeCategory = source.category;
+      }
+
+      if (mergeCategory) {
+        playerProfile.mergeCounts[mergeCategory] = (playerProfile.mergeCounts[mergeCategory] || 0) + 1;
+      }
+      // --- END NEW LOGIC ---
+
+      saveGame();
+      updateUI();
+      return;
     }
   }
 

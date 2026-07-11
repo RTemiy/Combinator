@@ -822,8 +822,8 @@ body.is-dragging, body.is-dragging * {
 .max-level-star {
   display: block;
   position: absolute;
-  bottom: 2px;
-  right: 2px;
+  bottom: 1px;
+  right: 4px;
   pointer-events: none;
   z-index: 12;
   text-shadow: 0 0 5px var(--energy-color), 0 0 2px rgba(0,0,0,0.8);
