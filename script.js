@@ -1,9 +1,16 @@
 import {
-  GENERATORS_DATA, CATEGORIES_CONFIG, CHARACTERS, STORY_CHARACTERS, ACHIEVEMENTS_DATA,
-  CONFIG, GEN_ENERGY_CONFIG, SPAWN_CHANCES, UNLOCK_THRESHOLDS
+  ACHIEVEMENTS_DATA,
+  CATEGORIES_CONFIG,
+  CHARACTERS,
+  CONFIG,
+  GEN_ENERGY_CONFIG,
+  GENERATORS_DATA,
+  SPAWN_CHANCES,
+  STORY_CHARACTERS,
+  UNLOCK_THRESHOLDS
 } from './config.js';
-import { gameState, playerProfile, gameSettings } from './state.js';
-import { DOMElements } from './dom.js';
+import {gameSettings, gameState, playerProfile} from './state.js';
+import {DOMElements} from './dom.js';
 
 // --- Проверка версии игры ---
 (function checkVersion() {
@@ -22,6 +29,10 @@ function initAudio() {
   DOMElements.bgMusic.play().catch(e => {
     console.warn("Audio autoplay failed. User interaction may be needed.", e);
   });
+}
+
+function applyTheme() {
+  document.body.dataset.theme = gameSettings.theme;
 }
 
 function playSound(soundElement) {
@@ -43,6 +54,7 @@ function initGame() {
   }
   // Apply loaded settings
   DOMElements.bgMusic.volume = gameSettings.musicVolume;
+  applyTheme();
 
   restoreGeneratorsEnergy();
   updateUI();
@@ -247,6 +259,7 @@ function startNewGame() {
   // Reset settings
   gameSettings.musicVolume = 0.2;
   gameSettings.sfxVolume = 0.5;
+  gameSettings.theme = 'dark';
   DOMElements.bgMusic.volume = gameSettings.musicVolume;
 
   // Сброс профиля
@@ -377,6 +390,7 @@ function loadGame() {
     const loadedSettings = loaded.settings || {};
     gameSettings.musicVolume = loadedSettings.musicVolume !== undefined ? loadedSettings.musicVolume : 0.2;
     gameSettings.sfxVolume = loadedSettings.sfxVolume !== undefined ? loadedSettings.sfxVolume : 0.5;
+    gameSettings.theme = loadedSettings.theme || 'dark';
 
     // Загрузка профиля с проверкой на случай старых сохранений
     const loadedProfile = loaded.profile || {};
@@ -920,6 +934,7 @@ function handleCellClick(index) {
   if (item.isGenerator) {
     // Логика двойного клика для генераторов
     if (gameState.lastClick.index === index) {
+      closeModal();
       triggerGenerator(item, index);
     } else {
       showItemInfoModal(item, index);
@@ -927,6 +942,7 @@ function handleCellClick(index) {
     }
   } else if (item.isItemGenerator) {
     if (gameState.lastClick.index === index) {
+      closeModal();
       triggerItemGenerator(item, index);
     } else {
       showItemInfoModal(item, index);
@@ -1895,6 +1911,15 @@ function renderSettingsModal() {
         <input type="range" id="sfx-volume-slider" min="0" max="1" step="0.05" value="${gameSettings.sfxVolume}">
       </div>
     </div>
+    <div class="settings-item">
+      <label for="theme-switch" class="settings-label">Светлая тема</label>
+      <div class="settings-control">
+        <label class="switch">
+          <input type="checkbox" id="theme-switch" ${gameSettings.theme === 'light' ? 'checked' : ''}>
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
     <!-- Future settings can go here -->
   `;
 
@@ -1920,14 +1945,20 @@ function renderSettingsModal() {
 
   const sfxSlider = body.querySelector('#sfx-volume-slider');
   sfxSlider.addEventListener('input', (e) => {
-    const volume = parseFloat(e.target.value);
-    gameSettings.sfxVolume = volume;
+    gameSettings.sfxVolume = parseFloat(e.target.value);
   });
 
   // Save when user stops sliding
   sfxSlider.addEventListener('change', () => {
     // Play a sample sound to give feedback
     playSound(DOMElements.sfxSwap);
+    saveGame();
+  });
+
+  const themeSwitch = body.querySelector('#theme-switch');
+  themeSwitch.addEventListener('change', (e) => {
+    gameSettings.theme = e.target.checked ? 'light' : 'dark';
+    applyTheme();
     saveGame();
   });
 }
@@ -2818,7 +2849,7 @@ function renderOrders() {
 
     card.innerHTML = `
       <div class="order-header">
-          ${!order.isStory ? `<button class="cancel-btn" title="Отменить заказ">&times;</button>` : `<span class="story-badge">⚡Сюжет ${order.storyStep}/3</span>`}
+          ${!order.isStory ? `<button class="cancel-btn" title="Отменить заказ">&times;</button>` : `<span class="story-badge">Сюжет ${order.storyStep}/3</span>`}
       </div>
       <div class="order-body">
           ${avatarHTML}
@@ -2949,19 +2980,23 @@ function completeOrder(id) {
           showToast(`Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
         } else {
           const rand = Math.random();
-          if (rand < 0.3) {
-            // 30% шанс на подарочную коробку
+          if (rand < 0.25) {
+            // 25% шанс на подарочную коробку
             gameState.rewardQueue.push({
               isGenerator: true,
               generatorKey: 'bonus_chest',
               genLevel: 1, genCharges: 1
             });
-            showToast(`<img src="assets/icons/generators/bonus_chest.png" class="toast-icon" alt=""> Сюжет завершен! Вы получили Подарочную коробку!`, "story");
-          } else if (rand < 0.6) {
-            // 30% шанс на новый генератор (или деталь, если все открыто)
+            showToast(`<img src="assets/icons/bonus_chest_lvl1.png" class="toast-icon" alt=""> Сюжет завершен! Вы получили Подарочную коробку!`, "story");
+          } else if (rand < 0.5) {
+            // 25% шанс на новый генератор (или деталь, если все открыто)
             spawnBonusGenerator();
+          } else if (rand < 0.75) {
+            // 25% шанс на магические инструменты
+            spawnMagicTool();
+            showToast(`<img src="assets/icons/magic_tool.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получены Магические инструменты!`, "story");
           } else {
-            // 40% шанс на случайный уже открытый генератор
+            // 25% шанс на случайный уже открытый генератор
             spawnRandomExistingGenerator();
           }
           generateOrder();

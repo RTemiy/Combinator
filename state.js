@@ -30,6 +30,7 @@ export const gameState = {
 export const gameSettings = {
   musicVolume: 0.2,
   sfxVolume: 0.5,
+  theme: 'dark',
 };
 
 export const playerProfile = {

@@ -9,9 +9,9 @@ export const GENERATORS_DATA = {
     icons: [
       'assets/icons/categories/flowers/generator_lvl_01.png',
       'assets/icons/categories/flowers/generator_lvl_02.png',
-      'assets/icons/categories/flowers/generator_lvl_03.png',
-      'assets/icons/categories/flowers/generator_lvl_04.png',
-      'assets/icons/categories/flowers/generator_lvl_05.png',
+      'assets/icons/categories/flowers/generator_lvl_02.png',
+      'assets/icons/categories/flowers/generator_lvl_02.png',
+      'assets/icons/categories/flowers/generator_lvl_02.png',
     ]
   },
   'coffee': {
@@ -24,9 +24,9 @@ export const GENERATORS_DATA = {
     icons: [
       'assets/icons/categories/coffee/generator_lvl_01.png',
       'assets/icons/categories/coffee/generator_lvl_02.png',
-      'assets/icons/categories/coffee/generator_lvl_03.png',
-      'assets/icons/categories/coffee/generator_lvl_04.png',
-      'assets/icons/categories/coffee/generator_lvl_05.png',
+      'assets/icons/categories/coffee/generator_lvl_02.png',
+      'assets/icons/categories/coffee/generator_lvl_02.png',
+      'assets/icons/categories/coffee/generator_lvl_02.png',
     ]
   },
   'stationery': {
@@ -39,9 +39,9 @@ export const GENERATORS_DATA = {
     icons: [
       'assets/icons/categories/writings/generator_lvl_01.png',
       'assets/icons/categories/writings/generator_lvl_02.png',
-      'assets/icons/categories/writings/generator_lvl_03.png',
-      'assets/icons/categories/writings/generator_lvl_04.png',
-      'assets/icons/categories/writings/generator_lvl_05.png',
+      'assets/icons/categories/writings/generator_lvl_02.png',
+      'assets/icons/categories/writings/generator_lvl_02.png',
+      'assets/icons/categories/writings/generator_lvl_02.png',
     ]
   },
   'bonus_chest': {
@@ -128,16 +128,18 @@ export const CATEGORIES_CONFIG = {
 };
 
 export const CHARACTERS = [
-  { icon: 'assets/icons/characters/simple_man_01.png', name: 'Студент', desc: 'Вечно занят учебой, но всегда находит время для чашечки кофе.' },
+  { icon: 'assets/icons/characters/simple_man_01.png', name: 'Джентльмен', desc: 'Ценитель классики и хороших манер. Часто заказывает что-то для своей подруги.' },
   { icon: 'assets/icons/characters/simple_man_02.png', name: 'Офисный работник', desc: 'Его день состоит из отчетов и таблиц. Любит, когда все разложено по полочкам.' },
-  { icon: 'assets/icons/characters/simple_man_03.png', name: 'Джентльмен', desc: 'Ценитель классики и хороших манер. Часто заказывает что-то для своей подруги.' },
+  { icon: 'assets/icons/characters/simple_man_03.png', name: 'Студент', desc: 'Вечно занят учебой, но всегда находит время для чашечки кофе.' },
   { icon: 'assets/icons/characters/simple_woman_01.png', name: 'Художница', desc: 'Ищет вдохновение в мелочах. Ей постоянно нужны новые материалы для творчества.' },
   { icon: 'assets/icons/characters/simple_woman_02.png', name: 'Молодая мама', desc: 'Вся в заботах, но не забывает радовать себя и близких небольшими подарками.' },
-  { icon: 'assets/icons/characters/simple_woman_03.png', name: 'Садовод-любитель', desc: 'Обожает все, что связано с растениями. Ее балкон похож на маленький ботанический сад.' },
+  { icon: 'assets/icons/characters/simple_woman_03.png', name: 'Фрилансер', desc: 'Постоянно в чем-то ищет вдохновение.' },
 ];
 
 export const STORY_CHARACTERS = [
-  { icon: 'assets/icons/characters/special_01.png', name: 'Незнакомец', desc: 'Секретный агент под прикрытием. Его запросы всегда важны и окутаны тайной.' }
+  { icon: 'assets/icons/characters/special_01.png', name: 'Человек в костюме (мага)', desc: 'Загадочный фокусник, которому постоянно требуются самые неожиданные предметы для его представлений. Никто не знает, что у него в шляпе.' },
+  { icon: 'assets/icons/characters/special_01.png', name: 'Человек в костюме (тигруля)', desc: 'Энергичный аниматор в костюме тигра. Готовится к детскому празднику и ищет всё необходимое, чтобы сделать его незабываемым.' },
+  { icon: 'assets/icons/characters/special_01.png', name: 'Человек в костюме (русалочка)', desc: 'Мечтательная девушка, готовящаяся к тематической вечеринке у бассейна. Ей нужны диковинные вещи, чтобы её образ русалки был безупречен.' }
 ];
 
 export const ACHIEVEMENTS_DATA = {

@@ -1,15 +1,73 @@
-:root {
+:root { /* Dark Theme */
   --bg-color: #1a1a1a;
   --panel-color: #2a2a2a;
+  --cell-color: #3a3a3a;
+  --modal-bg: #222222;
+  --modal-overlay-bg: rgba(0, 0, 0, 0.7);
+  --text-color: #ffffff;
+  --text-color-light: #b3b3b3;
+  --text-color-on-accent: #ffffff;
+  --border-color: #444;
+  --border-color-light: #555;
+  --button-bg: #333;
+  --button-hover-bg: #444;
+  --button-active-bg: #222;
+  --scrollbar-track: #222;
+  --scrollbar-thumb: #444;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --story-gradient-start: #3d1e6d;
+  --story-gradient-end: #251147;
+  --story-border: #ffb703;
+  --story-text: #ffb703;
+  --story-item-bg: #4a287a;
+  --generator-slot-bg: #4e3d30;
+  --generator-slot-border-1: #8c6d53;
+  --generator-slot-border-2: #ffcc00;
+  --generator-slot-no-energy-border: darkred;
+  --booster-cell-bg: #2d2d2d;
+  --input-focus-bg: #333;
+  --badge-bg: rgba(0, 0, 0, 0.6);
+  --flash-blend-mode: screen;
+  --switch-bg: #ccc;
+
+  /* Unchanged colors */
   --accent-color: #ff477e;
   --energy-color: #ffb703;
-  --energy-low-color: #dc3545;
-  --text-color: #ffffff;
-  --cell-color: #3a3a3a;
-  --box-bg-color: #4e3d30;
-  --modal-bg: #222222;
-  --blocked-color: #222222;
   --story-color: #9d4edd;
+  --coin-color: #ffd700;
+}
+
+body[data-theme="light"] {
+  --bg-color: #f0f2f5;
+  --panel-color: #ffffff;
+  --cell-color: #e4e6eb;
+  --modal-bg: #ffffff;
+  --modal-overlay-bg: rgba(0, 0, 0, 0.4);
+  --text-color: #1c1e21;
+  --text-color-light: #65676b;
+  --text-color-on-accent: #ffffff;
+  --border-color: #ced0d4;
+  --border-color-light: #dce1e4;
+  --button-bg: #e4e6eb;
+  --button-hover-bg: #dce1e4;
+  --button-active-bg: #ced0d4;
+  --scrollbar-track: #f0f2f5;
+  --scrollbar-thumb: #ced0d4;
+  --story-gradient-start: #f3e8ff;
+  --story-gradient-end: #e9d8ff;
+  --story-border: #9d4edd;
+  --story-text: #9d4edd;
+  --story-item-bg: #e9d8ff;
+  --generator-slot-bg: #fff4e3;
+  --generator-slot-border-1: #e6b88a;
+  --generator-slot-border-2: #ffcc00;
+  --generator-slot-no-energy-border: #c93a47;
+  --booster-cell-bg: #f0f0f0;
+  --input-focus-bg: #e4e6eb;
+  --badge-bg: rgba(0, 0, 0, 0.5);
+  --flash-blend-mode: lighten;
+  --switch-bg: #ced0d4;
 }
 
 html, body {
@@ -76,7 +134,7 @@ body.is-dragging, body.is-dragging * {
 .level-bar-bg {
   width: 100%;
   height: 5px;
-  background: #444;
+  background: var(--border-color);
   border-radius: 4px;
   overflow: hidden;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
@@ -95,7 +153,7 @@ body.is-dragging, body.is-dragging * {
   gap: 6px;
   font-size: 1.1rem;
   font-weight: bold;
-  color: #ffd700;
+  color: var(--coin-color);
   padding: 0 5px;
   cursor: pointer;
 }
@@ -125,7 +183,7 @@ body.is-dragging, body.is-dragging * {
 
 .menu-btn {
   background: var(--panel-color);
-  border: 2px solid #444;
+  border: 2px solid var(--border-color);
   color: var(--text-color);
   width: 45px;
   height: 45px;
@@ -138,7 +196,7 @@ body.is-dragging, body.is-dragging * {
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   transition: transform 0.2s, background-color 0.2s;
 }
-.menu-btn:hover { background: #3a3a3a; transform: scale(1.1); }
+.menu-btn:hover { background: var(--cell-color); transform: scale(1.1); }
 .menu-btn:active { transform: scale(0.95); }
 
 #toast-container {
@@ -169,9 +227,9 @@ body.is-dragging, body.is-dragging * {
   transition: all 0.3s ease-out;
 }
 
-.game-toast.success { background: #28a745; }
-.game-toast.error { background: #dc3545; }
-.game-toast.story { background: var(--story-color); border: 1px solid #ffb703; }
+.game-toast.success { background: var(--success-color); }
+.game-toast.error { background: var(--error-color); }
+.game-toast.story { background: var(--story-color); border: 1px solid var(--energy-color); }
 
 .game-toast.show { opacity: 1; transform: translateY(0) scale(1); }
 .game-toast img.toast-icon {
@@ -229,8 +287,8 @@ body.is-dragging, body.is-dragging * {
 .reward-item {
   width: 55px; /* Немного увеличим размер */
   height: 55px;
-  background: #333;
-  border: 1px solid #555;
+  background: var(--button-bg);
+  border: 1px solid var(--border-color-light);
   border-radius: 8px;
   display: flex;
   justify-content: center;
@@ -247,8 +305,8 @@ body.is-dragging, body.is-dragging * {
   cursor: pointer;
   pointer-events: auto;
   opacity: 1;
-  box-shadow: 0 0 12px #ffb703, 0 0 20px rgba(255, 183, 3, 0.5);
-  border-color: #ffb703;
+  box-shadow: 0 0 12px var(--energy-color), 0 0 20px rgba(255, 183, 3, 0.5);
+  border-color: var(--energy-color);
   transform: scale(1.05);
 }
 
@@ -281,17 +339,17 @@ body.is-dragging, body.is-dragging * {
 }
 
 #orders-list::-webkit-scrollbar { height: 4px; }
-#orders-list::-webkit-scrollbar-track { background: #222; }
-#orders-list::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+#orders-list::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+#orders-list::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
 
 .order-card {
-  background: #333;
+  background: var(--button-bg);
   border-radius: 8px;
   padding: 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   width: 180px; /* Делаем карточку шире для большого аватара */
   min-height: 100px; /* И немного выше */
   flex-shrink: 0;
@@ -325,8 +383,8 @@ body.is-dragging, body.is-dragging * {
 }
 
 .order-card.story-card {
-  background: linear-gradient(135deg, #3d1e6d, #251147);
-  border: 1px solid #ffb703;
+  background: linear-gradient(135deg, var(--story-gradient-start), var(--story-gradient-end));
+  border: 1px solid var(--story-border);
   box-shadow: 0 0 8px rgba(157, 78, 221, 0.4);
 }
 
@@ -342,7 +400,7 @@ body.is-dragging, body.is-dragging * {
 .order-items-list { display: flex; flex-wrap: wrap; gap: 4px; }
 
 .order-target {
-  background: #444;
+  background: var(--border-color);
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -357,27 +415,27 @@ body.is-dragging, body.is-dragging * {
 }
 
 .order-target.fulfilled {
-  background: #28a745;
-  border-color: #3cff70;
+  background: var(--success-color);
+  border-color: var(--success-color);
   box-shadow: 0 0 8px rgba(40, 167, 69, 0.6);
 }
 
 .story-card .order-target {
-  background: #4a287a;
-  border: 1px solid rgba(255, 183, 3, 0.3);
+  background: var(--story-item-bg);
+  border: 1px solid rgba(255, 183, 3, 0.3); /* This is fine as it's a specific effect */
 }
 
 .order-target .order-item-icon,
 .order-target .order-item-icon img {
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1.5rem;
+  height: 1.5rem;
   line-height: 1;
 }
 
 .complete-btn {
-  background: #28a745;
+  background: var(--success-color);
   border: none;
-  color: white;
+  color: var(--text-color-on-accent);
   padding: 3px 6px;
   border-radius: 4px;
   cursor: pointer;
@@ -400,13 +458,13 @@ body.is-dragging, body.is-dragging * {
 
 .story-card .complete-btn {
   background: linear-gradient(to right, #ffb703, #fb8500);
-  color: #111;
+  color: #111; /* This color is specific for this gradient and looks good on both themes */
 }
 
 .cancel-btn {
-  background: #dc3545;
+  background: var(--error-color);
   border: none;
-  color: white;
+  color: var(--text-color-on-accent);
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -421,7 +479,7 @@ body.is-dragging, body.is-dragging * {
 
 .story-badge {
   font-size: 0.65rem;
-  color: #ffb703;
+  color: var(--story-text);
   font-weight: bold;
 }
 
@@ -435,9 +493,9 @@ body.is-dragging, body.is-dragging * {
 }
 
 .order-avatar-container {
-  flex-shrink: 0;
+  flex-shrink: 1;
   cursor: pointer;
-  width: 60px; /* Увеличиваем ширину */
+  width: 50px; /* Увеличиваем ширину */
   border-radius: 6px; /* Делаем углы немного скругленными */
   overflow: hidden; /* Скрываем все, что выходит за пределы */
   position: relative; /* Для позиционирования картинки внутри */
@@ -499,8 +557,8 @@ body.is-dragging, body.is-dragging * {
 }
 
 .cell.generator-part-cell {
-  border: 2px dashed #888;
-  background: #333;
+  border: 2px dashed var(--text-color-light);
+  background: var(--button-bg);
 }
 
 .cell.generator-part-cell .item-level {
@@ -511,15 +569,15 @@ body.is-dragging, body.is-dragging * {
 .cell.generator-slot {
   /* Устанавливаем положение для псевдоэлемента */
   position: relative;
-  background: var(--box-bg-color);
+  background: var(--generator-slot-bg);
 
   /* Создаем рамку */
   border: 2px dashed transparent;
 
   /* Используем градиент для фона, который будет "двигаться" */
   background-image:
-          linear-gradient(var(--box-bg-color), var(--box-bg-color)),
-          linear-gradient(90deg, #8c6d53, #ffcc00, #8c6d53);
+          linear-gradient(var(--generator-slot-bg), var(--generator-slot-bg)),
+          linear-gradient(90deg, var(--generator-slot-border-1), var(--generator-slot-border-2), var(--generator-slot-border-1));
 
   background-origin: border-box;
   background-clip: padding-box, border-box;
@@ -530,7 +588,7 @@ body.is-dragging, body.is-dragging * {
 }
 
 .cell.generator-slot-no-energy {
-  border: 2px dashed darkred;
+  border: 2px dashed var(--generator-slot-no-energy-border);
   background-image: none;
   animation: none;
 }
@@ -545,8 +603,8 @@ body.is-dragging, body.is-dragging * {
 }
 
 .cell.blocked {
-  background: var(--blocked-color);
-  border: 1px dashed #555;
+  background: var(--cell-color);
+  border: 1px dashed var(--border-color-light);
   cursor: pointer;
 }
 .cell.blocked::after {
@@ -568,8 +626,8 @@ body.is-dragging, body.is-dragging * {
 }
 
 .cell.allocated-for-order {
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 0 1px #28a745;
-  border: 1px solid #34d399;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 0 1px var(--success-color);
+  border: 1px solid var(--success-color);
   transition: box-shadow 0.2s ease-out, border 0.2s ease-out;
 }
 
@@ -626,8 +684,8 @@ body.is-dragging, body.is-dragging * {
   bottom: 3px;
   right: 4px;
   font-size: 0.65rem;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  background: var(--badge-bg);
+  color: var(--text-color-on-accent);
   padding: 1px 4px;
   border-radius: 4px;
   pointer-events: none;
@@ -703,7 +761,7 @@ body.is-dragging, body.is-dragging * {
   bottom: 3px;
   left: 4px;
   font-size: 0.6rem;
-  background: rgba(255, 71, 126, 0.95);
+  background: var(--accent-color);
   color: #fff;
   padding: 1px 4px;
   border-radius: 3px;
@@ -726,7 +784,7 @@ body.is-dragging, body.is-dragging * {
   right: 2px;
   pointer-events: none;
   z-index: 12;
-  text-shadow: 0 0 5px #ffb703, 0 0 2px rgba(0,0,0,0.8);
+  text-shadow: 0 0 5px var(--energy-color), 0 0 2px rgba(0,0,0,0.8);
   line-height: 1;
   animation: star-pulse 2s infinite;
 }
@@ -750,7 +808,7 @@ body.is-dragging, body.is-dragging * {
   position: fixed;
   pointer-events: none;
   z-index: 26000; /* Выше модальных окон */
-  transition: transform 0.7s cubic-bezier(0.2, 0, 0.8, 0.6), opacity 0.7s ease-out;
+  transition: transform 0.7s cubic-bezier(0.2, 0, 0.8, 0.6), opacity 1s ease-out;
 }
 .flying-reward.coin {
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); /* Тень для лучшей видимости */
@@ -770,7 +828,7 @@ body.is-dragging, body.is-dragging * {
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0);
+  background: transparent;
   z-index: 20000;
   display: flex;
   justify-content: center;
@@ -809,8 +867,8 @@ body.is-dragging, body.is-dragging * {
 }
 
 .modal-overlay.active .modal-content { transform: translateY(0); }
-.modal-close { position: absolute; top: 8px; right: 14px; font-size: 1.3rem; color: #888; cursor: pointer; line-height: 1; }
-.modal-icon { background: #333; width: 50px; height: 50px; display: flex; justify-content: center; border-radius: 10px; align-items: center; }
+.modal-close { position: absolute; top: 8px; right: 14px; font-size: 1.3rem; color: var(--text-color-light); cursor: pointer; line-height: 1; }
+.modal-icon { background: var(--button-bg); width: 50px; height: 50px; display: flex; justify-content: center; border-radius: 10px; align-items: center; }
 
 .modal-icon img {
   width: 2.5rem;
@@ -843,11 +901,11 @@ body.is-dragging, body.is-dragging * {
 .modal-info-btn:hover { opacity: 1; }
 
 .modal-text-side { display: flex; flex-direction: column; gap: 2px; text-align: left; padding-right: 10px; overflow: hidden; }
-.modal-title { font-size: 1rem; font-weight: bold; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.modal-title { font-size: 1rem; font-weight: bold; color: var(--text-color); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .modal-subtitle { font-size: 0.7rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; }
 .modal-desc {
   font-size: 0.8rem;
-  color: #b3b3b3;
+  color: var(--text-color-light);
   line-height: 1.25;
   margin: 0;
   max-height: 150px; /* Увеличиваем высоту для цепочек предметов */
@@ -856,7 +914,7 @@ body.is-dragging, body.is-dragging * {
 }
 
 .modal-desc::-webkit-scrollbar { width: 4px; }
-.modal-desc::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
+.modal-desc::-webkit-scrollbar-thumb { background: var(--border-color-light); border-radius: 2px; }
 
 .progression-container {
   display: flex;
@@ -870,7 +928,7 @@ body.is-dragging, body.is-dragging * {
 .progression-item-square {
   width: 40px;
   height: 40px;
-  background-color: #3a3a3a;
+  background-color: var(--cell-color);
   border-radius: 6px;
   display: flex;
   justify-content: center;
@@ -897,16 +955,16 @@ body.is-dragging, body.is-dragging * {
 
 .progression-arrow-h {
   font-size: 1.2rem;
-  color: #666;
+  color: var(--text-color-light);
 }
 
 .progression-item-square.undiscovered {
-  background-color: #2c2c2c;
+  background-color: var(--panel-color);
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
 }
 
 .progression-item-square.undiscovered .progression-item-icon {
-  color: #666;
+  color: var(--text-color-light);
   font-weight: bold;
 }
 
@@ -921,8 +979,8 @@ body.is-dragging, body.is-dragging * {
 
 .progression-item-square.bonus-unclaimed {
   cursor: pointer;
-  box-shadow: 0 0 8px #ffd700, inset 0 1px 3px rgba(0,0,0,0.4);
-  border-color: #ffb703; /* Теперь меняем только цвет рамки */
+  box-shadow: 0 0 8px var(--coin-color), inset 0 1px 3px rgba(0,0,0,0.4);
+  border-color: var(--coin-color);
 }
 
 .progression-item-square.bonus-unclaimed:hover {
@@ -936,7 +994,7 @@ body.is-dragging, body.is-dragging * {
   font-size: 0.6rem;
   font-weight: bold;
   background: rgba(0,0,0,0.7);
-  color: #ffd700;
+  color: var(--coin-color);
   padding: 1px 3px;
   border-radius: 3px;
   animation: star-pulse 2s infinite;
@@ -959,9 +1017,9 @@ body.is-dragging, body.is-dragging * {
 
 .modal-action-btn {
   grid-column: span 2;
-  background: #28a745;
+  background: var(--success-color);
   border: none;
-  color: white;
+  color: var(--text-color-on-accent);
   padding: 10px;
   border-radius: 6px;
   font-weight: bold;
@@ -969,7 +1027,7 @@ body.is-dragging, body.is-dragging * {
   text-align: center;
   margin-top: 4px;
 }
-.modal-action-btn:active { background: #218838; }
+.modal-action-btn:active { background: var(--success-color); }
 
 .modal-button-group {
   grid-column: span 2;
@@ -981,27 +1039,27 @@ body.is-dragging, body.is-dragging * {
 
 .modal-btn-confirm {
   flex: 1;
-  background: #dc3545;
+  background: var(--error-color);
   border: none;
-  color: white;
+  color: var(--text-color-on-accent);
   padding: 10px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
 }
-.modal-btn-confirm:active {  background: #bd2130; }
+.modal-btn-confirm:active {  background: var(--error-color); }
 
 .modal-btn-cancel {
   flex: 1;
-  background: #555;
+  background: var(--border-color-light);
   border: none;
-  color: white;
+  color: var(--text-color);
   padding: 10px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
 }
-.modal-btn-cancel:active { background: #444; }
+.modal-btn-cancel:active { background: var(--button-hover-bg); }
 
 /* --- Menu Modal --- */
 .modal-overlay#menu-modal {
@@ -1049,9 +1107,9 @@ body.is-dragging, body.is-dragging * {
 
 .menu-btn-item {
   position: relative; /* Для позиционирования точки-уведомления */
-  background: #333;
-  border: 1px solid #444;
-  color: #fff;
+  background: var(--button-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   padding: 12px;
   border-radius: 8px;
   font-weight: bold;
@@ -1063,8 +1121,8 @@ body.is-dragging, body.is-dragging * {
   font-size: 1rem;
   transition: background-color 0.2s;
 }
-.menu-btn-item:hover { background-color: #444; }
-.menu-btn-item:active { background-color: #222; }
+.menu-btn-item:hover { background-color: var(--button-hover-bg); }
+.menu-btn-item:active { background-color: var(--button-active-bg); }
 
 .menu-btn-icon {
   width: 2.0rem;
@@ -1077,7 +1135,7 @@ body.is-dragging, body.is-dragging * {
   top: 50%;
   right: 15px;
   transform: translateY(-50%);
-  border-color: #333; /* Цвет фона кнопки */
+  border-color: var(--button-bg);
 }
 
 /* --- Detail Modal --- */
@@ -1088,7 +1146,7 @@ body.is-dragging, body.is-dragging * {
 #settings-modal {
   z-index: 25000; /* Выше, чем обычный модал */
   align-items: flex-end; /* По-прежнему внизу */
-  background: rgba(0, 0, 0, 0.7); /* Более темный фон */
+  background: var(--modal-overlay-bg); /* Более темный фон */
   /* Синхронизируем transition с анимацией контента (.detail-modal-content), чтобы фон и контент исчезали одновременно */
   transition: background 0.3s ease, opacity 0.3s ease;
 }
@@ -1098,7 +1156,7 @@ body.is-dragging, body.is-dragging * {
 #profile-modal:not(.active),
 #achievements-modal:not(.active),
 #settings-modal:not(.active) {
-  background: rgba(0, 0, 0, 0);
+  background: transparent;
 }
 
 .detail-modal-content {
@@ -1130,7 +1188,7 @@ body.is-dragging, body.is-dragging * {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
@@ -1167,7 +1225,7 @@ body.is-dragging, body.is-dragging * {
 
 .detail-modal-close {
   font-size: 1.8rem;
-  color: #888;
+  color: var(--text-color-light);
   cursor: pointer;
   line-height: 1;
   padding: 0 5px;
@@ -1181,7 +1239,7 @@ body.is-dragging, body.is-dragging * {
 
 .collection-footer {
   padding: 12px 16px;
-  border-top: 1px solid #444;
+  border-top: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
@@ -1199,8 +1257,8 @@ body.is-dragging, body.is-dragging * {
 }
 
 #claim-collection-bonus-btn:disabled {
-  background: #555;
-  color: #999;
+  background: var(--border-color-light);
+  color: var(--text-color-light);
   cursor: not-allowed;
 }
 
@@ -1221,7 +1279,7 @@ body.is-dragging, body.is-dragging * {
   pointer-events: none;
   z-index: 5;
   opacity: 0;
-  mix-blend-mode: screen;
+  mix-blend-mode: var(--flash-blend-mode);
   animation: flash-fade 0.4s ease-out forwards;
 }
 @keyframes flash-fade {
@@ -1330,7 +1388,7 @@ body.is-dragging, body.is-dragging * {
 .cell.booster-cell {
   position: relative;
   overflow: hidden; /* Важно, чтобы рамка не вылезала за пределы */
-  background: #2d2d2d; /* Немного другой фон для контраста */
+  background: var(--booster-cell-bg); /* Немного другой фон для контраста */
 }
 
 .cell.booster-cell::before {
@@ -1436,18 +1494,18 @@ body.is-dragging, body.is-dragging * {
   gap: 15px;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .profile-avatar {
-  background: #333;
+  background: var(--button-bg);
   width: 70px;
   height: 70px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #555;
+  border: 2px solid var(--border-color-light);
 }
 
 .profile-avatar img {
@@ -1472,7 +1530,7 @@ body.is-dragging, body.is-dragging * {
 .profile-name-input:focus {
   outline: none;
   border-color: var(--accent-color);
-  background: #333;
+  background: var(--input-focus-bg);
 }
 
 .profile-stats {
@@ -1485,7 +1543,7 @@ body.is-dragging, body.is-dragging * {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #333;
+  background: var(--button-bg);
   padding: 10px 15px;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -1510,13 +1568,20 @@ body.is-dragging, body.is-dragging * {
   height: 10px;
   background-color: var(--accent-color);
   border-radius: 50%;
-  border: 2px solid var(--panel-color);
   box-shadow: 0 0 5px var(--accent-color);
+}
+
+.menu-btn .notification-dot {
+  border: 2px solid var(--panel-color);
+}
+
+.menu-btn-item .notification-dot {
+  border: 2px solid var(--button-bg);
 }
 
 /* --- Achievements Modal --- */
 .achievement-item {
-  background: #333;
+  background: var(--button-bg);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
@@ -1537,7 +1602,7 @@ body.is-dragging, body.is-dragging * {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #2a2a2a;
+  background: var(--panel-color);
   border-radius: 8px;
 }
 
@@ -1556,7 +1621,7 @@ body.is-dragging, body.is-dragging * {
 
 .achievement-desc {
   font-size: 0.85rem;
-  color: #b3b3b3;
+  color: var(--text-color-light);
   margin: 0;
   line-height: 1.3;
 }
@@ -1583,13 +1648,13 @@ body.is-dragging, body.is-dragging * {
 
 .achievement-progress-text {
   font-size: 0.75rem;
-  color: #ccc;
+  color: var(--text-color-light);
 }
 
 .achievement-progress-bar-bg {
   width: 100%;
   height: 8px;
-  background: #222;
+  background: var(--scrollbar-track);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -1619,8 +1684,8 @@ body.is-dragging, body.is-dragging * {
 }
 
 .achievement-claim-btn:disabled {
-  background: #555;
-  color: #888;
+  background: var(--border-color-light);
+  color: var(--text-color-light);
   cursor: not-allowed;
   transform: none;
 }
@@ -1660,7 +1725,7 @@ input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
   height: 8px;
-  background: #444;
+  background: var(--border-color);
   border-radius: 4px;
   outline: none;
   opacity: 0.7;
@@ -1680,6 +1745,58 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
   border-radius: 50%;
   border: 2px solid var(--modal-bg);
+}
+
+/* --- Theme Switch --- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--switch-bg);
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--accent-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+.slider.round {
+  border-radius: 28px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 
 input[type="range"]::-moz-range-thumb {
