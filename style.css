@@ -497,7 +497,7 @@ body.is-dragging, body.is-dragging * {
   cursor: pointer;
   width: 50px; /* Увеличиваем ширину */
   border-radius: 6px; /* Делаем углы немного скругленными */
-  overflow: hidden; /* Скрываем все, что выходит за пределы */
+  // overflow: hidden; /* Скрываем все, что выходит за пределы */
   position: relative; /* Для позиционирования картинки внутри */
 }
 

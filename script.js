@@ -25,10 +25,18 @@ import {DOMElements} from './dom.js';
   }
 })();
 
-function initAudio() {
-  DOMElements.bgMusic.play().catch(e => {
-    console.warn("Audio autoplay failed. User interaction may be needed.", e);
-  });
+function initAudioOnInteraction() {
+  // It's possible for this to be called by both pointerdown and touchend.
+  // We immediately remove the listeners to ensure the logic runs only once.
+  document.body.removeEventListener('pointerdown', initAudioOnInteraction);
+  document.body.removeEventListener('touchend', initAudioOnInteraction);
+
+  // Only try to play if volume is not muted and music is currently paused.
+  if (gameSettings.musicVolume > 0 && DOMElements.bgMusic.paused) {
+    DOMElements.bgMusic.play().catch(e => {
+      console.warn("Background music playback failed to start. This is common and may require another user interaction.", e);
+    });
+  }
 }
 
 function applyTheme() {
@@ -76,8 +84,11 @@ function initGame() {
 }
 
 function addListeners() {
-  // Add a general listener to the body to catch the first interaction for audio
-  document.body.addEventListener('pointerdown', initAudio, { once: true });
+  // Add listeners to the body to catch the first user interaction for audio.
+  // We use both pointerdown and touchend for maximum compatibility on mobile devices.
+  // The handler itself will remove these listeners after the first run.
+  document.body.addEventListener('pointerdown', initAudioOnInteraction);
+  document.body.addEventListener('touchend', initAudioOnInteraction);
 
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
