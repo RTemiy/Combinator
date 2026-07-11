@@ -78,6 +78,7 @@ export const DOMElements = {
   sfxMerge: document.getElementById('sfx-merge'),
   sfxSwap: document.getElementById('sfx-swap'),
   sfxSpawn: document.getElementById('sfx-spawn'),
+  sfxGeneratorSpawn: document.getElementById('sfx-generator-spawn'),
   sfxOrderComplete: document.getElementById('sfx-order-complete'),
   sfxCoin: document.getElementById('sfx-coin'),
 };

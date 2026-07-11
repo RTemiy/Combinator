@@ -309,11 +309,15 @@ function startNewGame() {
     if (availableIndices.length > 5) {
       const randIdx = Math.floor(Math.random() * availableIndices.length);
       const cellIndex = availableIndices.splice(randIdx, 1)[0];
-      // Теперь создаем реальный предмет, но заблокированный
-      const randomCat = gameState.activeCategories[Math.floor(Math.random() * gameState.activeCategories.length)];
-      const randomLevel = Math.floor(Math.random() * 3) + 1; // Блокируем предметы с 1 по 3 уровень
+      // Теперь создаем реальный предмет, но заблокированный.
+      // Предметы могут быть любой категории (кроме тех, что генерируются другими предметами) и любого уровня.
+      const spawnableCategories = Object.keys(CATEGORIES_CONFIG).filter(cat => !CATEGORIES_CONFIG[cat].isItemGenerated);
+      const randomCat = spawnableCategories[Math.floor(Math.random() * spawnableCategories.length)];
+      // Уровень от 1 до предпоследнего (6), чтобы не блокировать предметы максимального уровня.
+      const randomLevel = Math.floor(Math.random() * (CONFIG.MAX_ITEM_LEVEL - 1)) + 1;
       gameState.gridData[cellIndex] = { category: randomCat, level: randomLevel, isBlocked: true };
-      markItemAsDiscovered(randomCat, randomLevel);
+      // Заблокированные предметы не добавляются в коллекцию при старте.
+      // markItemAsDiscovered(randomCat, randomLevel);
     }
   }
 
@@ -1256,8 +1260,11 @@ function clearBlockedItemWithCoins(index) {
     return;
   }
 
+  const item = gameState.gridData[index];
   gameState.coins -= CONFIG.BLOCKED_CLEAR_COST_COINS;
-  delete gameState.gridData[index].isBlocked; // Просто убираем флаг блокировки
+  delete item.isBlocked; // Просто убираем флаг блокировки
+  // После снятия блокировки предмет считается открытым и добавляется в коллекцию.
+  markItemAsDiscovered(item.category, item.level);
   closeModal();
   saveGame();
   updateUI();
@@ -1315,10 +1322,10 @@ function rechargePlayerEnergyWithCoins() {
 function getBlockedItemModalOptions(item, index) {
   const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
   return {
-    icon: 'assets/icons/web.png',
+    icon: 'assets/icons/block.png',
     title: `Заблокированный: ${info.name}`,
-    subtitle: 'В паутине',
-    desc: 'Этот предмет в паутине. Чтобы его освободить, перетащите на него точно такой же предмет с поля, либо расчистите завал за монеты.',
+    subtitle: 'Преграда',
+    desc: 'Этот предмет за баррикадой. Чтобы его освободить, перетащите на него точно такой же предмет с поля, либо расчистите завал за монеты.',
     actionButton: {
       text: `Расчистить завал (-${CONFIG.BLOCKED_CLEAR_COST_COINS}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
       onClick: () => clearBlockedItemWithCoins(index)
@@ -2225,6 +2232,7 @@ function triggerSpecialGenerator(generator, fromIndex) {
     return;
   }
 
+  playSound(DOMElements.sfxGeneratorSpawn);
   generator.genCharges--;
 
   const targetCellIndex = findClosestEmptyCell(fromIndex, emptyCells);
@@ -2262,6 +2270,7 @@ function triggerItemGenerator(generator, fromIndex) {
     return;
   }
 
+  playSound(DOMElements.sfxGeneratorSpawn);
   gameState.energy--;
   playerProfile.totalEnergySpent++;
   generator.charges--;
@@ -2310,6 +2319,7 @@ function triggerRegularGenerator(generator, fromIndex) {
     return;
   }
 
+  playSound(DOMElements.sfxGeneratorSpawn);
   if (generator.genEnergy === config.max) {
     generator.lastRegenTime = Date.now();
   }

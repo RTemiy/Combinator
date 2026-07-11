@@ -44,6 +44,21 @@ export const GENERATORS_DATA = {
       'assets/icons/categories/writings/generator_lvl_02.png',
     ]
   },
+  'bakery': {
+    name: 'Пекарня-кондитерская', desc: 'Уютное место, где рождаются ароматная выпечка и сладкие лакомства. Смешивайте муку и сахар, чтобы создавать шедевры.', categories: ['bakery', 'pastry'], isHybrid: true,
+    partIcons: [
+      'assets/icons/categories/dough/part_lvl_01.png',
+      'assets/icons/categories/dough/part_lvl_02.png',
+      'assets/icons/categories/dough/part_lvl_03.png',
+    ],
+    icons: [
+      'assets/icons/categories/dough/generator_lvl_01.png',
+      'assets/icons/categories/dough/generator_lvl_02.png',
+      'assets/icons/categories/dough/generator_lvl_02.png',
+      'assets/icons/categories/dough/generator_lvl_02.png',
+      'assets/icons/categories/dough/generator_lvl_02.png',
+    ]
+  },
   'bonus_chest': {
     name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true,
     icons: [
@@ -124,7 +139,45 @@ export const CATEGORIES_CONFIG = {
       { level: 6, icon: 'assets/icons/categories/books/books_stack.png', name: 'Стопка книг', desc: 'Коллекция мудрости и приключений, ожидающая своего читателя.' },
       { level: 7, icon: 'assets/icons/categories/books/bookshelf.png', name: 'Книжный шкаф', desc: 'Целая библиотека, хранящая в себе миры и эпохи.' },
     ]
+  },
+  bakery: {
+    name: 'Выпечка',
+    color: '#edca08',
+    generatorKey: 'bakery',
+    items: [
+      { level: 1, icon: 'assets/icons/categories/dough/toast.png', name: 'Тост', desc: 'Поджаренный ломтик хлеба, хрустящий снаружи и мягкий внутри.' },
+      { level: 2, icon: 'assets/icons/categories/dough/bagel.png', name: 'Бейгл', desc: 'Плотный бублик, который часто едят с начинкой.' },
+      { level: 3, icon: 'assets/icons/categories/dough/brioche.png', name: 'Бриошь', desc: 'Сдобная булочка из воздушного теста, идеальна для завтрака.' },
+      { level: 4, icon: 'assets/icons/categories/dough/ciabatta.png', name: 'Чиабатта', desc: 'Итальянский хлеб с пористой мякотью и хрустящей корочкой.' },
+      { level: 5, icon: 'assets/icons/categories/dough/focaccia.png', name: 'Фокачча с оливками', desc: 'Пышная итальянская лепешка, сдобренная оливковым маслом и оливками.' },
+      { level: 6, icon: 'assets/icons/categories/dough/baguette.png', name: 'Багет', desc: 'Длинный и тонкий французский хлеб с хрустящей корочкой.' },
+      { level: 7, icon: 'assets/icons/categories/dough/karavai.png', name: 'Каравай', desc: 'Пышный и румяный праздничный хлеб, символ гостеприимства.' },
+    ]
+  },
+  pastry: {
+    name: 'Кондитерские изделия',
+    color: '#ed08c7',
+    generatorKey: 'bakery',
+    items: [
+      { level: 1, icon: 'assets/icons/categories/candies/cacao.png', name: 'Какао', desc: 'Упаковка какао-порошка, основа для будущих шоколадных шедевров.' },
+      { level: 2, icon: 'assets/icons/categories/candies/choco_candy.png', name: 'Шоколадная конфета', desc: 'Маленькое шоколадное удовольствие с нежной начинкой.' },
+      { level: 3, icon: 'assets/icons/categories/candies/choco_bar.png', name: 'Плитка шоколада', desc: 'Классическая плитка темного шоколада.' },
+      { level: 4, icon: 'assets/icons/categories/candies/muffin.png', name: 'Шоколадный маффин', desc: 'Воздушный кекс с кусочками тающего шоколада.' },
+      { level: 5, icon: 'assets/icons/categories/candies/croissant.png', name: 'Круассан с фисташковой пастой', desc: 'Слоеный круассан с ароматной и сладкой фисташковой начинкой.' },
+      { level: 6, icon: 'assets/icons/categories/candies/eclairs.png', name: 'Упаковка эклеров', desc: 'Набор изысканных заварных пирожных с нежным кремом.' },
+      { level: 7, icon: 'assets/icons/categories/candies/bento_cake.png', name: 'Бенто-торт', desc: 'Миниатюрный торт в коробочке, модный и вкусный десерт.' },
+    ]
   }
+  /* Заготовка
+  candies: {
+    name: 'Выпечка',
+    color: '#edca08',
+    generatorKey: 'bakery',
+    items: [
+      { level: 1, icon: 'assets/icons/categories/dough/.png', name: '', desc: '' },
+    ]
+  }
+  */
 };
 
 export const CHARACTERS = [
@@ -200,26 +253,26 @@ export const CONFIG = {
   MAX_ITEM_LEVEL: 7,
   MAX_GENERATOR_LEVEL: 5,
   STARTING_ITEMS_COUNT: 2,
-  BLOCKED_ITEMS_AT_START: 23,
+  BLOCKED_ITEMS_AT_START: 25,
 
   // Energy
   MAX_ENERGY: 100,
-  ENERGY_REGEN_INTERVAL: 10000,
+  ENERGY_REGEN_INTERVAL: 15000,
   ENERGY_REGEN_AMOUNT: 1,
   STORY_ORDER_ENERGY_REWARD: 3,
   ORDER_ENERGY_REWARD: 1,
-  OFFLINE_ENERGY_REGEN_RATE: 10000,
+  OFFLINE_ENERGY_REGEN_RATE: 15000,
 
-  // Coinss
+  // Coins
   COIN_MULTIPLIER: 5,
-  COINS_PER_ORDER_CANCEL: 75,
-  BLOCKED_CLEAR_COST_COINS: 50,
-  GENERATOR_RECHARGE_COST: 100,
+  COINS_PER_ORDER_CANCEL: 100,
+  GENERATOR_RECHARGE_COST: 150,
+  BLOCKED_CLEAR_COST_COINS: 200,
   ENERGY_RECHARGE_COST_COINS: 250,
 
   // Orders
   MAX_ORDERS: 3,
-  ORDER_GENERATION_STORY_CHANCE: 0.15,
+  ORDER_GENERATION_STORY_CHANCE: 0.1,
 
   // Scoring and Progression
   ITEM_SCORE_MULTIPLIER: 50,
@@ -234,7 +287,7 @@ export const CONFIG = {
   DRAG_THRESHOLD: 5,
 
   // Collection
-  COLLECTION_BONUS_BASE_VALUE: 5, // 3 монеты за 1 уровень предмета
+  COLLECTION_BONUS_BASE_VALUE: 15,
 
   // System
   VERSION_KEY: 'merge_game_version',
@@ -262,8 +315,8 @@ export const SPAWN_CHANCES = {
 export const UNLOCK_THRESHOLDS = [
   { score: 1500, unlocked: false, level: 2, prevLimit: 0, orderLevels: { min: 3, max: 4 } },
   { score: 3000, unlocked: false, level: 3, prevLimit: 1500, orderLevels: { min: 4, max: 4 } },
-  { score: 6000, unlocked: false, level: 4, prevLimit: 3000, orderLevels: { min: 4, max: 5 } },
-  { score: 12000, unlocked: false, level: 5, prevLimit: 6000, orderLevels: { min: 5, max: 5 } },
-  { score: 24000, unlocked: false, level: 6, prevLimit: 12000, orderLevels: { min: 5, max: 6 } },
-  { score: 48000, unlocked: false, level: 7, prevLimit: 24000, orderLevels: { min: 6, max: 7 } }
+  { score: 12000, unlocked: false, level: 4, prevLimit: 3000, orderLevels: { min: 4, max: 5 } },
+  { score: 24000, unlocked: false, level: 5, prevLimit: 12000, orderLevels: { min: 5, max: 5 } },
+  { score: 36000, unlocked: false, level: 6, prevLimit: 24000, orderLevels: { min: 5, max: 6 } },
+  { score: 48000, unlocked: false, level: 7, prevLimit: 36000, orderLevels: { min: 6, max: 7 } }
 ];
