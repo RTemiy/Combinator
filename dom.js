@@ -1,5 +1,6 @@
 export const DOMElements = {
   grid: document.getElementById('grid'),
+  startScreen: document.getElementById('start-screen-overlay'),
   toastContainer: document.getElementById('toast-container'),
   infoModal: {
     overlay: document.getElementById('info-modal'),

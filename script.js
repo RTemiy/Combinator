@@ -25,18 +25,19 @@ import {DOMElements} from './dom.js';
   }
 })();
 
-function initAudioOnInteraction() {
-  // It's possible for this to be called by both pointerdown and touchend.
-  // We immediately remove the listeners to ensure the logic runs only once.
-  document.body.removeEventListener('pointerdown', initAudioOnInteraction);
-  document.body.removeEventListener('touchend', initAudioOnInteraction);
-
-  // Only try to play if volume is not muted and music is currently paused.
+function startGameAndAudio() {
+  // 1. Try to play music. This is now triggered by an explicit user click
+  // on the start screen, which is the most reliable way to handle autoplay policies.
   if (gameSettings.musicVolume > 0 && DOMElements.bgMusic.paused) {
     DOMElements.bgMusic.play().catch(e => {
-      console.warn("Background music playback failed to start. This is common and may require another user interaction.", e);
+      console.warn("Background music playback failed even after initial user interaction.", e);
     });
   }
+
+  // 2. Hide the start screen with a fade-out effect.
+  DOMElements.startScreen.style.opacity = '0';
+  // After the animation, set display to 'none' so it doesn't block game interactions.
+  setTimeout(() => { DOMElements.startScreen.style.display = 'none'; }, 500); // Must match CSS transition duration
 }
 
 function applyTheme() {
@@ -84,11 +85,8 @@ function initGame() {
 }
 
 function addListeners() {
-  // Add listeners to the body to catch the first user interaction for audio.
-  // We use both pointerdown and touchend for maximum compatibility on mobile devices.
-  // The handler itself will remove these listeners after the first run.
-  document.body.addEventListener('pointerdown', initAudioOnInteraction);
-  document.body.addEventListener('touchend', initAudioOnInteraction);
+  // Add a one-time listener to the start screen to initialize audio and begin the game.
+  DOMElements.startScreen.addEventListener('click', startGameAndAudio, { once: true });
 
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
