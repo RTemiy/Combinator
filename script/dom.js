@@ -86,6 +86,7 @@ export const DOMElements = {
   },
   sfxSwap: document.getElementById('sfx-swap'),
   sfxSpawn: document.getElementById('sfx-spawn'),
+  sfxClaimReward: document.getElementById('sfx-claim-reward'),
   sfxGeneratorSpawn: document.getElementById('sfx-generator-spawn'),
   sfxOrderComplete: document.getElementById('sfx-order-complete'),
   sfxCoin: document.getElementById('sfx-coin'),

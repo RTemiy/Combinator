@@ -202,7 +202,7 @@ export const ACHIEVEMENTS_DATA = {
     desc: 'Совершите определенное количество слияний.',
     icon: 'assets/icons/achievements/merge_achievement.png',
     tiers: [
-      { goal: 50, reward: 100 },
+      { goal: 50, reward: 75 },
       { goal: 250, reward: 250 },
       { goal: 1000, reward: 500 },
       { goal: 5000, reward: 1000 },
@@ -214,7 +214,7 @@ export const ACHIEVEMENTS_DATA = {
     desc: 'Выполните определенное количество заказов.',
     icon: 'assets/icons/achievements/order_achievement.png',
     tiers: [
-      { goal: 10, reward: 150 },
+      { goal: 10, reward: 50 },
       { goal: 50, reward: 300 },
       { goal: 100, reward: 600 },
       { goal: 250, reward: 1200 },
@@ -253,13 +253,13 @@ export const CONFIG = {
   MAX_ITEM_LEVEL: 7,
   MAX_GENERATOR_LEVEL: 5,
   STARTING_ITEMS_COUNT: 2,
-  BLOCKED_ITEMS_AT_START: 25,
+  BLOCKED_ITEMS_AT_START: 40,
 
   // Energy
   MAX_ENERGY: 100,
   ENERGY_REGEN_INTERVAL: 15000,
   ENERGY_REGEN_AMOUNT: 1,
-  STORY_ORDER_ENERGY_REWARD: 3,
+  STORY_ORDER_ENERGY_REWARD: 5,
   ORDER_ENERGY_REWARD: 1,
   OFFLINE_ENERGY_REGEN_RATE: 15000,
 
@@ -287,11 +287,11 @@ export const CONFIG = {
   DRAG_THRESHOLD: 5,
 
   // Collection
-  COLLECTION_BONUS_BASE_VALUE: 15,
+  COLLECTION_BONUS_BASE_VALUE: 12,
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.2.2',
+  GAME_VERSION: '1.2.3',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },

@@ -1847,3 +1847,41 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 50%;
   border: 2px solid var(--modal-bg);
 }
+
+/* Стили для нового логотипа на стартовом экране */
+.start-screen-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 24px;
+  /* Добавляем анимацию */
+  animation: pulse-logo 3s infinite ease-in-out;
+}
+
+/* Анимация "дыхания" для логотипа */
+@keyframes pulse-logo {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+
+/* Убираем старый лоадер, если стили для него еще где-то есть */
+.loader {
+  display: none !important;
+}
+
+/* Убедимся, что контент на стартовом экране центрирован */
+#start-screen-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

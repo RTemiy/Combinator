@@ -149,6 +149,8 @@ export function claimReward(rewardIndex, startElement) {
     startElement.style.pointerEvents = 'none';
     startElement.style.opacity = '0.5';
 
+    playSound(DOMElements.sfxClaimReward);
+
     const reward = gameState.rewardQueue[rewardIndex];
     const targetCellIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
     const targetCellElement = DOMElements.grid.children[targetCellIndex];
