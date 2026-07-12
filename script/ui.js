@@ -322,6 +322,25 @@ export function animateRewardFly(startElement, endElement, icon, count = 5, clas
   }
 }
 
+export function highlightHintItems(indices) {
+  indices.forEach(index => {
+    const cell = DOMElements.grid.children[index];
+    if (cell) {
+      const wrapper = cell.querySelector('.item-wrapper');
+      if (wrapper && !wrapper.classList.contains('hint-highlight')) {
+        wrapper.classList.add('hint-highlight');
+      }
+    }
+  });
+}
+
+export function removeHintHighlights() {
+    const highlightedItems = DOMElements.grid.querySelectorAll('.hint-highlight');
+    highlightedItems.forEach(item => {
+        item.classList.remove('hint-highlight');
+    });
+}
+
 export function renderGrid() {
   const cells = document.querySelectorAll('.cell');
   cells.forEach((cell, idx) => {

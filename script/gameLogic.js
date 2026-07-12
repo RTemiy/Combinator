@@ -501,7 +501,7 @@ function handleSwap(fromIdx, toIdx, source, target) {
 const MERGE_HANDLERS = [
   // Слияние с заблокированным предметом
   {
-    canHandle: (s, t) => t?.isBlocked && !s.isGenerator && !s.isItemGenerator && s.category === t.category && s.level === t.level,
+    canHandle: (s, t) => !s.isBlocked && t?.isBlocked && !s.isGenerator && !s.isItemGenerator && s.category === t.category && s.level === t.level,
     execute: (from, to, src) => handleUnblockMerge(from, to, src)
   },
   // Улучшение генератора деталью (в обе стороны)
@@ -534,7 +534,7 @@ const MERGE_HANDLERS = [
   },
   // Слияние двух обычных предметов (включая предметы-генераторы)
   {
-    canHandle: (s, t) => t && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && !s.isMagicTool && !t.isMagicTool && s.category === t.category && s.level === t.level,
+    canHandle: (s, t) => t && !s.isBlocked && !t.isBlocked && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && !s.isMagicTool && !t.isMagicTool && s.category === t.category && s.level === t.level,
     execute: (from, to, src) => handleItemMerge(from, to, src)
   },
 ];
@@ -715,7 +715,7 @@ export function triggerRegularGenerator(generator, fromIndex) {
   if (generator.genEnergy === undefined) generator.genEnergy = config.max;
 
   if (generator.genEnergy <= 0) {
-    showToast(`<img src="../assets/icons/box.png" class="toast-icon" alt=""> Генератор истощен! Подождите, пока накопятся заряды.`, "error");
+    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Генератор истощен! Подождите, пока накопятся заряды.`, "error");
     return;
   }
   if (gameState.energy <= 0) {
@@ -1208,4 +1208,38 @@ export function completeOrder(id) {
       updateUI();
     }, CONFIG.ANIMATION.FADE_DURATION);
   });
+}
+
+export function findMergeablePair() {
+    const grid = gameState.gridData;
+    const mergeablePairs = [];
+
+    for (let i = 0; i < grid.length; i++) {
+        const source = grid[i];
+        if (!source) continue;
+
+        // Start j from i + 1 to avoid duplicate pairs and self-comparison
+        for (let j = i + 1; j < grid.length; j++) {
+            const target = grid[j];
+            if (!target) continue;
+
+            for (const handler of MERGE_HANDLERS) {
+                // Check both directions as some handlers are not symmetrical
+                if (handler.canHandle(source, target)) {
+                    mergeablePairs.push([i, j]);
+                    break;
+                }
+                if (handler.canHandle(target, source)) {
+                    mergeablePairs.push([j, i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (mergeablePairs.length > 0) {
+        return mergeablePairs[Math.floor(Math.random() * mergeablePairs.length)];
+    }
+
+    return null; // No mergeable pair found
 }

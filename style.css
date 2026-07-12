@@ -1885,3 +1885,18 @@ input[type="range"]::-moz-range-thumb {
   align-items: center;
   justify-content: center;
 }
+
+@keyframes hint-bounce {
+  /* 0% - 40% (1s) - Пауза */
+  0%, 40% { transform: translateY(0) scale(1); }
+
+  /* 40% - 100% (1.5s) - Анимация двойного подскока */
+  52%, 70%, 76% { transform: translateY(-10px) scale(1.05); } /* вверх */
+  64%, 88%, 100% { transform: translateY(0) scale(1); }       /* вниз */
+}
+
+.hint-highlight {
+  animation: hint-bounce 2.5s ease-in-out;
+  /* To make sure it can be re-triggered */
+  animation-iteration-count: infinite;
+}

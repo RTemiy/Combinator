@@ -2,8 +2,8 @@ import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG, GENERATORS_DATA, CATEGORI
 import { gameState, playerProfile, gameSettings } from './state.js';
 import { DOMElements } from './dom.js';
 import { addListeners } from './eventHandlers.js';
-import { createGrid, updateUI, applyTheme, showToast } from './ui.js';
-import { restoreGeneratorsEnergy, regenerateEnergy, checkOrdersAvailability, shuffleArray, getEmptyGridCells, markItemAsDiscovered, generateOrder } from './gameLogic.js';
+import { createGrid, updateUI, applyTheme, showToast, highlightHintItems, removeHintHighlights } from './ui.js';
+import { restoreGeneratorsEnergy, regenerateEnergy, checkOrdersAvailability, shuffleArray, getEmptyGridCells, markItemAsDiscovered, generateOrder, findMergeablePair } from './gameLogic.js';
 
 // --- Game Version Check ---
 (function checkVersion() {
@@ -16,6 +16,23 @@ import { restoreGeneratorsEnergy, regenerateEnergy, checkOrdersAvailability, shu
     window.location.reload();
   }
 })();
+
+// --- Inactivity Hint Logic ---
+const HINT_INACTIVITY_DELAY = 8000; // 8 seconds
+let inactivityTimer = null;
+
+function showHint() {
+    const pair = findMergeablePair();
+    if (pair) {
+        highlightHintItems(pair);
+    }
+}
+
+function resetInactivityTimer() {
+    removeHintHighlights();
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(showHint, HINT_INACTIVITY_DELAY);
+}
 
 export function startGameAndAudio() {
   if (gameSettings.musicVolume > 0 && DOMElements.bgMusic.paused) {
@@ -41,6 +58,10 @@ export function initGame() {
   checkOrdersAvailability();
   updateUI();
   addListeners();
+
+  // Reset inactivity timer on any user interaction on the screen
+  document.body.addEventListener('pointerdown', resetInactivityTimer, true);
+  resetInactivityTimer(); // Start the first timer
 
   setInterval(() => {
     if (!document.hidden) {
