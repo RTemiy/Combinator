@@ -89,4 +89,6 @@ export const DOMElements = {
   sfxGeneratorSpawn: document.getElementById('sfx-generator-spawn'),
   sfxOrderComplete: document.getElementById('sfx-order-complete'),
   sfxCoin: document.getElementById('sfx-coin'),
+  sfxDragStart: document.getElementById('sfx-drag-start'),
+  sfxOrderReady: document.getElementById('sfx-order-ready'),
 };

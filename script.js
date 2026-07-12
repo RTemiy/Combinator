@@ -814,6 +814,7 @@ function handleDragMove(clientX, clientY) {
 
   if (!isMoved && (Math.abs(clientX - startX) > CONFIG.DRAG_THRESHOLD || Math.abs(clientY - startY) > CONFIG.DRAG_THRESHOLD)) {
     gameState.dragState.isMoved = true;
+    playSound(DOMElements.sfxDragStart);
     document.body.classList.add('is-dragging');
     if (!gameState.dragState.element) {
       // Запрещаем перетаскивание заблокированных предметов
@@ -2814,6 +2815,7 @@ function checkOrdersAvailability() {
 
   // Если появился новый выполненный заказ, плавно прокручиваем панель влево
   if (hasNewlyCompletedOrder) {
+    playSound(DOMElements.sfxOrderReady);
     setTimeout(() => {
       DOMElements.ordersList.scrollTo({ left: 0, behavior: 'smooth' });
     }, 50); // Небольшая задержка, чтобы DOM успел обновиться перед прокруткой
