@@ -73,7 +73,7 @@ export function addListeners() {
     };
     if (gameState.energy < CONFIG.MAX_ENERGY) {
       modalOptions.actionButton = {
-        text: `Восстановить энергию (-${CONFIG.ENERGY_RECHARGE_COST_COINS}<img src="../assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+        text: `Восстановить энергию (-${CONFIG.ENERGY_RECHARGE_COST_COINS}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
         onClick: rechargePlayerEnergyWithCoins
       };
     }

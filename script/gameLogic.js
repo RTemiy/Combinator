@@ -160,9 +160,9 @@ export function claimReward(rewardIndex, startElement) {
         const iconPath = genInfo.icons[lvl - 1];
         icon = `<img src="${iconPath}" alt="">`;
     } else if (reward.isUpgradePart) {
-        icon = `<img src="../assets/icons/upgrade_part.png" alt="">`;
+        icon = `<img src="assets/icons/upgrade_part.png" alt="">`;
     } else if (reward.isMagicTool) {
-        icon = `<img src="../assets/icons/magic_tool.png" alt="">`;
+        icon = `<img src="assets/icons/magic_tool.png" alt="">`;
     }
     else if (reward.isGeneratorPart) {
         const genInfo = GENERATORS_DATA[reward.generatorKey];
@@ -247,7 +247,7 @@ export function claimAchievementReward(achievementId, tierIndex, buttonElement) 
     // Обновляем UI
     buttonElement.classList.add('claimed');
     buttonElement.disabled = true;
-    buttonElement.innerHTML = '<img src="../assets/icons/checkmark.png" alt="Выполнено">';
+    buttonElement.innerHTML = '<img src="assets/icons/checkmark.png" alt="Выполнено">';
     buttonElement.onclick = null;
 
     DOMElements.coins.value.innerText = gameState.coins;
@@ -288,7 +288,7 @@ export function deleteItem(index) {
 
 export function clearBlockedItemWithCoins(index) {
   if (gameState.coins < CONFIG.BLOCKED_CLEAR_COST_COINS) {
-    showToast(`<img src="../assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет для расчистки (нужно ${CONFIG.BLOCKED_CLEAR_COST_COINS})!`, "error");
+    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет для расчистки (нужно ${CONFIG.BLOCKED_CLEAR_COST_COINS})!`, "error");
     closeModal();
     return;
   }
@@ -315,7 +315,7 @@ export function rechargeGeneratorWithCoins(index) {
   }
 
   if (gameState.coins < CONFIG.GENERATOR_RECHARGE_COST) {
-    showToast(`<img src="../assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.GENERATOR_RECHARGE_COST})!`, "error");
+    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.GENERATOR_RECHARGE_COST})!`, "error");
     closeModal();
     return;
   }
@@ -330,18 +330,18 @@ export function rechargeGeneratorWithCoins(index) {
   closeModal();
   saveGame();
   updateUI();
-  showToast(`<img src="../assets/icons/energy.png" class="toast-icon" alt=""> Энергия генератора полностью восстановлена!`, "success");
+  showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Энергия генератора полностью восстановлена!`, "success");
 }
 
 export function rechargePlayerEnergyWithCoins() {
   if (gameState.coins < CONFIG.ENERGY_RECHARGE_COST_COINS) {
-    showToast(`<img src="../assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.ENERGY_RECHARGE_COST_COINS})!`, "error");
+    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.ENERGY_RECHARGE_COST_COINS})!`, "error");
     closeModal();
     return;
   }
 
   if (gameState.energy >= CONFIG.MAX_ENERGY) {
-    showToast(`<img src="../assets/icons/energy.png" class="toast-icon" alt=""> Ваша энергия уже полная!`, "error");
+    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Ваша энергия уже полная!`, "error");
     closeModal();
     return;
   }
@@ -352,7 +352,7 @@ export function rechargePlayerEnergyWithCoins() {
   closeModal();
   saveGame();
   updateUI();
-  showToast(`<img src="../assets/icons/energy.png" class="toast-icon" alt=""> Энергия полностью восстановлена!`, "success");
+  showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Энергия полностью восстановлена!`, "success");
 }
 
 function handleUnblockMerge(fromIdx, toIdx, source) {
@@ -669,7 +669,7 @@ export function triggerItemGenerator(generator, fromIndex) {
     return;
   }
   if (gameState.energy <= 0) {
-    showToast(`<img src="../assets/icons/energy.png" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
+    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
     return;
   }
   const emptyCells = getAvailableEmptyCells();
@@ -717,7 +717,7 @@ export function triggerRegularGenerator(generator, fromIndex) {
     return;
   }
   if (gameState.energy <= 0) {
-    showToast(`<img src="../assets/icons/energy.png" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
+    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
     return;
   }
 
@@ -807,10 +807,10 @@ export function checkProgressiveUnlocks() {
           lastRegenTime: Date.now()
         });
         markItemAsDiscovered(genKey, 'generator');
-        showToast(`<img src="../assets/icons/level.png" class="toast-icon" alt=""> Уровень ${threshold.level}! Новый генератор: ${generatorData.name}!`, "success");
+        showToast(`<img src="assets/icons/level.png" class="toast-icon" alt=""> Уровень ${threshold.level}! Новый генератор: ${generatorData.name}!`, "success");
       } else {
         spawnUpgradePart();
-        showToast(`<img src="../assets/icons/upgrade_part.png" class="toast-icon" alt=""> Уровень ${threshold.level}! Бонус: получена Новая деталь!`, "success");
+        showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Уровень ${threshold.level}! Бонус: получена Новая деталь!`, "success");
       }
       updateUI(); // Обновляем UI, чтобы показать награду в очереди
     }
@@ -851,11 +851,11 @@ export function spawnBonusGenerator() {
       lastRegenTime: Date.now()
     });
     markItemAsDiscovered(genKey, 'generator');
-    showToast(`<img src="../assets/icons/box.png" class="toast-icon" alt=""> Сюжет завершен! Вы открыли новый генератор: ${generatorData.name}!`, "story");
+    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Сюжет завершен! Вы открыли новый генератор: ${generatorData.name}!`, "story");
   } else {
     // Если все генераторы уже открыты, даем вместо этого деталь для улучшения
     spawnUpgradePart();
-    showToast(`<img src="../assets/icons/upgrade_part.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получена Новая деталь!`, "story");
+    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получена Новая деталь!`, "story");
   }
 }
 
@@ -884,7 +884,7 @@ export function spawnRandomExistingGenerator() {
   } else {
     // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
     spawnUpgradePart();
-    showToast(`<img src="../assets/icons/upgrade_part.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получена Новая деталь!`, "story");
+    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получена Новая деталь!`, "story");
   }
 }
 
@@ -1158,8 +1158,8 @@ export function completeOrder(id) {
     playSound(DOMElements.sfxCoin);
 
     // Анимация полета наград
-    animateRewardFly(targetAvatarElement, DOMElements.coins.value, `<img src="../assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
-    if (energyReward > 0) animateRewardFly(targetAvatarElement, DOMElements.energy.value, `<img src="../assets/icons/energy.png" alt="энергия">`, energyReward, 'energy');
+    animateRewardFly(targetAvatarElement, DOMElements.coins.value, `<img src="assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
+    if (energyReward > 0) animateRewardFly(targetAvatarElement, DOMElements.energy.value, `<img src="assets/icons/energy.png" alt="энергия">`, energyReward, 'energy');
 
     // Wait for the card fade-out animation to complete
     setTimeout(() => {
@@ -1183,14 +1183,14 @@ export function completeOrder(id) {
               generatorKey: 'bonus_chest',
               genLevel: 1, genCharges: 1
             });
-            showToast(`<img src="../assets/icons/box.png" class="toast-icon" alt=""> Сюжет завершен! Вы получили Подарочную коробку!`, "story");
+            showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Сюжет завершен! Вы получили Подарочную коробку!`, "story");
           } else if (rand < 0.5) {
             // 25% шанс на новый генератор (или деталь, если все открыто)
             spawnBonusGenerator();
           } else if (rand < 0.75) {
             // 25% шанс на магические инструменты
             spawnMagicTool();
-            showToast(`<img src="../assets/icons/magic_tool.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получены Магические инструменты!`, "story");
+            showToast(`<img src="assets/icons/magic_tool.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получены Магические инструменты!`, "story");
           } else {
             // 25% шанс на случайный уже открытый генератор
             spawnRandomExistingGenerator();
