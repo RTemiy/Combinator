@@ -30,6 +30,10 @@ export function updateUI() {
 
 export function createGrid() {
   DOMElements.grid.innerHTML = '';
+  // Динамически устанавливаем количество строк и столбцов из конфига
+  DOMElements.grid.style.gridTemplateColumns = `repeat(${CONFIG.GRID_COLS}, 1fr)`;
+  DOMElements.grid.style.gridTemplateRows = `repeat(${CONFIG.GRID_ROWS}, 1fr)`;
+
   for (let i = 0; i < CONFIG.GRID_COLS * CONFIG.GRID_ROWS; i++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');

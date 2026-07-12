@@ -1,5 +1,5 @@
 import { DOMElements } from './dom.js';
-import { gameState, gameSettings } from './state.js';
+import { gameState } from './state.js';
 import { CONFIG, CATEGORIES_CONFIG, GENERATORS_DATA, GEN_ENERGY_CONFIG } from './config.js';
 import {
   clearBlockedItemWithCoins,

@@ -569,8 +569,6 @@ body.is-dragging, body.is-dragging * {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(7, 1fr);
   gap: 6px;
   background: var(--panel-color);
   padding: 10px;

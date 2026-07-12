@@ -30,7 +30,7 @@ export const GENERATORS_DATA = {
     ]
   },
   'stationery': {
-    name: 'Канцелярский шкафчик', desc: 'Источник всего, что нужно для учебы и творчества. От простого карандаша до целой библиотеки.', categories: ['books', 'writings'], isHybrid: true,
+    name: 'Канцелярский шкафчик', desc: 'Источник всего, что нужно для учебы и творчества. От простого карандаша до целой библиотеки.', categories: ['books', 'stationery'], isHybrid: true,
     partIcons: [
       'assets/icons/categories/writings/part_lvl_01.png',
       'assets/icons/categories/writings/part_lvl_02.png',
@@ -112,7 +112,7 @@ export const CATEGORIES_CONFIG = {
       { level: 7, icon: 'assets/icons/categories/coffee/best_coffee.png', name: 'Сладкий кофе с допингами', desc: 'Авторский напиток с сиропом, сливками и маршмеллоу.' },
     ]
   },
-  writings: {
+  stationery: {
     name: 'Письменные принадлежности',
     color: '#2b5e55',
     generatorKey: 'stationery',
@@ -248,8 +248,8 @@ export const ACHIEVEMENTS_DATA = {
 
 export const CONFIG = {
   // Grid and Board
-  GRID_COLS: 5,
-  GRID_ROWS: 7,
+  GRID_COLS: 6,
+  GRID_ROWS: 8,
   MAX_ITEM_LEVEL: 7,
   MAX_GENERATOR_LEVEL: 5,
   STARTING_ITEMS_COUNT: 2,
@@ -291,7 +291,7 @@ export const CONFIG = {
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.2.1',
+  GAME_VERSION: '1.2.2',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },
