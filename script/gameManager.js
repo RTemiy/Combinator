@@ -122,7 +122,7 @@ export function loadGame() {
 
     if (energyToRestore > 0) {
       gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
-      showToast(`<img src="../assets/icons/energy.png" class="toast-icon" alt=""> Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100} энергии!`, "success");
+      showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100} энергии!`, "success");
     }
 
     if (loaded.thresholds) {

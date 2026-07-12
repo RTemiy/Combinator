@@ -9,7 +9,7 @@
   "theme_color": "#ffb703",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "assets/icon.png",
       "sizes": "256x256",
       "type": "image/png"
     }
@@ -18,7 +18,7 @@
     {
       "name": "Продолжить игру",
       "url": "https://rtemiy.github.io/Combinator/",
-      "icons": [{ "src": "icon.png", "sizes": "256x256" }]
+      "icons": [{ "src": "assets/icon.png", "sizes": "256x256" }]
     }
   ]
 }
