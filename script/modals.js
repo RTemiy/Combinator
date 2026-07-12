@@ -1,0 +1,544 @@
+import { DOMElements } from './dom.js';
+import { gameState, gameSettings } from './state.js';
+import { CONFIG, CATEGORIES_CONFIG, GENERATORS_DATA, GEN_ENERGY_CONFIG } from './config.js';
+import {
+  clearBlockedItemWithCoins,
+  rechargeGeneratorWithCoins,
+  deleteItem,
+  isDiscovered,
+  getItemType,
+  hasUnclaimedAchievements,
+  hasUnclaimedCollectionBonuses,
+  generateOrder
+} from './gameLogic.js';
+import { renderProfile, renderSettingsModal, renderAchievementsModal, renderCollectionModal } from './ui.js';
+import { saveGame, startNewGame } from './gameManager.js';
+import { showToast, updateUI } from './ui.js';
+
+export function showModal(options) {
+  const { icon, title, subtitle, desc, actionButton, dangerButtons, infoButton, isBlocking } = options;
+  const modal = DOMElements.infoModal;
+
+  modal.icon.innerHTML = icon.startsWith('assets/') ? `<img src="${icon}" alt="">` : icon;
+  modal.title.innerText = title;
+  modal.subtitle.innerText = subtitle;
+  modal.desc.innerHTML = desc; // Use innerHTML to support icons
+
+  modal.infoBtn.style.display = infoButton ? 'block' : 'none';
+  if (infoButton) {
+    modal.infoBtn.onclick = infoButton.onClick;
+  }
+
+  modal.actionBtn.style.display = actionButton ? 'block' : 'none';
+  if (actionButton) {
+    modal.actionBtn.innerHTML = actionButton.text;
+    modal.actionBtn.onclick = actionButton.onClick;
+  }
+
+  modal.dangerGroup.style.display = dangerButtons ? 'flex' : 'none';
+  if (dangerButtons) {
+    modal.confirmBtn.innerHTML = dangerButtons.confirmButtonText;
+    modal.confirmBtn.onclick = dangerButtons.onConfirm;
+  }
+
+  modal.overlay.className = `modal-overlay active ${isBlocking ? 'blocking' : ''}`;
+}
+
+export function closeModal() {
+  DOMElements.infoModal.overlay.className = 'modal-overlay';
+}
+
+export function openMenuModal() {
+  closeAllModals();
+  DOMElements.menuModal.achievementsNotificationDot.style.display = hasUnclaimedAchievements() ? 'block' : 'none';
+  DOMElements.menuModal.collectionNotificationDot.style.display = hasUnclaimedCollectionBonuses() ? 'block' : 'none';
+  DOMElements.menuModal.overlay.classList.add('active', 'blocking');
+}
+
+export function closeMenuModal() {
+  DOMElements.menuModal.overlay.classList.remove('active', 'blocking');
+}
+
+export function openProfileModal() {
+  renderProfile();
+  DOMElements.profileModal.overlay.classList.add('active', 'blocking');
+}
+
+export function closeProfileModal() {
+  DOMElements.profileModal.overlay.classList.remove('active', 'blocking');
+}
+
+export function openAchievementsModal() {
+  renderAchievementsModal();
+  DOMElements.achievementsModal.overlay.classList.add('active', 'blocking');
+}
+
+export function closeAchievementsModal() {
+  DOMElements.achievementsModal.overlay.classList.remove('active', 'blocking');
+}
+
+export function openSettingsModal() {
+  renderSettingsModal();
+  DOMElements.settingsModal.overlay.classList.add('active', 'blocking');
+}
+
+export function closeSettingsModal() {
+  DOMElements.settingsModal.overlay.classList.remove('active', 'blocking');
+}
+
+export function showCollectionModal() {
+    renderCollectionModal();
+    DOMElements.collectionModal.overlay.classList.add('active', 'blocking');
+}
+
+export function closeCollectionModal() {
+  const modal = DOMElements.collectionModal;
+  modal.overlay.classList.remove('active', 'blocking');
+  setTimeout(() => {
+    modal.body.innerHTML = '';
+    modal.footer.innerHTML = '';
+  }, 300);
+}
+
+export function closeDetailModal() {
+  const modal = DOMElements.detailModal;
+  modal.overlay.classList.remove('active', 'blocking');
+  setTimeout(() => {
+    modal.body.innerHTML = '';
+  }, 300);
+}
+
+function closeAllModals() {
+    closeModal();
+    closeDetailModal();
+    closeCollectionModal();
+    closeProfileModal();
+    closeSettingsModal();
+    closeAchievementsModal();
+    closeMenuModal();
+}
+
+export function confirmReset() {
+  showModal({
+    icon: `<img src="assets/icons/warning.png" alt="Внимание">`,
+    title: 'Сбросить весь прогресс?',
+    subtitle: 'Полное обнуление',
+    desc: 'Вы потеряете все свои открытые предметы, генераторы, очки уровня и текущие заказы. Это действие нельзя отменить.',
+    dangerButtons: {
+      confirmButtonText: 'Да, сбросить',
+      onConfirm: () => {
+        closeModal();
+        setTimeout(() => {
+          localStorage.removeItem(CONFIG.SAVE_KEY);
+          startNewGame();
+          updateUI();
+          showToast("Игра полностью перезапущена", "success");
+        }, 50);
+      }
+    },
+    isBlocking: true,
+  });
+}
+
+export function confirmCancelOrder(id) {
+  const order = gameState.orders.find(o => o.id === id);
+  if (!order || order.isStory) return;
+
+  showModal({
+    icon: `<img src="assets/icons/question.png" alt="Вопрос">`,
+    title: 'Отменить заказ?',
+    subtitle: 'Подтверждение действия',
+    desc: `Вы уверены, что хотите отменить этот заказ? Это будет стоить ${CONFIG.COINS_PER_ORDER_CANCEL} монет.`,
+    dangerButtons: {
+      confirmButtonText: `Да, отменить (-${CONFIG.COINS_PER_ORDER_CANCEL}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      onConfirm: () => {
+        if (gameState.coins < CONFIG.COINS_PER_ORDER_CANCEL) {
+          showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет для отмены (нужно ${CONFIG.COINS_PER_ORDER_CANCEL})!`, "error");
+          closeModal();
+          return;
+        }
+        gameState.coins -= CONFIG.COINS_PER_ORDER_CANCEL;
+        const idx = gameState.orders.findIndex(o => o.id === id);
+        if (idx !== -1) {
+          gameState.orders.splice(idx, 1);
+          generateOrder();
+          saveGame();
+          updateUI();
+          showToast("Заказ отменен", "error");
+        }
+        closeModal();
+      }
+    },
+    isBlocking: true,
+  });
+}
+
+export function showCharacterById(id) {
+    const order = gameState.orders.find(o => o.id === id);
+    if (order) showCharacterModal(order);
+}
+
+export function showCharacterModal(order) {
+  showModal({
+    icon: `<img src="${order.character.icon}" alt="">`,
+    title: order.character.name,
+    subtitle: order.isStory ? `Важный гость (Сюжет)` : "Постоянный клиент",
+    desc: order.character.desc || "Заглянул за покупками.",
+  });
+}
+
+export function showItemInfoModal(item, index = -1) {
+  const itemType = getItemType(item);
+  const getOptions = MODAL_OPTIONS_GETTERS[itemType];
+  if (getOptions) {
+    const modalOptions = getOptions(item, index);
+    showModal(modalOptions);
+  }
+}
+
+function getBlockedItemModalOptions(item, index) {
+  const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
+  return {
+    icon: 'assets/icons/block.png',
+    title: `Заблокированный: ${info.name}`,
+    subtitle: 'Преграда',
+    desc: 'Этот предмет за баррикадой. Чтобы его освободить, перетащите на него точно такой же предмет с поля, либо расчистите завал за монеты.',
+    actionButton: {
+      text: `Расчистить завал (-${CONFIG.BLOCKED_CLEAR_COST_COINS}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      onClick: () => clearBlockedItemWithCoins(index)
+    },
+    isBlocking: false
+  };
+}
+
+function getGeneratorModalOptions(item, index) {
+  const genInfo = GENERATORS_DATA[item.generatorKey];
+  const lvl = item.genLevel || 1;
+
+  if (item.generatorKey === 'bonus_chest') {
+    const lvl = item.genLevel || 1;
+    const iconPath = genInfo.icons[lvl - 1];
+    return {
+      icon: iconPath,
+      title: `Подарочная коробка ${CONFIG.ROMAN_NUMERALS[lvl]}`,
+      subtitle: 'Особый генератор',
+      desc: `Этот генератор содержит редкие предметы. У него осталось ${item.genCharges} заряд(ов). Когда заряды закончатся, он исчезнет. Перетащите на него такую же коробку, чтобы улучшить и получить больше предметов.`,
+      isBlocking: false,
+    };
+  }
+
+  const config = GEN_ENERGY_CONFIG[lvl];
+  const desc = `Создает предметы из своей категории.`;
+
+  const iconPath = genInfo.icons[lvl - 1];
+  const modalOptions = {
+    icon: iconPath,
+    title: `${genInfo.name} ${CONFIG.ROMAN_NUMERALS[lvl]}`,
+    subtitle: `Генератор • Уровень ${CONFIG.ROMAN_NUMERALS[lvl]}`,
+    desc: desc,
+    infoButton: {
+      onClick: () => showGeneratorDetailModal(item)
+    }
+  };
+
+  if (item.genEnergy < config.max) {
+    modalOptions.actionButton = {
+      text: `Восстановить (-${CONFIG.GENERATOR_RECHARGE_COST}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      onClick: () => rechargeGeneratorWithCoins(index),
+    };
+  }
+
+  return modalOptions;
+}
+
+function getItemGeneratorModalOptions(item, index) {
+  const itemInfo = CATEGORIES_CONFIG[item.category].items[item.level - 1];
+  const generatedCatInfo = CATEGORIES_CONFIG[item.generatedCategory];
+  return {
+    icon: itemInfo.icon,
+    title: itemInfo.name,
+    subtitle: `Предмет-генератор • ${item.charges} заряд(ов)`,
+    desc: `Этот предмет может произвести предметы из категории "${generatedCatInfo.name}". После использования всех зарядов он исчезнет. Его также можно сдать в заказе.`,
+    infoButton: {
+      onClick: () => showItemDetailModal(item)
+    },
+    isBlocking: false
+  };
+}
+
+function getBoosterModalOptions(item) {
+  if (item.isUpgradePart) {
+    return {
+      icon: 'assets/icons/upgrade_part.png',
+      title: 'Новая деталь',
+      subtitle: 'Универсальный улучшитель',
+      desc: 'Редкая деталь, полученная за выполнение особого заказа. Перетащите ее на любой генератор (кроме подарочных коробок), чтобы повысить его уровень.',
+      isBlocking: false
+    };
+  }
+  if (item.isMagicTool) {
+    return {
+      icon: 'assets/icons/magic_tool.png',
+      title: 'Магические инструменты',
+      subtitle: 'Универсальный улучшитель',
+      desc: 'Волшебные инструменты, способные улучшить любой предмет на один уровень. Перетащите их на предмет, который хотите улучшить.',
+      isBlocking: false
+    };
+  }
+  return {};
+}
+
+function getGeneratorPartModalOptions(item, index) {
+  const genInfo = GENERATORS_DATA[item.generatorKey];
+  const lvl = item.level || 1;
+  const iconPath = genInfo.partIcons[lvl - 1];
+  const sellPrice = (item.level || 1) * 3;
+
+  return {
+    icon: iconPath,
+    title: `Деталь для "${genInfo.name}"`,
+    subtitle: `Деталь для сборки • Уровень ${item.level}`,
+    desc: 'Часть будущего генератора. Объединяйте с такими же деталями. ',
+    dangerButtons: {
+      confirmButtonText: `Продать (+${sellPrice}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      onConfirm: () => deleteItem(index)
+    },
+    infoButton: {
+      onClick: () => showGeneratorPartDetailModal(item)
+    },
+    isBlocking: false
+  };
+}
+
+function getRegularItemModalOptions(item, index) {
+  const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
+  const sellPrice = (item.level || 1) * 3;
+  return {
+    icon: info.icon,
+    title: info.name,
+    subtitle: `${CATEGORIES_CONFIG[item.category].name} • Уровень ${item.level}`,
+    desc: 'Предмет для выполнения заказов и слияния.',
+    dangerButtons: {
+      confirmButtonText: `Продать (+${sellPrice}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      onConfirm: () => deleteItem(index)
+    },
+    infoButton: {
+      onClick: () => showItemDetailModal(item)
+    },
+    isBlocking: false
+  };
+}
+
+const MODAL_OPTIONS_GETTERS = {
+  blocked: getBlockedItemModalOptions,
+  generator: getGeneratorModalOptions,
+  itemGenerator: getItemGeneratorModalOptions,
+  generatorPart: getGeneratorPartModalOptions,
+  booster: getBoosterModalOptions,
+  regular: getRegularItemModalOptions,
+};
+
+export function showCategoryProgressionModal(categoryKeyOrKeys, icon = 'assets/icons/chain.png') {
+  const categoryKeys = Array.isArray(categoryKeyOrKeys) ? categoryKeyOrKeys : [categoryKeyOrKeys];
+  if (categoryKeys.length === 0) return;
+  const modal = DOMElements.detailModal; // Используем большой модал
+  let contentHTML = '';
+  let modalTitle = 'Цепочка эволюции';
+
+  modal.icon.innerHTML = `<img src="${icon}" alt="Иконка цепочки">`;
+
+  categoryKeys.forEach((key, index) => {
+    const category = CATEGORIES_CONFIG[key];
+    if (!category) return;
+
+    if (index > 0) {
+      contentHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
+    }
+
+    contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
+
+    contentHTML += `<div class="progression-container">`;
+    category.items.forEach((item, itemIndex) => {
+      const discovered = isDiscovered(key, item.level);
+      const undiscoveredClass = discovered ? '' : 'undiscovered';
+      const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+      contentHTML += `
+        <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? item.name : 'Не открыто'}">
+          <div class="progression-item-icon">${itemIcon}</div>
+          <div class="progression-item-level">${item.level}</div>
+        </div>
+      `;
+      if (itemIndex < category.items.length - 1) {
+        contentHTML += '<div class="progression-arrow-h">→</div>';
+      }
+    });
+    contentHTML += '</div>';
+  });
+
+  modal.title.innerText = modalTitle;
+  modal.body.innerHTML = contentHTML;
+  modal.overlay.classList.add('active', 'blocking');
+}
+
+export function showGeneratorDetailModal(item) {
+  const modal = DOMElements.detailModal;
+  const genInfo = GENERATORS_DATA[item.generatorKey];
+  const lvl = item.genLevel || 1;
+
+  const iconPath = genInfo.icons[lvl - 1];
+  modal.icon.innerHTML = `<img src="${iconPath}" alt="${genInfo.name}">`;
+  modal.title.innerText = `${genInfo.name} ${CONFIG.ROMAN_NUMERALS[lvl]}`;
+
+  // --- Генерация контента ---
+  let contentHTML = '';
+
+  // 1. Описание генератора
+  let desc = `<p class="modal-desc">${genInfo.desc} `;
+  if (genInfo.isHybrid) {
+    desc += `Производит предметы из категорий: ${genInfo.categories.map(c => CATEGORIES_CONFIG[c].name).join(' и ')}. `;
+  }
+  const cdSec = GEN_ENERGY_CONFIG[lvl].cooldown / 1000;
+  const levelDescriptions = {
+    1: `Базовый уровень. Создаёт предметы 1-го уровня. Восстанавливает 1 заряд каждые ${cdSec} сек.`,
+    2: `Продвинутый ранг. Шансы получения: 80% (ур. 1), 20% (ур. 2). Заряд каждые ${cdSec} сек.`,
+    3: `Профессиональный ранг. Шансы получения: 65% (ур. 1), 25% (ур. 2), 10% (ур. 3). Заряд каждые ${cdSec} сек.`,
+    4: `Элитный ранг. Шансы получения: 50% (ур. 1), 30% (ур. 2), 15% (ур. 3), 5% (ур. 4). Заряд каждые ${cdSec} сек.`,
+    5: `Легендарный ранг! Шансы: 30% (ур. 1), 30% (ур. 2), 25% (ур. 3), 10% (ур. 4), 5% (ур. 5). Самая быстрая перезарядка: ${cdSec} сек.`
+  };
+  desc += (levelDescriptions[lvl] || '') + '</p>';
+  contentHTML += desc;
+
+  // 2. Цепочка(и) предметов
+  const categoryKeys = genInfo.categories;
+  categoryKeys.forEach((key, index) => {
+    const category = CATEGORIES_CONFIG[key];
+    if (!category) return;
+
+    if (index > 0) {
+      contentHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
+    }
+
+    contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
+
+    contentHTML += `<div class="progression-container">`;
+    category.items.forEach((item, itemIndex) => {
+      const discovered = isDiscovered(key, item.level);
+      const undiscoveredClass = discovered ? '' : 'undiscovered';
+      const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+      contentHTML += `
+              <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? item.name : 'Не открыто'}">
+                  <div class="progression-item-icon">${itemIcon}</div>
+                  <div class="progression-item-level">${item.level}</div>
+              </div>
+          `;
+      if (itemIndex < category.items.length - 1) {
+        contentHTML += '<div class="progression-arrow-h">→</div>';
+      }
+    });
+    contentHTML += '</div>';
+  });
+
+  modal.body.innerHTML = contentHTML;
+  modal.overlay.classList.add('active', 'blocking');
+}
+
+export function showItemDetailModal(item) {
+  const modal = DOMElements.detailModal;
+  const category = CATEGORIES_CONFIG[item.category];
+  const itemInfo = category.items[item.level - 1];
+
+  modal.icon.innerHTML = `<img src="${itemInfo.icon}" alt="">`;
+  modal.title.innerText = itemInfo.name;
+
+  let contentHTML = '';
+
+  // 1. Описание самого предмета
+  contentHTML += `<p class="modal-desc">${itemInfo.desc}</p>`;
+
+  // --- Вспомогательная функция для отрисовки цепочки ---
+  const renderProgressionChain = (cat, title, categoryKey) => {
+    let chainHTML = `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${title}</h4>`;
+    chainHTML += `<div class="progression-container">`;
+    cat.items.forEach((progItem, itemIndex) => {
+      const discovered = isDiscovered(categoryKey, progItem.level);
+      const undiscoveredClass = discovered ? '' : 'undiscovered';
+      const itemIcon = discovered ? `<img src="${progItem.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+      chainHTML += `
+          <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? progItem.name : 'Не открыто'}">
+              <div class="progression-item-icon">${itemIcon}</div>
+              <div class="progression-item-level">${progItem.level}</div>
+          </div>
+      `;
+      if (itemIndex < cat.items.length - 1) {
+        chainHTML += '<div class="progression-arrow-h">→</div>';
+      }
+    });
+    chainHTML += '</div>';
+    return chainHTML;
+  };
+
+  contentHTML += '<hr style="border-color: #444; margin: 20px 0 15px;">';
+
+  // 2. Цепочка эволюции самого предмета
+  contentHTML += renderProgressionChain(category, `Цепочка: ${category.name}`, item.category);
+
+  // 3. Цепочка производимых предметов (если применимо)
+  if (item.isItemGenerator || itemInfo.becomesGenerator) {
+    const genCategoryKey = item.generatedCategory || itemInfo.becomesGenerator.category;
+    const genCategory = CATEGORIES_CONFIG[genCategoryKey];
+    if (genCategory) {
+      contentHTML += '<hr style="border-color: #444; margin: 20px 0 15px;">';
+      contentHTML += renderProgressionChain(genCategory, `Производит: ${genCategory.name}`, genCategoryKey);
+    }
+  }
+
+  modal.body.innerHTML = contentHTML;
+  modal.overlay.classList.add('active', 'blocking');
+}
+
+export function showGeneratorPartDetailModal(item) {
+  const modal = DOMElements.detailModal;
+  const genInfo = GENERATORS_DATA[item.generatorKey];
+  const lvl = item.level || 1;
+  const iconPath = genInfo.partIcons[lvl - 1];
+
+  modal.icon.innerHTML = `<img src="${iconPath}" alt="Деталь для ${genInfo.name}">`;
+  modal.title.innerText = `Сборка: ${genInfo.name}`;
+
+  let contentHTML = '';
+  contentHTML += `<p class="modal-desc">Объединяйте детали, чтобы собрать полноценный генератор. Две детали 3-го уровня создают генератор 1-го уровня.</p>`;
+  contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Цепочка сборки</h4>`;
+  contentHTML += `<div class="progression-container">`;
+
+  const partHTML = (level) => {
+    const currentPartIconPath = genInfo.partIcons[level - 1];
+    return `
+        <div class="progression-item-square" title="Деталь, Ур. ${level}">
+            <div class="progression-item-icon">
+                <img src="${currentPartIconPath}" alt="Деталь для ${genInfo.name}">
+            </div>
+            <div class="progression-item-level">${level}</div>
+        </div>
+    `};
+
+  const generatorHTML = `
+        <div class="progression-item-square" title="${genInfo.name}, Ур. I">
+            <div class="progression-item-icon">
+                <img src="${genInfo.icons[0]}" alt="${genInfo.name}">
+            </div>
+            <div class="progression-item-level">I</div>
+        </div>
+    `;
+
+  contentHTML += partHTML(1);
+  contentHTML += '<div class="progression-arrow-h">→</div>';
+  contentHTML += partHTML(2);
+  contentHTML += '<div class="progression-arrow-h">→</div>';
+  contentHTML += partHTML(3);
+  contentHTML += '<div class="progression-arrow-h">→</div>';
+  contentHTML += generatorHTML;
+  contentHTML += '</div>';
+
+  modal.body.innerHTML = contentHTML;
+  modal.overlay.classList.add('active', 'blocking');
+}
