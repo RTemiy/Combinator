@@ -200,7 +200,7 @@ export function claimItemBonus(category, level, element) {
     playerProfile.totalCoinsEarned += bonusAmount;
 
     // Анимация полета монетки
-    animateRewardFly(element, DOMElements.coins.container, `<img src="../assets/icons/coin.png" alt="монета">`, 1, 'coin');
+    animateRewardFly(element, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, 1, 'coin');
 
     // Обновляем вид элемента в модалке и запускаем анимации
     element.classList.remove('bonus-unclaimed');
@@ -242,7 +242,7 @@ export function claimAchievementReward(achievementId, tierIndex, buttonElement) 
     gameState.claimedAchievements[key] = true;
 
     // Анимация
-    animateRewardFly(buttonElement, DOMElements.coins.container, `<img src="../assets/icons/coin.png" alt="монета">`, 5, 'coin');
+    animateRewardFly(buttonElement, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, 5, 'coin');
 
     // Обновляем UI
     buttonElement.classList.add('claimed');
@@ -271,7 +271,7 @@ export function deleteItem(index) {
   const sellPrice = (item.level || 1) * 3;
 
   // Запускаем анимацию полета монеток. Она возьмет координаты ячейки, пока предмет еще в ней.
-  animateRewardFly(cellElement, DOMElements.coins.container, `<img src="../assets/icons/coin.png" alt="монета">`, 5, 'coin');
+  animateRewardFly(cellElement, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, 5, 'coin');
 
   // Теперь обновляем состояние игры
   gameState.coins += sellPrice;
