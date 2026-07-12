@@ -880,7 +880,7 @@ export function spawnRandomExistingGenerator() {
       lastRegenTime: Date.now()
     });
     markItemAsDiscovered(randomGenKey, 'generator');
-    showToast(`<img src="assets/icons/generators/bonus_chest.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получен генератор "${generatorData.name}"!`, "story");
+    showToast(`<img src="assets/icons/generators/bonus_chest_lvl1.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получен генератор "${generatorData.name}"!`, "story");
   } else {
     // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
     spawnUpgradePart();
