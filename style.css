@@ -683,8 +683,8 @@ body.is-dragging, body.is-dragging * {
 }
 
 .item-wrapper img {
-  width: 3.2rem;
-  height: 3.2rem;
+  width: 3rem;
+  height: 3rem;
   object-fit: contain;
 }
 
