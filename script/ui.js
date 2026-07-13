@@ -5,7 +5,8 @@ import {
   hasUnclaimedAchievements,
   hasUnclaimedCollectionBonuses,
   isDiscovered,
-  getCurrentPlayerLevel,
+  getCurrentPlayerLevel, 
+  hasNewStoryUpdate,
   formatTimePlayed,
   checkOrdersAvailability
 } from './gameLogic.js';
@@ -63,8 +64,15 @@ export function updateLevelProgressBar() {
 }
 
 export function updateMenuNotification() {
-  const hasNotifications = hasUnclaimedAchievements() || hasUnclaimedCollectionBonuses();
+  const storyUpdate = hasNewStoryUpdate();
+  const achievementsUpdate = hasUnclaimedAchievements();
+  const collectionUpdate = hasUnclaimedCollectionBonuses();
+
+  const hasNotifications = storyUpdate || achievementsUpdate || collectionUpdate;
   DOMElements.menuNotificationDot.style.display = hasNotifications ? 'block' : 'none';
+  DOMElements.menuModal.storyNotificationDot.style.display = storyUpdate ? 'block' : 'none';
+  DOMElements.menuModal.achievementsNotificationDot.style.display = achievementsUpdate ? 'block' : 'none';
+  DOMElements.menuModal.collectionNotificationDot.style.display = collectionUpdate ? 'block' : 'none';
 }
 
 export function renderRewardQueue() {
@@ -106,6 +114,13 @@ export function renderRewardQueue() {
     } else if (reward.isMagicTool) {
         iconHTML = `<img src="assets/icons/magic_tool.png" alt="Магические инструменты" style="width: 1.5rem; height: 1.5rem;">`;
         title = 'Забрать: Магические инструменты';
+    } else if (reward.category && reward.level) {
+        // Обычный предмет или предмет-генератор
+        const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
+        if (itemInfo) {
+            iconHTML = `<img src="${itemInfo.icon}" alt="${itemInfo.name}" style="width: 2.5rem; height: 2.5rem;">`;
+            title = `Забрать: ${itemInfo.name}`;
+        }
     }
     rewardElem.innerHTML = iconHTML;
     rewardElem.title = title;
@@ -370,6 +385,7 @@ export function renderGrid() {
 
         renderGeneratorBadges(cell, item);
       } else if (item.isItemGenerator) {
+        cell.classList.add('item-generator-slot');
         const itemInfo = CATEGORIES_CONFIG[item.category].items[item.level - 1];
         wrapper.innerHTML = `<img src="${itemInfo.icon}" alt="">`;
 
@@ -513,7 +529,7 @@ export function renderOrders() {
 
     card.innerHTML = `
       <div class="order-header">
-          ${!order.isStory ? `<button class="cancel-btn" title="Отменить заказ">&times;</button>` : `<span class="story-badge">Сюжет ${order.storyStep}/3</span>`}
+          ${!order.isStory ? `<button class="cancel-btn" title="Отменить заказ">&times;</button>` : `<span class="story-badge">Серия ${order.storyStep}/3</span>`}
       </div>
       <div class="order-body">
           ${avatarHTML}

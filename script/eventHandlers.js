@@ -19,11 +19,13 @@ import {
   closeSettingsModal,
   confirmCancelOrder,
   showCharacterById,
+  openStoryModal,
+  closeStoryModal,
   showCategoryProgressionModal,
-  showItemInfoModal
+  showItemInfoModal, closeTutorialModal, openTutorialModal
 } from './modals.js';
 import {
-  rechargePlayerEnergyWithCoins,
+  rechargePlayerEnergyWithCoins, advanceStoryStep,
   claimItemBonus,
   claimAchievementReward,
   completeOrder,
@@ -91,12 +93,28 @@ export function addListeners() {
   DOMElements.menuModal.collectionBtn.addEventListener('click', () => { closeMenuModal(); showCollectionModal(); });
   DOMElements.menuModal.profileBtn.addEventListener('click', () => { closeMenuModal(); openProfileModal(); });
   DOMElements.menuModal.achievementsBtn.addEventListener('click', () => { closeMenuModal(); openAchievementsModal(); });
+  DOMElements.menuModal.storyBtn.addEventListener('click', () => { closeMenuModal(); openStoryModal(); });
   DOMElements.menuModal.settingsBtn.addEventListener('click', () => { closeMenuModal(); openSettingsModal(); });
+  DOMElements.menuModal.tutorialBtn.addEventListener('click', () => { closeMenuModal(); openTutorialModal(); });
   DOMElements.profileModal.closeBtn.addEventListener('click', closeProfileModal);
   DOMElements.detailModal.closeBtn.addEventListener('click', closeDetailModal);
   DOMElements.achievementsModal.closeBtn.addEventListener('click', closeAchievementsModal);
   DOMElements.collectionModal.closeBtn.addEventListener('click', closeCollectionModal);
   DOMElements.settingsModal.closeBtn.addEventListener('click', closeSettingsModal);
+  DOMElements.storyModal.closeBtn.addEventListener('click', closeStoryModal);
+  DOMElements.tutorialModal.closeBtn.addEventListener('click', closeTutorialModal);
+  DOMElements.tutorialModal.confirmBtn.addEventListener('click', closeTutorialModal);
+  DOMElements.tutorialModal.overlay.addEventListener('click', (e) => {
+    if (e.target === DOMElements.tutorialModal.overlay) closeTutorialModal();
+  });
+
+
+  DOMElements.storyModal.actions.addEventListener('click', (e) => {
+      const button = e.target.closest('button');
+      if (button && (button.id === 'story-continue-btn' || button.id === 'story-task-btn')) {
+          advanceStoryStep(true);
+      }
+  });
 
   DOMElements.collectionModal.body.addEventListener('click', e => {
     const claimButton = e.target.closest('[data-action="claim-bonus"]');

@@ -25,6 +25,9 @@
   --generator-slot-border-1: #8c6d53;
   --generator-slot-border-2: #ffcc00;
   --generator-slot-no-energy-border: darkred;
+  --item-generator-slot-bg: #2a3b4e;
+  --item-generator-slot-border-1: #4361ee;
+  --item-generator-slot-border-2: #4cc9f0;
   --booster-cell-bg: #2d2d2d;
   --input-focus-bg: #333;
   --badge-bg: rgba(0, 0, 0, 0.6);
@@ -63,6 +66,7 @@ body[data-theme="light"] {
   --generator-slot-border-1: #e6b88a;
   --generator-slot-border-2: #ffcc00;
   --generator-slot-no-energy-border: #c93a47;
+  --item-generator-slot-bg: #e3f2fd;
   --booster-cell-bg: #f0f0f0;
   --input-focus-bg: #e4e6eb;
   --badge-bg: rgba(0, 0, 0, 0.5);
@@ -627,6 +631,21 @@ body.is-dragging, body.is-dragging * {
   animation: border-dance 3s linear infinite;
 }
 
+.cell.item-generator-slot {
+  position: relative;
+  background: var(--item-generator-slot-bg);
+  border: 2px dashed transparent;
+  background-image:
+          linear-gradient(var(--item-generator-slot-bg), var(--item-generator-slot-bg)),
+          linear-gradient(90deg, var(--item-generator-slot-border-1), var(--item-generator-slot-border-2), var(--item-generator-slot-border-1));
+
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+
+  background-size: 200% 100%;
+  animation: border-dance 3s linear infinite;
+}
+
 .cell.generator-slot-no-energy {
   border: 2px dashed var(--generator-slot-no-energy-border);
   background-image: none;
@@ -1183,7 +1202,9 @@ body.is-dragging, body.is-dragging * {
 #collection-modal,
 #profile-modal,
 #achievements-modal,
-#settings-modal {
+#settings-modal,
+#story-modal,
+#tutorial-modal {
   z-index: 25000; /* Выше, чем обычный модал */
   align-items: flex-end; /* По-прежнему внизу */
   background: var(--modal-overlay-bg); /* Более темный фон */
@@ -1195,7 +1216,9 @@ body.is-dragging, body.is-dragging * {
 #collection-modal:not(.active),
 #profile-modal:not(.active),
 #achievements-modal:not(.active),
-#settings-modal:not(.active) {
+#settings-modal:not(.active),
+#story-modal:not(.active),
+#tutorial-modal:not(.active) {
   background: transparent;
 }
 
@@ -1219,7 +1242,9 @@ body.is-dragging, body.is-dragging * {
 #collection-modal.active .detail-modal-content,
 #profile-modal.active .detail-modal-content,
 #achievements-modal.active .detail-modal-content,
-#settings-modal.active .detail-modal-content {
+#settings-modal.active .detail-modal-content,
+#story-modal.active .detail-modal-content,
+#tutorial-modal.active .detail-modal-content {
   transform: translateY(0);
 }
 
@@ -1899,4 +1924,97 @@ input[type="range"]::-moz-range-thumb {
   animation: hint-bounce 2.5s ease-in-out;
   /* To make sure it can be re-triggered */
   animation-iteration-count: infinite;
+}
+
+/* --- Story Modal --- */
+.story-dialogue {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.story-char-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 65px;
+  flex-shrink: 0;
+}
+
+.story-char-avatar {
+  width: 60px;
+  height: 60px;
+}
+
+.story-char-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: var(--panel-color);
+  border: 1px solid var(--border-color);
+  object-fit: cover;
+}
+
+.story-char-name {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--text-color-light);
+  text-align: center;
+  width: 100%;
+}
+
+.story-text-bubble {
+  background: var(--panel-color);
+  padding: 12px 15px;
+  border-radius: 12px;
+  flex-grow: 1;
+  position: relative;
+  border: 1px solid var(--border-color);
+}
+
+.story-text-bubble p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-color-light);
+}
+
+
+/* --- Tutorial Modal --- */
+#tutorial-modal .detail-modal-body {
+  text-align: left;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.tutorial-section {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+.tutorial-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.tutorial-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  color: var(--accent-color);
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.tutorial-section h4 img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+#tutorial-close-btn {
+  width: 100%;
+  background: var(--success-color);
 }

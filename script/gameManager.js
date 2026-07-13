@@ -1,10 +1,10 @@
-import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG, GENERATORS_DATA, CATEGORIES_CONFIG, CHARACTERS } from './config.js';
+import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG, GENERATORS_DATA, CATEGORIES_CONFIG, CHARACTERS, STORY_DATA } from './config.js';
 import { gameState, playerProfile, gameSettings } from './state.js';
 import { DOMElements } from './dom.js';
 import { addListeners } from './eventHandlers.js';
 import { createGrid, updateUI, applyTheme, showToast, highlightHintItems, removeHintHighlights } from './ui.js';
 import { restoreGeneratorsEnergy, regenerateEnergy, checkOrdersAvailability, shuffleArray, getEmptyGridCells, markItemAsDiscovered, generateOrder, findMergeablePair } from './gameLogic.js';
-
+import { openTutorialModal } from './modals.js';
 // --- Game Version Check ---
 (function checkVersion() {
   const storedVersion = localStorage.getItem(CONFIG.VERSION_KEY);
@@ -59,6 +59,11 @@ export function initGame() {
   updateUI();
   addListeners();
 
+  // Показываем обучение для новых игроков
+  if (!playerProfile.hasSeenTutorial) {
+    openTutorialModal();
+  }
+
   // Reset inactivity timer on any user interaction on the screen
   document.body.addEventListener('pointerdown', resetInactivityTimer, true);
   resetInactivityTimer(); // Start the first timer
@@ -92,6 +97,7 @@ export function saveGame() {
     claimedAchievements: gameState.claimedAchievements,
     profile: playerProfile,
     claimedCollectionBonuses: gameState.claimedCollectionBonuses,
+    storyState: gameState.storyState,
     settings: gameSettings,
     thresholds: UNLOCK_THRESHOLDS.map(t => ({ score: t.score, unlocked: t.unlocked, level: t.level }))
   };
@@ -124,6 +130,19 @@ export function loadGame() {
     gameState.discoveredItems = loaded.discoveredItems || {};
     gameState.claimedAchievements = loaded.claimedAchievements || {};
     gameState.claimedCollectionBonuses = loaded.claimedCollectionBonuses || {};
+    gameState.storyState = loaded.storyState || { unlocked: false, currentChapter: 1, currentStep: 0, completed: false };
+
+    // Делаем сюжет доступным по умолчанию для старых сохранений, где он мог быть заблокирован
+    if (!gameState.storyState.unlocked) {
+      gameState.storyState.unlocked = true;
+      showToast("Вам доступна новая сюжетная глава!", "story");
+    }
+
+    // Проверяем, не были ли добавлены новые главы с момента последнего сохранения
+    if (gameState.storyState.completed && STORY_DATA.main.chapters[gameState.storyState.currentChapter]) {
+      // Если сюжет был завершен, но теперь для текущей главы есть данные, сбрасываем флаг
+      gameState.storyState.completed = false;
+    }
     
     const loadedSettings = loaded.settings || {};
     gameSettings.musicVolume = loadedSettings.musicVolume !== undefined ? loadedSettings.musicVolume : 0.2;
@@ -141,6 +160,13 @@ export function loadGame() {
     playerProfile.totalEnergySpent = loadedProfile.totalEnergySpent || 0;
     playerProfile.mergeCounts = loadedProfile.mergeCounts || {};
 
+    // Для старых сохранений считаем, что обучение пройдено
+    // Изменено: теперь для старых сохранений обучение будет показано один раз.
+    if (loadedProfile.hasSeenTutorial === undefined) {
+      playerProfile.hasSeenTutorial = false;
+    } else {
+      playerProfile.hasSeenTutorial = loadedProfile.hasSeenTutorial;
+    }
     if (energyToRestore > 0) {
       gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
       showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100} энергии!`, "success");
@@ -169,6 +195,7 @@ export function startNewGame() {
   gameState.discoveredItems = {};
   gameState.claimedAchievements = {};
   gameState.claimedCollectionBonuses = {};
+  gameState.storyState = { unlocked: true, currentChapter: 1, currentStep: 0, completed: false };
   // Reset settings
   gameSettings.musicVolume = 0.2;
   gameSettings.sfxVolume = 0.5;
@@ -186,6 +213,7 @@ export function startNewGame() {
   playerProfile.totalEnergySpent = 0;
   playerProfile.mergeCounts = {};
 
+  playerProfile.hasSeenTutorial = false;
   // --- Новая логика генерации стартовых генераторов ---
   const allGeneratorKeys = Object.keys(GENERATORS_DATA).filter(k => k !== 'bonus_chest');
   const startingGenerators = [];

@@ -1,5 +1,5 @@
 import { DOMElements } from './dom.js';
-import { gameState } from './state.js';
+import { gameState, playerProfile } from './state.js';
 import { CONFIG, CATEGORIES_CONFIG, GENERATORS_DATA, GEN_ENERGY_CONFIG } from './config.js';
 import {
   clearBlockedItemWithCoins,
@@ -14,6 +14,106 @@ import {
 import { renderProfile, renderSettingsModal, renderAchievementsModal, renderCollectionModal } from './ui.js';
 import { saveGame, startNewGame } from './gameManager.js';
 import { showToast, updateUI } from './ui.js';
+import { STORY_DATA } from './config.js';
+
+export function openStoryModal() {
+  if (!gameState.storyState.unlocked) {
+    showToast("Сюжет пока недоступен.", "error");
+    return;
+  }
+
+  const modal = DOMElements.storyModal;
+  const story = STORY_DATA.main;
+  const chapter = story.chapters[gameState.storyState.currentChapter];
+
+  if (!chapter || gameState.storyState.completed) {
+    modal.title.textContent = story.title;
+    modal.body.innerHTML = `<p style="text-align: center;">Вы завершили текущую сюжетную линию. Продолжение следует!</p>`;
+    modal.actions.innerHTML = '';
+    modal.overlay.classList.add('active', 'blocking');
+    return;
+  }
+
+  const step = chapter.steps[gameState.storyState.currentStep];
+  if (!step) {
+    closeStoryModal();
+    return;
+  }
+
+  modal.title.textContent = 'Сюжет. ' + chapter.title;
+
+  // Теперь мы берем иконку и имя прямо из объекта шага сюжета
+  modal.body.innerHTML = `
+        <div class="story-dialogue">
+            <div class="story-char-container">
+                <div class="story-char-avatar">
+                    <img src="${step.character}" alt="${step.name}">
+                </div>
+                <div class="story-char-name">${step.name}</div>
+            </div>
+            <div class="story-text-bubble">
+                <p>${step.text}</p>
+            </div>
+        </div>
+    `;
+
+  if (step.type === 'dialogue') {
+    modal.actions.innerHTML = `<button id="story-continue-btn" class="modal-action-btn">Продолжить</button>`;
+  } else if (step.type === 'task' && step.task.type === 'spend_coins') {
+    modal.actions.innerHTML = `<button id="story-task-btn" class="modal-action-btn">${step.task.buttonText} (${step.task.amount} <img src="assets/icons/coin.png" class="inline-icon" />)</button>`;
+  } else {
+    modal.actions.innerHTML = '';
+  }
+
+  modal.overlay.classList.add('active', 'blocking');
+}
+
+export function closeStoryModal() {
+  DOMElements.storyModal.overlay.classList.remove('active', 'blocking');
+}
+
+export function openTutorialModal() {
+  const modal = DOMElements.tutorialModal;
+
+  modal.body.innerHTML = `
+    <div class="tutorial-section">
+        <h4><img src="assets/icons/magic_tool.png" alt="Слияние">1. Объединяйте предметы</h4>
+        <p>Перетаскивайте одинаковые предметы друг на друга, чтобы получить предмет более высокого уровня. Это основной способ получения новых вещей!</p>
+    </div>
+    <div class="tutorial-section">
+        <h4><img src="assets/icons/box.png" alt="Генераторы">2. Используйте генераторы</h4>
+        <p>Нажимайте на генераторы (предметы с оранжевой/синей анимированной обводкой), чтобы создавать предметы. Это тратит энергию генератора и вашу личную энергию (молния вверху).</p>
+    </div>
+    <div class="tutorial-section">
+        <h4><img src="assets/icons/achievements.png" alt="Заказы">3. Выполняйте заказы</h4>
+        <p>В верхней части экрана находятся заказы от клиентов. Собирайте нужные предметы и нажимайте "Сдать заказ", чтобы получить монеты и опыт.</p>
+    </div>
+    <div class="tutorial-section">
+        <h4><img src="assets/icons/chain.png" alt="Информация">4. Узнайте больше о предметах</h4>
+        <p>Нажмите на любой предмет на поле, чтобы открыть окно с информацией. В этом окне нажмите на иконку цепочки <img src="assets/icons/chain.png" class="inline-icon">, чтобы увидеть всю его линию эволюции.</p>
+    </div>
+    <div class="tutorial-section">
+        <h4><img src="assets/icons/coin.png" alt="Ресурсы">5. Следите за ресурсами</h4>
+        <p><b>Монеты</b> <img src="assets/icons/coin.png" class="inline-icon"> нужны для покупки улучшений и отмены заказов. <b>Энергия</b> <img src="assets/icons/energy.png" class="inline-icon"> нужна для использования генераторов. Оба ресурса восстанавливаются со временем.</p>
+    </div>
+    <div class="tutorial-section">
+        <h4><img src="assets/icons/story_scroll.png" alt="Меню">6. Исследуйте игру</h4>
+        <p>Нажмите на кнопку меню (☰), чтобы открыть <b>Сюжет</b>, посмотреть свою <b>Коллекцию</b> предметов и отследить <b>Достижения</b>. За их выполнение вы будете получать награды!</p>
+    </div>
+    <div class="tutorial-section">
+        <h4><img src="assets/icons/question.png" alt="Обучение">7. Возвращайтесь к обучению</h4>
+        <p>Вы всегда можете вернуться к этому руководству, нажав на кнопку меню (☰) в правом верхнем углу и выбрав пункт "Обучение".</p>
+    </div>
+  `;
+
+  modal.overlay.classList.add('active', 'blocking');
+}
+
+export function closeTutorialModal() {
+  DOMElements.tutorialModal.overlay.classList.remove('active', 'blocking');
+  playerProfile.hasSeenTutorial = true;
+  saveGame();
+}
 
 export function showModal(options) {
   const { icon, title, subtitle, desc, actionButton, dangerButtons, infoButton, isBlocking } = options;
@@ -115,6 +215,8 @@ function closeAllModals() {
     closeProfileModal();
     closeSettingsModal();
     closeAchievementsModal();
+    closeStoryModal();
+    closeTutorialModal();
     closeMenuModal();
 }
 
@@ -182,7 +284,7 @@ export function showCharacterModal(order) {
   showModal({
     icon: `<img src="${order.character.icon}" alt="">`,
     title: order.character.name,
-    subtitle: order.isStory ? `Важный гость (Сюжет)` : "Постоянный клиент",
+    subtitle: order.isStory ? `Важный гость (Серия)` : "Постоянный клиент",
     desc: order.character.desc || "Заглянул за покупками.",
   });
 }

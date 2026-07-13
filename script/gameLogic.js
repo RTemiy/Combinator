@@ -8,7 +8,8 @@ import {
   SPAWN_CHANCES,
   UNLOCK_THRESHOLDS,
   CHARACTERS,
-  STORY_CHARACTERS,
+  STORY_CHARACTERS, 
+  STORY_DATA,
   ACHIEVEMENTS_DATA
 } from './config.js';
 import { playSound, playMergeSound } from './audio.js';
@@ -22,7 +23,7 @@ import {
   renderGrid, updateMenuNotification
 } from './ui.js';
 import { saveGame, startNewGame } from './gameManager.js';
-import { closeModal } from './modals.js';
+import { closeModal, openStoryModal } from './modals.js';
 
 export function getEmptyGridCells() {
     return gameState.gridData.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
@@ -138,6 +139,67 @@ export function hasUnclaimedAchievements() {
     return false;
 }
 
+export function hasNewStoryUpdate() {
+    if (!gameState.storyState.unlocked || gameState.storyState.completed) {
+        return false;
+    }
+    const story = STORY_DATA.main;
+    const chapter = story.chapters[gameState.storyState.currentChapter];
+    if (!chapter) return false;
+    // Если есть следующий шаг для отображения, значит, есть обновление.
+    return !!chapter.steps[gameState.storyState.currentStep];
+}
+
+export function advanceStoryStep(fromModal = false) {
+    if (!gameState.storyState.unlocked || gameState.storyState.completed) return;
+
+    const story = STORY_DATA.main;
+    const chapter = story.chapters[gameState.storyState.currentChapter];
+    if (!chapter) return;
+
+    const step = chapter.steps[gameState.storyState.currentStep];
+    if (!step) return;
+
+    // Обработка выполнения задачи
+    if (step.type === 'task') {
+        if (step.task.type === 'spend_coins') {
+            if (gameState.coins < step.task.amount) {
+                showToast(`Недостаточно монет! Нужно ${step.task.amount}`, 'error');
+                return;
+            }
+            gameState.coins -= step.task.amount;
+            // В идеале, здесь должна быть отдельная статистика потраченных монет
+            playSound(DOMElements.sfxCoin);
+        }
+        // Обработка награды
+        if (step.reward) {
+            if (step.reward.type === 'generator') {
+                gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: step.reward.level, genEnergy: GEN_ENERGY_CONFIG[step.reward.level].max, lastRegenTime: Date.now() });
+                markItemAsDiscovered(step.reward.key, 'generator');
+            } else if (step.reward.type === 'item') {
+                gameState.rewardQueue.push({ category: step.reward.category, level: step.reward.level });
+                markItemAsDiscovered(step.reward.category, step.reward.level);
+            }
+        }
+    }
+
+    // Переход к следующему шагу
+    gameState.storyState.currentStep++;
+    if (gameState.storyState.currentStep >= chapter.steps.length) {
+        gameState.storyState.currentChapter++;
+        gameState.storyState.currentStep = 0;
+        // Если следующей главы нет, помечаем сюжет как завершенный
+        if (!story.chapters[gameState.storyState.currentChapter]) {
+            gameState.storyState.completed = true;
+        }
+    }
+
+    // Перерисовываем модальное окно с новым шагом, если оно было открыто
+    if (fromModal) openStoryModal();
+    updateMenuNotification();
+    saveGame();
+}
+
 export function claimReward(rewardIndex, startElement) {
     const emptyCells = getEmptyGridCells();
     if (emptyCells.length === 0) {
@@ -171,12 +233,40 @@ export function claimReward(rewardIndex, startElement) {
         const lvl = reward.level || 1;
         const iconPath = genInfo.partIcons[lvl - 1];
         icon = `<img src="${iconPath}" alt="">`;
+    } else if (reward.category && reward.level) {
+        // Обычный предмет из категории
+        const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
+        if (itemInfo) {
+            icon = `<img src="${itemInfo.icon}" alt="">`;
+        }
     }
 
     moveItem3D(startElement, targetCellElement, icon).then(() => {
         // Удаляем награду из массива только после завершения анимации
         gameState.rewardQueue.splice(rewardIndex, 1);
-        gameState.gridData[targetCellIndex] = reward;
+
+        let finalItem = reward;
+        // Проверяем, не должен ли предмет стать генератором предметов
+        if (reward.category && reward.level) {
+            const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
+            if (itemInfo && itemInfo.becomesGenerator) {
+                const genInfo = itemInfo.becomesGenerator;
+                finalItem = {
+                    isItemGenerator: true,
+                    category: reward.category,
+                    level: reward.level,
+                    generatedCategory: genInfo.category,
+                    charges: genInfo.charges,
+                };
+
+                // Разблокируем новую категорию для заказов, если это впервые
+                if (!gameState.unlockedItemGenCategories.includes(genInfo.category)) {
+                    gameState.unlockedItemGenCategories.push(genInfo.category);
+                    showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
+                }
+            }
+        }
+        gameState.gridData[targetCellIndex] = finalItem;
 
         saveGame();
         updateUI(); // Перерисовывает и очередь, и поле
@@ -853,11 +943,11 @@ export function spawnBonusGenerator() {
       lastRegenTime: Date.now()
     });
     markItemAsDiscovered(genKey, 'generator');
-    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Сюжет завершен! Вы открыли новый генератор: ${generatorData.name}!`, "story");
+    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Вы открыли новый генератор: ${generatorData.name}!`, "story");
   } else {
     // Если все генераторы уже открыты, даем вместо этого деталь для улучшения
     spawnUpgradePart();
-    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получена Новая деталь!`, "story");
+    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
   }
 }
 
@@ -882,11 +972,11 @@ export function spawnRandomExistingGenerator() {
       lastRegenTime: Date.now()
     });
     markItemAsDiscovered(randomGenKey, 'generator');
-    showToast(`<img src="assets/icons/generators/bonus_chest_lvl1.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получен генератор "${generatorData.name}"!`, "story");
+    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Бонус: получен генератор "${generatorData.name}"!`, "story");
   } else {
     // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
     spawnUpgradePart();
-    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получена Новая деталь!`, "story");
+    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
   }
 }
 
@@ -1026,7 +1116,7 @@ export function generateStoryOrder(step, fixedChar = null) {
   });
 
   if (step === 1 && !fixedChar) {
-    showToast(`Появился сюжетный персонаж с особым заказом!`, "story");
+    showToast(`Появился персонаж с серийным заказом!`, "story");
   }
 }
 
@@ -1175,7 +1265,7 @@ export function completeOrder(id) {
       if (wasStory) {
         if (currentStep < 3) {
           generateStoryOrder(currentStep + 1, storyChar);
-          showToast(`Сюжет выполнен! Шаг ${currentStep + 1}/3 начался.`, "story");
+          showToast(`Часть серии выполнена! Шаг ${currentStep + 1}/3 начался.`, "story");
         } else {
           const rand = Math.random();
           if (rand < 0.25) {
@@ -1185,14 +1275,14 @@ export function completeOrder(id) {
               generatorKey: 'bonus_chest',
               genLevel: 1, genCharges: 1
             });
-            showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Сюжет завершен! Вы получили Подарочную коробку!`, "story");
+            showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Вы получили Подарочную коробку!`, "story");
           } else if (rand < 0.5) {
             // 25% шанс на новый генератор (или деталь, если все открыто)
             spawnBonusGenerator();
           } else if (rand < 0.75) {
             // 25% шанс на магические инструменты
             spawnMagicTool();
-            showToast(`<img src="assets/icons/magic_tool.png" class="toast-icon" alt=""> Сюжет завершен! Бонус: получены Магические инструменты!`, "story");
+            showToast(`<img src="assets/icons/magic_tool.png" class="toast-icon" alt=""> Серия завершена! Бонус: получены Магические инструменты!`, "story");
           } else {
             // 25% шанс на случайный уже открытый генератор
             spawnRandomExistingGenerator();

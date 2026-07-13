@@ -32,6 +32,9 @@ export const DOMElements = {
     achievementsBtn: document.getElementById('achievements-btn'),
     collectionNotificationDot: document.getElementById('collection-notification-dot'),
     achievementsNotificationDot: document.getElementById('achievements-notification-dot'),
+    storyBtn: document.getElementById('story-btn'),
+    storyNotificationDot: document.getElementById('story-notification-dot'),
+    tutorialBtn: document.getElementById('tutorial-btn'),
   },
   settingsModal: {
     overlay: document.getElementById('settings-modal'),
@@ -92,4 +95,19 @@ export const DOMElements = {
   sfxCoin: document.getElementById('sfx-coin'),
   sfxDragStart: document.getElementById('sfx-drag-start'),
   sfxOrderReady: document.getElementById('sfx-order-ready'),
+  // Добавьте новый объект для модального окна сюжета
+  storyModal: {
+    overlay: document.getElementById('story-modal'),
+    closeBtn: document.getElementById('st-m-close'),
+    title: document.getElementById('st-m-title'),
+    body: document.getElementById('st-m-body'),
+    actions: document.getElementById('st-m-actions'),
+  },
+  tutorialModal: {
+    overlay: document.getElementById('tutorial-modal'),
+    body: document.getElementById('tut-m-body'),
+    closeBtn: document.getElementById('tut-m-close'),
+    confirmBtn: document.getElementById('tutorial-close-btn')
+  },
+
 };
