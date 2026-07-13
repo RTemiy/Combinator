@@ -109,5 +109,10 @@ export const DOMElements = {
     closeBtn: document.getElementById('tut-m-close'),
     confirmBtn: document.getElementById('tutorial-close-btn')
   },
+  storySelectionModal: {
+    overlay: document.getElementById('story-selection-modal'),
+    closeBtn: document.getElementById('story-selection-close'),
+    body: document.getElementById('story-selection-body'),
+  },
 
 };

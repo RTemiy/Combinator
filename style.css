@@ -1204,7 +1204,8 @@ body.is-dragging, body.is-dragging * {
 #achievements-modal,
 #settings-modal,
 #story-modal,
-#tutorial-modal {
+#tutorial-modal,
+#story-selection-modal {
   z-index: 25000; /* Выше, чем обычный модал */
   align-items: flex-end; /* По-прежнему внизу */
   background: var(--modal-overlay-bg); /* Более темный фон */
@@ -1218,7 +1219,8 @@ body.is-dragging, body.is-dragging * {
 #achievements-modal:not(.active),
 #settings-modal:not(.active),
 #story-modal:not(.active),
-#tutorial-modal:not(.active) {
+#tutorial-modal:not(.active),
+#story-selection-modal:not(.active) {
   background: transparent;
 }
 
@@ -1244,7 +1246,8 @@ body.is-dragging, body.is-dragging * {
 #achievements-modal.active .detail-modal-content,
 #settings-modal.active .detail-modal-content,
 #story-modal.active .detail-modal-content,
-#tutorial-modal.active .detail-modal-content {
+#tutorial-modal.active .detail-modal-content,
+#story-selection-modal.active .detail-modal-content {
   transform: translateY(0);
 }
 
@@ -1978,6 +1981,42 @@ input[type="range"]::-moz-range-thumb {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.4;
+  color: var(--text-color-light);
+}
+
+/* --- Story Selection Modal --- */
+.story-selection-card {
+  display: flex;
+  gap: 15px;
+  background: var(--button-bg);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: 1px solid var(--border-color);
+}
+
+.story-selection-card:hover {
+  background-color: var(--button-hover-bg);
+}
+
+.story-selection-icon {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  border-radius: 6px;
+}
+
+.story-selection-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+  color: var(--accent-color);
+}
+
+.story-selection-info p {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
   color: var(--text-color-light);
 }
 

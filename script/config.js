@@ -59,6 +59,24 @@ export const GENERATORS_DATA = {
       'assets/icons/categories/dough/generator_lvl_02.png',
     ]
   },
+  /*'alchemy_lab': {
+    name: 'Алхимическая лаборатория',
+    desc: 'Место, где наука встречается с магией. Только для посвященных.',
+    categories: ['alchemy'],
+    isStoryOnly: true,
+    partIcons: [
+      'assets/icons/categories/writings/part_lvl_01.png',
+      'assets/icons/categories/writings/part_lvl_02.png',
+      'assets/icons/categories/writings/part_lvl_03.png',
+    ],
+    icons: [
+      'assets/icons/categories/writings/generator_lvl_01.png',
+      'assets/icons/categories/writings/generator_lvl_02.png',
+      'assets/icons/categories/writings/generator_lvl_02.png',
+      'assets/icons/categories/writings/generator_lvl_02.png',
+      'assets/icons/categories/writings/generator_lvl_02.png',
+    ]
+  },*/
   'bonus_chest': {
     name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true,
     icons: [
@@ -181,50 +199,54 @@ export const CATEGORIES_CONFIG = {
 };
 
 export const STORY_DATA = {
-  main: {
-    title: "Сюжет",
+  'gardener_arc': {
+    id: 'gardener_arc',
+    title: "Ветвь Садоводства",
+    description: "Помогите местному садовнику вырастить редкое дерево и откройте для себя новую категорию предметов.",
+    icon: 'assets/icons/characters/gardener.png',
     chapters: {
       1: {
         title: "Предложение садовника",
         steps: [
-          {
-            type: 'dialogue',
-            character: 'assets/icons/characters/gardener.png',
-            name: 'Садовник',
-            text: 'Приветствую, коллега! Я вижу, у тебя тут своя лавочка. А я вот знаю способ, как можно расширить твой... ассортимент. И заработок, само собой.'
-          },
-          {
-            type: 'dialogue',
-            character: 'assets/icons/characters/gardener.png',
-            name: 'Садовник',
-            text: 'У меня есть семена одного очень редкого дерева. Оно не просто красивое, но и плодоносит! Правда, чтобы его вырастить до нужного состояния, нужны особые условия и, скажем так, первоначальные инвестиции.'
-          },
+          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'Приветствую, коллега! Я вижу, у тебя тут своя лавочка. А я вот знаю способ, как можно расширить твой... ассортимент. И заработок, само собой.' },
+          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'У меня есть семена одного очень редкого дерева. Оно не просто красивое, но и плодоносит! Правда, чтобы его вырастить до нужного состояния, нужны особые условия и, скажем так, первоначальные инвестиции.' },
           {
             type: 'task',
             character: 'assets/icons/characters/gardener.png',
             name: 'Садовник',
             text: 'Если вложишь 500 монет в наше общее дело, я подготовлю для тебя саженец, который быстро вырастет в могучее дерево. С него и начнется твой новый бизнес!',
-            task: {
-              type: 'spend_coins',
-              amount: 500,
-              buttonText: 'Вложиться в саженец'
-            },
-            reward: {
-              type: 'item',
-              category: 'flowers',
-              level: 7
-            }
+            task: { type: 'spend_coins', amount: 500, buttonText: 'Вложиться в саженец' },
+            reward: { type: 'item', category: 'flowers', level: 7 }
           },
-          {
-            type: 'dialogue',
-            character: 'assets/icons/characters/gardener.png',
-            name: 'Садовник',
-            text: 'Отличный выбор! Вот, держи. Это не просто дерево, а настоящий генератор ягод! Ухаживай за ним, и оно принесет тебе немало выгоды. Удачи в новом начинании!'
-          },
+          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'Отличный выбор! Вот, держи. Это не просто дерево, а настоящий генератор ягод! Ухаживай за ним, и оно принесет тебе немало выгоды. Удачи в новом начинании!' },
         ]
       }
-    },
-  }
+    }
+  },
+  'alchemist_arc': {
+    id: 'alchemist_arc',
+    title: "Путь Алхимика",
+    description: "Загадочный незнакомец предлагает вам приобщиться к древнему искусству. Готовы ли вы рискнуть?",
+    icon: 'assets/icons/characters/special_01.png',
+    chapters: {
+      1: {
+        title: "Предложение Алхимика",
+        steps: [
+          { type: 'dialogue', character: 'assets/icons/characters/special_01.png', name: 'Таинственный Алхимик', text: 'Я вижу в тебе потенциал, юный комбинатор. Твои таланты могут служить не только мирским делам, но и великому искусству... Алхимии.' },
+          { type: 'dialogue', character: 'assets/icons/characters/special_01.png', name: 'Таинственный Алхимик', text: 'Я готов поделиться с тобой секретами своего ремесла и предоставить необходимое оборудование. Но знания и редкие компоненты стоят дорого. Это будет стоить тебе 1500 монет.' },
+          /*{
+            type: 'task',
+            character: 'assets/icons/characters/special_01.png',
+            name: 'Таинственный Алхимик',
+            text: 'Если ты готов встать на путь трансформации, вложись в это предприятие. Ты получишь доступ к моей лаборатории и сможешь создавать невиданные доселе предметы.',
+            task: { type: 'spend_coins', amount: 1500, buttonText: 'Купить лабораторию' },
+            reward: { type: 'generator', key: 'alchemy_lab', level: 1 }
+          },
+          { type: 'dialogue', character: 'assets/icons/characters/special_01.png', name: 'Таинственный Алхимик', text: 'Мудрое решение! Вот ключ от лаборатории. Помни, алхимия не терпит спешки. Изучай, сочетай и, возможно, однажды ты создашь Философский камень! Теперь категория "Алхимия" доступна для заказов.' },*/
+        ]
+      }
+    }
+  },
 };
 
 export const CHARACTERS = [
@@ -237,7 +259,6 @@ export const CHARACTERS = [
 ];
 
 export const STORY_CHARACTERS = [
-  { icon: 'assets/icons/characters/gardener.png', name: 'Садовник', desc: 'Опытный садовод, знающий толк в редких и прибыльных растениях. Всегда готов поделиться секретом-другим за скромную плату.' },
   { icon: 'assets/icons/characters/special_01.png', name: 'Маг', desc: 'Загадочный фокусник, которому постоянно требуются самые неожиданные предметы для его представлений. Никто не знает, что у него в шляпе.' },
   { icon: 'assets/icons/characters/special_02.png', name: 'Тигруля', desc: 'Энергичный аниматор в костюме тигра. Готовится к детскому празднику и ищет всё необходимое, чтобы сделать его незабываемым.' },
   { icon: 'assets/icons/characters/special_03.png', name: 'Русалочка', desc: 'Мечтательная девушка, готовящаяся к тематической вечеринке у бассейна. Ей нужны диковинные вещи, чтобы её образ русалки был безупречен.' }
@@ -339,7 +360,7 @@ export const CONFIG = {
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.2.4',
+  GAME_VERSION: '1.2.5',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },

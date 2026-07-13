@@ -24,7 +24,12 @@ export const gameState = {
   },
   lastClick: {
     index: null,
-  }
+  },
+  storyState: {
+    unlocked: false, // Сюжет изначально заблокирован
+    activeStoryId: null, // ID сюжета, который игрок просматривает в данный момент
+    progress: {}
+  },
 };
 
 export const gameSettings = {

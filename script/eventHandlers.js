@@ -19,7 +19,7 @@ import {
   closeSettingsModal,
   confirmCancelOrder,
   showCharacterById,
-  openStoryModal,
+  openStorySelectionModal, openStoryModal, closeStorySelectionModal,
   closeStoryModal,
   showCategoryProgressionModal,
   showItemInfoModal, closeTutorialModal, openTutorialModal
@@ -93,13 +93,14 @@ export function addListeners() {
   DOMElements.menuModal.collectionBtn.addEventListener('click', () => { closeMenuModal(); showCollectionModal(); });
   DOMElements.menuModal.profileBtn.addEventListener('click', () => { closeMenuModal(); openProfileModal(); });
   DOMElements.menuModal.achievementsBtn.addEventListener('click', () => { closeMenuModal(); openAchievementsModal(); });
-  DOMElements.menuModal.storyBtn.addEventListener('click', () => { closeMenuModal(); openStoryModal(); });
+  DOMElements.menuModal.storyBtn.addEventListener('click', () => { closeMenuModal(); openStorySelectionModal(); });
   DOMElements.menuModal.settingsBtn.addEventListener('click', () => { closeMenuModal(); openSettingsModal(); });
   DOMElements.menuModal.tutorialBtn.addEventListener('click', () => { closeMenuModal(); openTutorialModal(); });
   DOMElements.profileModal.closeBtn.addEventListener('click', closeProfileModal);
   DOMElements.detailModal.closeBtn.addEventListener('click', closeDetailModal);
   DOMElements.achievementsModal.closeBtn.addEventListener('click', closeAchievementsModal);
   DOMElements.collectionModal.closeBtn.addEventListener('click', closeCollectionModal);
+  DOMElements.storySelectionModal.closeBtn.addEventListener('click', closeStorySelectionModal);
   DOMElements.settingsModal.closeBtn.addEventListener('click', closeSettingsModal);
   DOMElements.storyModal.closeBtn.addEventListener('click', closeStoryModal);
   DOMElements.tutorialModal.closeBtn.addEventListener('click', closeTutorialModal);
@@ -108,6 +109,19 @@ export function addListeners() {
     if (e.target === DOMElements.tutorialModal.overlay) closeTutorialModal();
   });
 
+  DOMElements.storySelectionModal.body.addEventListener('click', (e) => {
+    const card = e.target.closest('.story-selection-card');
+    if (card) {
+      const storyId = card.dataset.storyId;
+      gameState.storyState.activeStoryId = storyId;
+      // Инициализируем прогресс, если его еще нет
+      if (!gameState.storyState.progress[storyId]) {
+        gameState.storyState.progress[storyId] = { currentChapter: 1, currentStep: 0, completed: false };
+      }
+      closeStorySelectionModal();
+      openStoryModal();
+    }
+  });
 
   DOMElements.storyModal.actions.addEventListener('click', (e) => {
       const button = e.target.closest('button');

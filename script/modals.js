@@ -1,6 +1,6 @@
 import { DOMElements } from './dom.js';
 import { gameState, playerProfile } from './state.js';
-import { CONFIG, CATEGORIES_CONFIG, GENERATORS_DATA, GEN_ENERGY_CONFIG } from './config.js';
+import { CONFIG, CATEGORIES_CONFIG, GENERATORS_DATA, GEN_ENERGY_CONFIG, STORY_DATA } from './config.js';
 import {
   clearBlockedItemWithCoins,
   rechargeGeneratorWithCoins,
@@ -14,27 +14,62 @@ import {
 import { renderProfile, renderSettingsModal, renderAchievementsModal, renderCollectionModal } from './ui.js';
 import { saveGame, startNewGame } from './gameManager.js';
 import { showToast, updateUI } from './ui.js';
-import { STORY_DATA } from './config.js';
 
-export function openStoryModal() {
+export function openStorySelectionModal() {
   if (!gameState.storyState.unlocked) {
     showToast("Сюжет пока недоступен.", "error");
     return;
   }
 
-  const modal = DOMElements.storyModal;
-  const story = STORY_DATA.main;
-  const chapter = story.chapters[gameState.storyState.currentChapter];
+  const modal = DOMElements.storySelectionModal;
+  let contentHTML = '';
 
-  if (!chapter || gameState.storyState.completed) {
+  for (const storyId in STORY_DATA) {
+    const story = STORY_DATA[storyId];
+    const progress = gameState.storyState.progress[storyId] || { currentChapter: 1, currentStep: 0, completed: false };
+    const status = progress.completed ? 'Завершено' : 'В процессе';
+
+    contentHTML += `
+      <div class="story-selection-card" data-story-id="${story.id}">
+        <img src="${story.icon}" class="story-selection-icon" alt="${story.title}">
+        <div class="story-selection-info">
+          <h4>${story.title}</h4>
+          <p>${story.description}</p>
+          <span class="story-status ${progress.completed ? 'completed' : ''}">${status}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  modal.body.innerHTML = contentHTML;
+  modal.overlay.classList.add('active', 'blocking');
+}
+
+export function closeStorySelectionModal() {
+  DOMElements.storySelectionModal.overlay.classList.remove('active', 'blocking');
+}
+
+export function openStoryModal() {
+  const activeStoryId = gameState.storyState.activeStoryId;
+  if (!gameState.storyState.unlocked || !activeStoryId) {
+    showToast("Сюжет пока недоступен.", "error");
+    return;
+  }
+
+  const modal = DOMElements.storyModal;
+  const story = STORY_DATA[activeStoryId];
+  const progress = gameState.storyState.progress[activeStoryId];
+  const chapter = story.chapters[progress.currentChapter];
+
+  if (!chapter || progress.completed) {
     modal.title.textContent = story.title;
     modal.body.innerHTML = `<p style="text-align: center;">Вы завершили текущую сюжетную линию. Продолжение следует!</p>`;
     modal.actions.innerHTML = '';
     modal.overlay.classList.add('active', 'blocking');
     return;
   }
-
-  const step = chapter.steps[gameState.storyState.currentStep];
+  
+  const step = chapter.steps[progress.currentStep];
   if (!step) {
     closeStoryModal();
     return;
@@ -216,6 +251,7 @@ function closeAllModals() {
     closeSettingsModal();
     closeAchievementsModal();
     closeStoryModal();
+    closeStorySelectionModal();
     closeTutorialModal();
     closeMenuModal();
 }

@@ -140,24 +140,39 @@ export function hasUnclaimedAchievements() {
 }
 
 export function hasNewStoryUpdate() {
-    if (!gameState.storyState.unlocked || gameState.storyState.completed) {
-        return false;
+    if (!gameState.storyState.unlocked) return false;
+
+    for (const storyId in STORY_DATA) {
+        const story = STORY_DATA[storyId];
+        const progress = gameState.storyState.progress[storyId] || { currentChapter: 1, currentStep: 0, completed: false };
+
+        if (progress.completed) continue;
+
+        const chapter = story.chapters[progress.currentChapter];
+        if (chapter && chapter.steps[progress.currentStep]) {
+            return true; // Найдена доступная для продолжения история
+        }
     }
-    const story = STORY_DATA.main;
-    const chapter = story.chapters[gameState.storyState.currentChapter];
-    if (!chapter) return false;
-    // Если есть следующий шаг для отображения, значит, есть обновление.
-    return !!chapter.steps[gameState.storyState.currentStep];
+    return false;
 }
 
 export function advanceStoryStep(fromModal = false) {
-    if (!gameState.storyState.unlocked || gameState.storyState.completed) return;
+    const activeStoryId = gameState.storyState.activeStoryId;
+    if (!gameState.storyState.unlocked || !activeStoryId) return;
 
-    const story = STORY_DATA.main;
-    const chapter = story.chapters[gameState.storyState.currentChapter];
+    const story = STORY_DATA[activeStoryId];
+    // Если прогресса для этой истории еще нет, создаем его "на лету"
+    if (!gameState.storyState.progress[activeStoryId]) {
+        gameState.storyState.progress[activeStoryId] = { currentChapter: 1, currentStep: 0, completed: false };
+    }
+    const progress = gameState.storyState.progress[activeStoryId];
+
+    if (!story || progress.completed) return;
+
+    const chapter = story.chapters[progress.currentChapter];
     if (!chapter) return;
 
-    const step = chapter.steps[gameState.storyState.currentStep];
+    const step = chapter.steps[progress.currentStep];
     if (!step) return;
 
     // Обработка выполнения задачи
@@ -176,6 +191,15 @@ export function advanceStoryStep(fromModal = false) {
             if (step.reward.type === 'generator') {
                 gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: step.reward.level, genEnergy: GEN_ENERGY_CONFIG[step.reward.level].max, lastRegenTime: Date.now() });
                 markItemAsDiscovered(step.reward.key, 'generator');
+                // Если генератор сюжетный, сразу разблокируем его категории для заказов
+                const generatorData = GENERATORS_DATA[step.reward.key];
+                if (generatorData && generatorData.isStoryOnly) {
+                    generatorData.categories.forEach(cat => {
+                        if (!gameState.activeCategories.includes(cat)) {
+                            gameState.activeCategories.push(cat);
+                        }
+                    });
+                }
             } else if (step.reward.type === 'item') {
                 gameState.rewardQueue.push({ category: step.reward.category, level: step.reward.level });
                 markItemAsDiscovered(step.reward.category, step.reward.level);
@@ -184,13 +208,13 @@ export function advanceStoryStep(fromModal = false) {
     }
 
     // Переход к следующему шагу
-    gameState.storyState.currentStep++;
-    if (gameState.storyState.currentStep >= chapter.steps.length) {
-        gameState.storyState.currentChapter++;
-        gameState.storyState.currentStep = 0;
+    progress.currentStep++;
+    if (progress.currentStep >= chapter.steps.length) {
+        progress.currentChapter++;
+        progress.currentStep = 0;
         // Если следующей главы нет, помечаем сюжет как завершенный
-        if (!story.chapters[gameState.storyState.currentChapter]) {
-            gameState.storyState.completed = true;
+        if (!story.chapters[progress.currentChapter]) {
+            progress.completed = true;
         }
     }
 
@@ -956,7 +980,7 @@ export function spawnRandomExistingGenerator() {
   const activeGeneratorKeys = [...new Set(gameState.activeCategories.map(cat => CATEGORIES_CONFIG[cat].generatorKey))];
 
   // 2. Фильтруем специальные генераторы, такие как bonus_chest.
-  const regularGeneratorKeys = activeGeneratorKeys.filter(key => !GENERATORS_DATA[key].isSpecial);
+  const regularGeneratorKeys = activeGeneratorKeys.filter(key => !GENERATORS_DATA[key].isSpecial && !GENERATORS_DATA[key].isStoryOnly);
 
   if (regularGeneratorKeys.length > 0) {
     // 3. Выбираем один случайным образом.

@@ -138,12 +138,6 @@ export function loadGame() {
       showToast("Вам доступна новая сюжетная глава!", "story");
     }
 
-    // Проверяем, не были ли добавлены новые главы с момента последнего сохранения
-    if (gameState.storyState.completed && STORY_DATA.main.chapters[gameState.storyState.currentChapter]) {
-      // Если сюжет был завершен, но теперь для текущей главы есть данные, сбрасываем флаг
-      gameState.storyState.completed = false;
-    }
-    
     const loadedSettings = loaded.settings || {};
     gameSettings.musicVolume = loadedSettings.musicVolume !== undefined ? loadedSettings.musicVolume : 0.2;
     gameSettings.sfxVolume = loadedSettings.sfxVolume !== undefined ? loadedSettings.sfxVolume : 0.5;
@@ -195,7 +189,11 @@ export function startNewGame() {
   gameState.discoveredItems = {};
   gameState.claimedAchievements = {};
   gameState.claimedCollectionBonuses = {};
-  gameState.storyState = { unlocked: true, currentChapter: 1, currentStep: 0, completed: false };
+  gameState.storyState = {
+    unlocked: true,
+    activeStoryId: null,
+    progress: {}
+  };
   // Reset settings
   gameSettings.musicVolume = 0.2;
   gameSettings.sfxVolume = 0.5;
@@ -215,7 +213,7 @@ export function startNewGame() {
 
   playerProfile.hasSeenTutorial = false;
   // --- Новая логика генерации стартовых генераторов ---
-  const allGeneratorKeys = Object.keys(GENERATORS_DATA).filter(k => k !== 'bonus_chest');
+  const allGeneratorKeys = Object.keys(GENERATORS_DATA).filter(k => k !== 'bonus_chest' && !GENERATORS_DATA[k].isStoryOnly);
   const startingGenerators = [];
   const activeCategoriesSet = new Set();
 
@@ -232,7 +230,11 @@ export function startNewGame() {
 
   [genKey1, genKey2].forEach(key => GENERATORS_DATA[key].categories.forEach(cat => activeCategoriesSet.add(cat)));
   gameState.activeCategories = Array.from(activeCategoriesSet);
-  gameState.lockedCategories = Object.keys(CATEGORIES_CONFIG).filter(cat => !gameState.activeCategories.includes(cat) && !CATEGORIES_CONFIG[cat].isItemGenerated);
+  gameState.lockedCategories = Object.keys(CATEGORIES_CONFIG).filter(cat => {
+    const genKey = CATEGORIES_CONFIG[cat].generatorKey;
+    const isStoryGenerator = genKey && GENERATORS_DATA[genKey] && GENERATORS_DATA[genKey].isStoryOnly;
+    return !gameState.activeCategories.includes(cat) && !CATEGORIES_CONFIG[cat].isItemGenerated && !isStoryGenerator;
+  });
   shuffleArray(gameState.lockedCategories);
   // --- Конец новой логики ---
 
