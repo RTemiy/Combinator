@@ -471,13 +471,39 @@ export function rechargePlayerEnergyWithCoins() {
   showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Энергия полностью восстановлена!`, "success");
 }
 
+function createUpgradedItem(category, level) {
+    markItemAsDiscovered(category, level);
+    const newItemInfo = CATEGORIES_CONFIG[category]?.items[level - 1];
+
+    if (newItemInfo && newItemInfo.becomesGenerator) {
+        const genInfo = newItemInfo.becomesGenerator;
+
+        // Разблокируем новую категорию для заказов, если это впервые
+        if (!gameState.unlockedItemGenCategories.includes(genInfo.category)) {
+            gameState.unlockedItemGenCategories.push(genInfo.category);
+            showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
+        }
+
+        return {
+            isItemGenerator: true,
+            category: category,
+            level: level,
+            generatedCategory: genInfo.category,
+            charges: genInfo.charges,
+        };
+    }
+
+    return { category: category, level: level };
+}
+
 function handleUnblockMerge(fromIdx, toIdx, source) {
   if (source.level >= CONFIG.MAX_ITEM_LEVEL) return false;
   const nextLevel = source.level + 1;
   playMergeSound(nextLevel);
   gameState.gridData[fromIdx] = null;
-  markItemAsDiscovered(source.category, source.level + 1);
-  gameState.gridData[toIdx] = { ...source, level: source.level + 1, isBlocked: false };
+  const newItem = createUpgradedItem(source.category, nextLevel);
+  newItem.isBlocked = false; // Убедимся, что предмет разблокирован
+  gameState.gridData[toIdx] = newItem;
   triggerMergeEffects(toIdx, source.category);
   // showToast("Паутина снята!", "success");
   return true;
@@ -530,8 +556,7 @@ function handleItemUpgradeWithTool(toolIdx, itemIdx, regularItem) {
   const nextLvl = regularItem.level + 1;
   playMergeSound(nextLvl);
   gameState.gridData[toolIdx] = null;
-  markItemAsDiscovered(regularItem.category, nextLvl);
-  gameState.gridData[itemIdx] = { ...regularItem, level: nextLvl };
+  gameState.gridData[itemIdx] = createUpgradedItem(regularItem.category, nextLvl);
   triggerMergeEffects(itemIdx, regularItem.category);
   // showToast(`✨ Предмет улучшен до уровня ${nextLvl}!`, "success");
   return true;
@@ -542,32 +567,10 @@ function handleItemMerge(fromIdx, toIdx, source) {
 
   const nextLevel = source.level + 1;
   playMergeSound(nextLevel);
-  const newItemInfo = CATEGORIES_CONFIG[source.category].items[nextLevel - 1];
 
-  markItemAsDiscovered(source.category, nextLevel);
-  // Проверяем, становится ли новый предмет генератором
-  if (newItemInfo && newItemInfo.becomesGenerator) {
-    const genInfo = newItemInfo.becomesGenerator;
-    gameState.gridData[fromIdx] = null;
-    gameState.gridData[toIdx] = {
-      isItemGenerator: true,
-      category: source.category,
-      level: nextLevel,
-      generatedCategory: genInfo.category,
-      charges: genInfo.charges,
-    };
-
-    // Разблокируем новую категорию для заказов, если это впервые
-    if (!gameState.unlockedItemGenCategories.includes(genInfo.category)) {
-      gameState.unlockedItemGenCategories.push(genInfo.category);
-      // showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
-    }
-
-  } else {
-    // Стандартное слияние
-    gameState.gridData[fromIdx] = null;
-    gameState.gridData[toIdx] = { category: source.category, level: nextLevel };
-  }
+  // Стандартное слияние
+  gameState.gridData[fromIdx] = null;
+  gameState.gridData[toIdx] = createUpgradedItem(source.category, nextLevel);
 
   triggerMergeEffects(toIdx, source.category);
   return true;
