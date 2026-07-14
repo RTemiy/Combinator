@@ -8,7 +8,7 @@ import {
   SPAWN_CHANCES,
   UNLOCK_THRESHOLDS,
   CHARACTERS,
-  STORY_CHARACTERS, 
+  STORY_CHARACTERS,
   STORY_DATA,
   ACHIEVEMENTS_DATA
 } from './config.js';
@@ -185,14 +185,29 @@ export function advanceStoryStep(fromModal = false) {
             gameState.coins -= step.task.amount;
             // В идеале, здесь должна быть отдельная статистика потраченных монет
             playSound(DOMElements.sfxCoin);
+            playSound(DOMElements.sfxOrderComplete);
         }
         // Обработка награды
         if (step.reward) {
             if (step.reward.type === 'generator') {
-                gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: step.reward.level, genEnergy: GEN_ENERGY_CONFIG[step.reward.level].max, lastRegenTime: Date.now() });
+                const generatorData = GENERATORS_DATA[step.reward.key];
+                const rewardLevel = step.reward.level;
+
+                if (generatorData && generatorData.isSpecial) {
+                    // Специальный генератор (например, bonus_chest) с конечными зарядами
+                    gameState.rewardQueue.push({
+                        isGenerator: true,
+                        generatorKey: step.reward.key,
+                        genLevel: rewardLevel,
+                        genCharges: 1 // По умолчанию для сундука 1-го уровня
+                    });
+                } else {
+                    // Обычный, перезаряжаемый генератор
+                    gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: rewardLevel, genEnergy: GEN_ENERGY_CONFIG[rewardLevel].max, lastRegenTime: Date.now() });
+                }
+
                 markItemAsDiscovered(step.reward.key, 'generator');
                 // Если генератор сюжетный, сразу разблокируем его категории для заказов
-                const generatorData = GENERATORS_DATA[step.reward.key];
                 if (generatorData && generatorData.isStoryOnly) {
                     generatorData.categories.forEach(cat => {
                         if (!gameState.activeCategories.includes(cat)) {
@@ -221,6 +236,7 @@ export function advanceStoryStep(fromModal = false) {
     // Перерисовываем модальное окно с новым шагом, если оно было открыто
     if (fromModal) openStoryModal();
     updateMenuNotification();
+    updateUI();
     saveGame();
 }
 

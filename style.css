@@ -646,6 +646,13 @@ body.is-dragging, body.is-dragging * {
   animation: border-dance 3s linear infinite;
 }
 
+.cell.generator-slot.finite-charge-generator {
+  /* Переопределяем градиент рамки на синий для особых генераторов (с конечными зарядами) */
+  background-image:
+          linear-gradient(var(--generator-slot-bg), var(--generator-slot-bg)),
+          linear-gradient(90deg, var(--item-generator-slot-border-1), var(--item-generator-slot-border-2), var(--item-generator-slot-border-1));
+}
+
 .cell.generator-slot-no-energy {
   border: 2px dashed var(--generator-slot-no-energy-border);
   background-image: none;

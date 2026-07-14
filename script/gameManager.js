@@ -1,4 +1,4 @@
-import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG, GENERATORS_DATA, CATEGORIES_CONFIG, CHARACTERS, STORY_DATA } from './config.js';
+import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG, GENERATORS_DATA, CATEGORIES_CONFIG } from './config.js';
 import { gameState, playerProfile, gameSettings } from './state.js';
 import { DOMElements } from './dom.js';
 import { addListeners } from './eventHandlers.js';

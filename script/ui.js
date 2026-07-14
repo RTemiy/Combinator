@@ -5,7 +5,7 @@ import {
   hasUnclaimedAchievements,
   hasUnclaimedCollectionBonuses,
   isDiscovered,
-  getCurrentPlayerLevel, 
+  getCurrentPlayerLevel,
   hasNewStoryUpdate,
   formatTimePlayed,
   checkOrdersAvailability
@@ -383,9 +383,15 @@ export function renderGrid() {
         const iconPath = genInfo.icons[lvl - 1];
         wrapper.innerHTML = `<img src="${iconPath}" alt="${genInfo.name}">`;
 
+        // Добавляем класс для специальной рамки, если генератор с конечными зарядами
+        if (genInfo.isSpecial) {
+          cell.classList.add('finite-charge-generator');
+        }
+
         renderGeneratorBadges(cell, item);
       } else if (item.isItemGenerator) {
-        cell.classList.add('item-generator-slot');
+        // Предметы-генераторы всегда имеют конечные заряды, поэтому добавляем им спец-класс
+        cell.classList.add('item-generator-slot', 'finite-charge-generator');
         const itemInfo = CATEGORIES_CONFIG[item.category].items[item.level - 1];
         wrapper.innerHTML = `<img src="${itemInfo.icon}" alt="">`;
 
