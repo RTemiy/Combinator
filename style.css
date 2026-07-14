@@ -974,11 +974,11 @@ body.is-dragging, body.is-dragging * {
 .modal-desc {
   font-size: 0.78rem;
   color: var(--text-color-light);
-  line-height: 1;
+  line-height: 1.3;
   margin: 0;
   max-height: 150px; /* Увеличиваем высоту для цепочек предметов */
   overflow-y: auto;   /* Добавляем скролл, если текст не помещается */
-  padding-right: 5px; /* Небольшой отступ для скроллбара, чтобы он не налезал на текст */
+  // padding-right: 5px; /* Небольшой отступ для скроллбара, чтобы он не налезал на текст */
 }
 
 .modal-desc::-webkit-scrollbar { width: 4px; }
@@ -1308,10 +1308,51 @@ body.is-dragging, body.is-dragging * {
   padding: 0 5px;
 }
 
+.detail-modal-top-content {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detail-modal-main-icon {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  background-color: var(--cell-color);
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.detail-modal-main-icon img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+}
+
+.detail-modal-main-desc {
+  flex-grow: 1;
+}
+
+.detail-modal-main-desc .modal-desc {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-color-light);
+}
+
 .detail-modal-body {
   padding: 16px;
   overflow-y: auto;
   flex-grow: 1;
+}
+
+#d-m-extra-content {
+  padding-top: 15px;
 }
 
 .collection-footer {
@@ -1552,15 +1593,6 @@ body.is-dragging, body.is-dragging * {
 
 .detail-modal-body::-webkit-scrollbar { width: 5px; }
 .detail-modal-body::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
-
-.detail-modal-body .modal-desc {
-  /* Переопределяем стили для описания внутри детального модала */
-  max-height: none; /* Убираем ограничение по высоте */
-  padding-right: 0;
-  margin-bottom: 20px;
-  font-size: 0.85rem;
-  line-height: 1.35;
-}
 
 .detail-modal-body .progression-container {
   justify-content: flex-start; /* Выравниваем по левому краю */

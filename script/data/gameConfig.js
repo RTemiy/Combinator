@@ -6,6 +6,7 @@ export const CONFIG = {
   MAX_GENERATOR_LEVEL: 5,
   STARTING_ITEMS_COUNT: 2,
   BLOCKED_ITEMS_AT_START: 40,
+  BLOCKED_UNLOCKED_CATEGORY_ITEMS_AT_START: 0.2,
 
   // Energy
   MAX_ENERGY: 100,
@@ -43,7 +44,7 @@ export const CONFIG = {
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.2.5',
+  GAME_VERSION: '1.2.6',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },

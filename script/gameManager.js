@@ -1,10 +1,10 @@
-import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG, GENERATORS_DATA, CATEGORIES_CONFIG } from './config.js';
+import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG, GENERATORS_DATA, CATEGORIES_CONFIG, STORY_DATA } from './config.js';
 import { gameState, playerProfile, gameSettings } from './state.js';
 import { DOMElements } from './dom.js';
 import { addListeners } from './eventHandlers.js';
 import { createGrid, updateUI, applyTheme, showToast, highlightHintItems, removeHintHighlights } from './ui.js';
 import { restoreGeneratorsEnergy, regenerateEnergy, checkOrdersAvailability, shuffleArray, getEmptyGridCells, markItemAsDiscovered, generateOrder, findMergeablePair } from './gameLogic.js';
-import { openTutorialModal } from './modals.js';
+import { openTutorialModal, openStoryModal, openStorySelectionModal } from './modals.js';
 // --- Game Version Check ---
 (function checkVersion() {
   const storedVersion = localStorage.getItem(CONFIG.VERSION_KEY);
@@ -46,10 +46,12 @@ export function startGameAndAudio() {
 
 export function initGame() {
   createGrid();
-  if (localStorage.getItem(CONFIG.SAVE_KEY)) {
-    loadGame();
-  } else {
+  const isNewPlayer = !localStorage.getItem(CONFIG.SAVE_KEY);
+
+  if (isNewPlayer) {
     startNewGame();
+  } else {
+    loadGame();
   }
   DOMElements.bgMusic.volume = gameSettings.musicVolume;
   applyTheme();
@@ -59,9 +61,21 @@ export function initGame() {
   updateUI();
   addListeners();
 
-  // Показываем обучение для новых игроков
+  // Показываем обучение для новых игроков или модал сюжета для вернувшихся
   if (!playerProfile.hasSeenTutorial) {
     openTutorialModal();
+  } else if (!isNewPlayer) { // Если не новый игрок и обучение уже видел
+    if (gameState.storyState.unlocked) {
+      const activeStoryId = gameState.storyState.activeStoryId;
+      const hasActiveStory = activeStoryId && STORY_DATA[activeStoryId];
+      const progress = hasActiveStory ? gameState.storyState.progress[activeStoryId] : null;
+
+      if (hasActiveStory && progress && !progress.completed) {
+        openStoryModal();
+      } else {
+        openStorySelectionModal();
+      }
+    }
   }
 
   // Reset inactivity timer on any user interaction on the screen
@@ -239,21 +253,46 @@ export function startNewGame() {
   // --- Конец новой логики ---
 
   let availableIndices = Array.from({length: CONFIG.GRID_COLS * CONFIG.GRID_ROWS}, (_, i) => i);
-  for (let i = 0; i < CONFIG.BLOCKED_ITEMS_AT_START; i++) {
-    if (availableIndices.length > 5) {
-      const randIdx = Math.floor(Math.random() * availableIndices.length);
-      const cellIndex = availableIndices.splice(randIdx, 1)[0];
-      // Теперь создаем реальный предмет, но заблокированный.
-      // Предметы могут быть любой категории (кроме тех, что генерируются другими предметами) и любого уровня.
-      const spawnableCategories = Object.keys(CATEGORIES_CONFIG).filter(cat => !CATEGORIES_CONFIG[cat].isItemGenerated);
-      const randomCat = spawnableCategories[Math.floor(Math.random() * spawnableCategories.length)];
-      // Уровень от 1 до предпоследнего (6), чтобы не блокировать предметы максимального уровня.
-      const randomLevel = Math.floor(Math.random() * (CONFIG.MAX_ITEM_LEVEL - 1)) + 1;
-      gameState.gridData[cellIndex] = { category: randomCat, level: randomLevel, isBlocked: true };
-      // Заблокированные предметы не добавляются в коллекцию при старте.
-      // markItemAsDiscovered(randomCat, randomLevel);
+
+  // --- Новая логика генерации заблокированных предметов ---
+  const blockedItemsToGenerate = [];
+  const totalBlockedItems = CONFIG.BLOCKED_ITEMS_AT_START;
+  const activeCategoryBlockedCount = Math.round(totalBlockedItems * CONFIG.BLOCKED_UNLOCKED_CATEGORY_ITEMS_AT_START);
+  const lockedCategoryBlockedCount = totalBlockedItems - activeCategoryBlockedCount;
+
+  // Фильтруем категории, которые могут быть сгенерированы (не являются результатом крафта другого предмета)
+  const activeSpawnableCategories = gameState.activeCategories.filter(cat => !CATEGORIES_CONFIG[cat].isItemGenerated);
+  const lockedSpawnableCategories = gameState.lockedCategories.filter(cat => !CATEGORIES_CONFIG[cat].isItemGenerated);
+
+  // Функция для генерации случайного уровня от 3 до предпоследнего (6)
+  const getRandomBlockedLevel = () => Math.floor(Math.random() * (CONFIG.MAX_ITEM_LEVEL - 3)) + 3;
+
+  // Генерируем предметы из активных категорий
+  for (let i = 0; i < activeCategoryBlockedCount; i++) {
+    if (activeSpawnableCategories.length > 0) {
+      const randomCat = activeSpawnableCategories[Math.floor(Math.random() * activeSpawnableCategories.length)];
+      blockedItemsToGenerate.push({ category: randomCat, level: getRandomBlockedLevel(), isBlocked: true });
     }
   }
+
+  // Генерируем предметы из заблокированных категорий
+  for (let i = 0; i < lockedCategoryBlockedCount; i++) {
+    if (lockedSpawnableCategories.length > 0) {
+      const randomCat = lockedSpawnableCategories[Math.floor(Math.random() * lockedSpawnableCategories.length)];
+      blockedItemsToGenerate.push({ category: randomCat, level: getRandomBlockedLevel(), isBlocked: true });
+    }
+  }
+
+  // Перемешиваем и размещаем на поле
+  shuffleArray(blockedItemsToGenerate);
+
+  blockedItemsToGenerate.forEach(item => {
+    if (availableIndices.length > 5) { // Оставляем немного места для стартовых предметов
+      const randIdx = Math.floor(Math.random() * availableIndices.length);
+      const cellIndex = availableIndices.splice(randIdx, 1)[0];
+      gameState.gridData[cellIndex] = item;
+    }
+  });
 
   // Размещаем стартовые генераторы
   startingGenerators.forEach(gen => {

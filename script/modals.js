@@ -239,7 +239,9 @@ export function closeDetailModal() {
   const modal = DOMElements.detailModal;
   modal.overlay.classList.remove('active', 'blocking');
   setTimeout(() => {
-    modal.body.innerHTML = '';
+    modal.icon.innerHTML = '';
+    modal.desc.innerHTML = '';
+    modal.extraContent.innerHTML = '';
   }, 300);
 }
 
@@ -480,41 +482,71 @@ export function showCategoryProgressionModal(categoryKeyOrKeys, icon = 'assets/i
   const categoryKeys = Array.isArray(categoryKeyOrKeys) ? categoryKeyOrKeys : [categoryKeyOrKeys];
   if (categoryKeys.length === 0) return;
   const modal = DOMElements.detailModal; // Используем большой модал
-  let contentHTML = '';
-  let modalTitle = 'Цепочка эволюции';
+  let progressionHTML = '';
+  let modalTitle = 'Цепочка эволюции'; // Заголовок по умолчанию
 
+  let itemDescription = '';
+  let specificItemFound = false;
+
+  // Если передан один ключ категории и иконка, пытаемся найти описание конкретного предмета
+  if (categoryKeys.length === 1 && icon && icon !== 'assets/icons/chain.png') {
+    const categoryKey = categoryKeys[0];
+    const category = CATEGORIES_CONFIG[categoryKey];
+    if (category) {
+      // Иконка из DOM будет полным URL, а в конфиге - относительный путь.
+      // Ищем предмет, чей путь к иконке совпадает с концом URL.
+      const itemInfo = category.items.find(item => icon.endsWith(item.icon));
+      if (itemInfo) {
+        modalTitle = itemInfo.name;
+        itemDescription = `<p class="modal-desc">${itemInfo.desc}</p>`;
+        specificItemFound = true;
+      }
+    }
+  }
+
+  // Setup modal shell
+  modal.title.innerText = modalTitle;
   modal.icon.innerHTML = `<img src="${icon}" alt="Иконка цепочки">`;
+  if (specificItemFound) {
+    modal.desc.innerHTML = itemDescription;
+    modal.desc.style.display = 'block';
+  } else {
+    modal.desc.innerHTML = '';
+    modal.desc.style.display = 'none';
+  }
+  modal.icon.style.display = 'flex';
 
   categoryKeys.forEach((key, index) => {
     const category = CATEGORIES_CONFIG[key];
     if (!category) return;
 
     if (index > 0) {
-      contentHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
+      progressionHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
     }
 
-    contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
+    // Если мы нашли конкретный предмет, заголовок для его цепочки будет другим, для консистентности
+    const chainTitle = specificItemFound ? `Цепочка: ${category.name}` : category.name;
+    progressionHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${chainTitle}</h4>`;
 
-    contentHTML += `<div class="progression-container">`;
+    progressionHTML += `<div class="progression-container">`;
     category.items.forEach((item, itemIndex) => {
       const discovered = isDiscovered(key, item.level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
       const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
-      contentHTML += `
+      progressionHTML += `
         <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? item.name : 'Не открыто'}">
           <div class="progression-item-icon">${itemIcon}</div>
           <div class="progression-item-level">${item.level}</div>
         </div>
       `;
       if (itemIndex < category.items.length - 1) {
-        contentHTML += '<div class="progression-arrow-h">→</div>';
+        progressionHTML += '<div class="progression-arrow-h">→</div>';
       }
     });
-    contentHTML += '</div>';
+    progressionHTML += '</div>';
   });
 
-  modal.title.innerText = modalTitle;
-  modal.body.innerHTML = contentHTML;
+  modal.extraContent.innerHTML = progressionHTML;
   modal.overlay.classList.add('active', 'blocking');
 }
 
@@ -522,15 +554,15 @@ export function showGeneratorDetailModal(item) {
   const modal = DOMElements.detailModal;
   const genInfo = GENERATORS_DATA[item.generatorKey];
   const lvl = item.genLevel || 1;
-
   const iconPath = genInfo.icons[lvl - 1];
+
+  // Setup modal shell
   modal.icon.innerHTML = `<img src="${iconPath}" alt="${genInfo.name}">`;
   modal.title.innerText = `${genInfo.name} ${CONFIG.ROMAN_NUMERALS[lvl]}`;
+  modal.desc.style.display = 'block';
+  modal.icon.style.display = 'flex';
 
-  // --- Генерация контента ---
-  let contentHTML = '';
-
-  // 1. Описание генератора
+  // 1. Description
   let desc = `<p class="modal-desc">${genInfo.desc} `;
   if (genInfo.isHybrid) {
     desc += `Производит предметы из категорий: ${genInfo.categories.map(c => CATEGORIES_CONFIG[c].name).join(' и ')}. `;
@@ -544,39 +576,40 @@ export function showGeneratorDetailModal(item) {
     5: `Легендарный ранг! Шансы: 30% (ур. 1), 30% (ур. 2), 25% (ур. 3), 10% (ур. 4), 5% (ур. 5). Самая быстрая перезарядка: ${cdSec} сек.`
   };
   desc += (levelDescriptions[lvl] || '') + '</p>';
-  contentHTML += desc;
+  modal.desc.innerHTML = desc;
 
-  // 2. Цепочка(и) предметов
+  // 2. Progression chain(s)
+  let progressionHTML = '';
   const categoryKeys = genInfo.categories;
   categoryKeys.forEach((key, index) => {
     const category = CATEGORIES_CONFIG[key];
     if (!category) return;
 
     if (index > 0) {
-      contentHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
+      progressionHTML += '<hr style="border-color: #444; margin: 15px 0 10px;">';
     }
 
-    contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
+    progressionHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
 
-    contentHTML += `<div class="progression-container">`;
+    progressionHTML += `<div class="progression-container">`;
     category.items.forEach((item, itemIndex) => {
       const discovered = isDiscovered(key, item.level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
       const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
-      contentHTML += `
+      progressionHTML += `
               <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? item.name : 'Не открыто'}">
                   <div class="progression-item-icon">${itemIcon}</div>
                   <div class="progression-item-level">${item.level}</div>
               </div>
           `;
       if (itemIndex < category.items.length - 1) {
-        contentHTML += '<div class="progression-arrow-h">→</div>';
+        progressionHTML += '<div class="progression-arrow-h">→</div>';
       }
     });
-    contentHTML += '</div>';
+    progressionHTML += '</div>';
   });
 
-  modal.body.innerHTML = contentHTML;
+  modal.extraContent.innerHTML = progressionHTML;
   modal.overlay.classList.add('active', 'blocking');
 }
 
@@ -585,13 +618,16 @@ export function showItemDetailModal(item) {
   const category = CATEGORIES_CONFIG[item.category];
   const itemInfo = category.items[item.level - 1];
 
+  // Setup modal shell
   modal.icon.innerHTML = `<img src="${itemInfo.icon}" alt="">`;
   modal.title.innerText = itemInfo.name;
+  modal.desc.style.display = 'block';
+  modal.icon.style.display = 'flex';
 
-  let contentHTML = '';
+  // 1. Description
+  modal.desc.innerHTML = `<p class="modal-desc">${itemInfo.desc}</p>`;
 
-  // 1. Описание самого предмета
-  contentHTML += `<p class="modal-desc">${itemInfo.desc}</p>`;
+  let progressionHTML = '';
 
   // --- Вспомогательная функция для отрисовки цепочки ---
   const renderProgressionChain = (cat, title, categoryKey) => {
@@ -615,22 +651,22 @@ export function showItemDetailModal(item) {
     return chainHTML;
   };
 
-  contentHTML += '<hr style="border-color: #444; margin: 20px 0 15px;">';
+  // progressionHTML += '<hr style="border-color: #444; margin: 20px 0 15px;">';
 
   // 2. Цепочка эволюции самого предмета
-  contentHTML += renderProgressionChain(category, `Цепочка: ${category.name}`, item.category);
+  progressionHTML += renderProgressionChain(category, `Цепочка: ${category.name}`, item.category);
 
   // 3. Цепочка производимых предметов (если применимо)
   if (item.isItemGenerator || itemInfo.becomesGenerator) {
     const genCategoryKey = item.generatedCategory || itemInfo.becomesGenerator.category;
     const genCategory = CATEGORIES_CONFIG[genCategoryKey];
     if (genCategory) {
-      contentHTML += '<hr style="border-color: #444; margin: 20px 0 15px;">';
-      contentHTML += renderProgressionChain(genCategory, `Производит: ${genCategory.name}`, genCategoryKey);
+      progressionHTML += '<hr style="border-color: #444; margin: 20px 0 15px;">';
+      progressionHTML += renderProgressionChain(genCategory, `Производит: ${genCategory.name}`, genCategoryKey);
     }
   }
 
-  modal.body.innerHTML = contentHTML;
+  modal.extraContent.innerHTML = progressionHTML;
   modal.overlay.classList.add('active', 'blocking');
 }
 
@@ -639,14 +675,20 @@ export function showGeneratorPartDetailModal(item) {
   const genInfo = GENERATORS_DATA[item.generatorKey];
   const lvl = item.level || 1;
   const iconPath = genInfo.partIcons[lvl - 1];
-
+  
+  // Setup modal shell
   modal.icon.innerHTML = `<img src="${iconPath}" alt="Деталь для ${genInfo.name}">`;
   modal.title.innerText = `Сборка: ${genInfo.name}`;
+  modal.desc.style.display = 'block';
+  modal.icon.style.display = 'flex';
 
-  let contentHTML = '';
-  contentHTML += `<p class="modal-desc">Объединяйте детали, чтобы собрать полноценный генератор. Две детали 3-го уровня создают генератор 1-го уровня.</p>`;
-  contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Цепочка сборки</h4>`;
-  contentHTML += `<div class="progression-container">`;
+  // Description
+  modal.desc.innerHTML = `<p class="modal-desc">Объединяйте детали, чтобы собрать полноценный генератор. Две детали 3-го уровня создают генератор 1-го уровня.</p>`;
+
+  // Progression chain
+  let progressionHTML = '';
+  progressionHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Цепочка сборки</h4>`;
+  progressionHTML += `<div class="progression-container">`;
 
   const partHTML = (level) => {
     const currentPartIconPath = genInfo.partIcons[level - 1];
@@ -668,15 +710,15 @@ export function showGeneratorPartDetailModal(item) {
         </div>
     `;
 
-  contentHTML += partHTML(1);
-  contentHTML += '<div class="progression-arrow-h">→</div>';
-  contentHTML += partHTML(2);
-  contentHTML += '<div class="progression-arrow-h">→</div>';
-  contentHTML += partHTML(3);
-  contentHTML += '<div class="progression-arrow-h">→</div>';
-  contentHTML += generatorHTML;
-  contentHTML += '</div>';
+  progressionHTML += partHTML(1);
+  progressionHTML += '<div class="progression-arrow-h">→</div>';
+  progressionHTML += partHTML(2);
+  progressionHTML += '<div class="progression-arrow-h">→</div>';
+  progressionHTML += partHTML(3);
+  progressionHTML += '<div class="progression-arrow-h">→</div>';
+  progressionHTML += generatorHTML;
+  progressionHTML += '</div>';
 
-  modal.body.innerHTML = contentHTML;
+  modal.extraContent.innerHTML = progressionHTML;
   modal.overlay.classList.add('active', 'blocking');
 }

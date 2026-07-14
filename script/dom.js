@@ -21,6 +21,8 @@ export const DOMElements = {
     icon: document.getElementById('d-m-icon'),
     title: document.getElementById('d-m-title'),
     body: document.getElementById('d-m-body'),
+    desc: document.getElementById('d-m-desc'),
+    extraContent: document.getElementById('d-m-extra-content'),
   },
   menuModal: {
     overlay: document.getElementById('menu-modal'),
