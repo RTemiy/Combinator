@@ -1,6 +1,6 @@
 export const GENERATORS_DATA = {
   'flowers': {
-    name: 'Цветочная теплица', desc: 'Оазис для выращивания декоративной флоры.', categories: ['flowers'],
+    name: 'Кашпо с землей', desc: 'Простое кашпо, наполненное плодородной землей. Идеальная основа для будущих растений.', categories: ['flowers'],
     partIcons: [
       'assets/icons/categories/flowers/part_lvl_01.png',
       'assets/icons/categories/flowers/part_lvl_02.png',
@@ -30,7 +30,7 @@ export const GENERATORS_DATA = {
     ]
   },
   'stationery': {
-    name: 'Канцелярский шкафчик', desc: 'Источник всего, что нужно для учебы и творчества. От простого карандаша до целой библиотеки.', categories: ['books', 'stationery'], isHybrid: true,
+    name: 'Коробка с канцелярией', desc: 'Коробка, полная полезных вещей для учебы и творчества. От скрепки до всяких бумажек.', categories: ['books', 'stationery'], isHybrid: true,
     partIcons: [
       'assets/icons/categories/writings/part_lvl_01.png',
       'assets/icons/categories/writings/part_lvl_02.png',
@@ -39,13 +39,13 @@ export const GENERATORS_DATA = {
     icons: [
       'assets/icons/categories/writings/generator_lvl_01.png',
       'assets/icons/categories/writings/generator_lvl_02.png',
-      'assets/icons/categories/writings/generator_lvl_02.png',
-      'assets/icons/categories/writings/generator_lvl_02.png',
-      'assets/icons/categories/writings/generator_lvl_02.png',
+      'assets/icons/categories/writings/generator_lvl_03.png',
+      'assets/icons/categories/writings/generator_lvl_03.png',
+      'assets/icons/categories/writings/generator_lvl_03.png',
     ]
   },
   'bakery': {
-    name: 'Пекарня-кондитерская', desc: 'Уютное место, где рождаются ароматная выпечка и сладкие лакомства. Смешивайте муку и сахар, чтобы создавать шедевры.', categories: ['bakery', 'pastry'], isHybrid: true,
+    name: 'Планетарный миксер', desc: 'Мощный помощник для смешивания ингредиентов. Создает основу для выпечки и кондитерских изделий.', categories: ['bakery', 'pastry'], isHybrid: true,
     partIcons: [
       'assets/icons/categories/dough/part_lvl_01.png',
       'assets/icons/categories/dough/part_lvl_02.png',

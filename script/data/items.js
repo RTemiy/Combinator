@@ -62,7 +62,7 @@ export const CATEGORIES_CONFIG = {
     generatorKey: 'stationery',
     items: [
       { level: 1, icon: 'assets/icons/categories/books/sticker.png', name: 'Липучая наклейка', desc: 'Маленький листок для быстрых заметок и напоминаний.' },
-      { level: 2, icon: 'assets/icons/categories/books/paper.png', name: 'Листок', desc: 'Чистый лист бумаги, готовый принять любые идеи.' },
+      { level: 2, icon: 'assets/icons/categories/books/paper.png', name: 'Упаковка наклеек', desc: 'Свежая упаковка наклеек, прямо из типографии. Все готово для мощного брейншторма.' },
       { level: 3, icon: 'assets/icons/categories/books/spiral_notebook.png', name: 'Блокнот на пружине', desc: 'Удобный блокнот для конспектов и зарисовок.' },
       { level: 4, icon: 'assets/icons/categories/books/notebook.png', name: 'Блокнот', desc: 'Надежный спутник для записи мыслей и планов в твердой обложке.' },
       { level: 5, icon: 'assets/icons/categories/books/book.png', name: 'Книжка', desc: 'Источник знаний или увлекательная история в переплете.' },

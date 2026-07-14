@@ -1,18 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
 :root { /* Dark Theme */
-  --bg-color: #1a1a1a;
-  --panel-color: #2a2a2a;
-  --cell-color: #3a3a3a;
-  --modal-bg: #222222;
+  --bg-color: #2C2F33;
+  --panel-color: #36393F;
+  --cell-color: #40444B;
+  --modal-bg: #32353B;
   --modal-overlay-bg: rgba(0, 0, 0, 0.7);
   --text-color: #ffffff;
   --text-color-light: #b3b3b3;
   --text-color-on-accent: #ffffff;
-  --border-color: #444;
+  --border-color: #4A4E54;
   --border-color-light: #555;
-  --button-bg: #333;
-  --button-hover-bg: #444;
-  --button-active-bg: #222;
-  --scrollbar-track: #222;
+  --button-bg: #40444B;
+  --button-hover-bg: #50545B;
+  --button-active-bg: #393D42;
+  --scrollbar-track: #2C2F33;
   --scrollbar-thumb: #444;
   --success-color: #28a745;
   --error-color: #dc3545;
@@ -42,20 +44,20 @@
 }
 
 body[data-theme="light"] {
-  --bg-color: #f0f2f5;
-  --panel-color: #ffffff;
-  --cell-color: #e4e6eb;
-  --modal-bg: #ffffff;
+  --bg-color: #FDF6F0;
+  --panel-color: #FFFFFF;
+  --cell-color: #FBEFE2;
+  --modal-bg: #FFFFFF;
   --modal-overlay-bg: rgba(0, 0, 0, 0.4);
   --text-color: #1c1e21;
   --text-color-light: #65676b;
   --text-color-on-accent: #ffffff;
-  --border-color: #ced0d4;
+  --border-color: #E8D8C9;
   --border-color-light: #dce1e4;
-  --button-bg: #e4e6eb;
-  --button-hover-bg: #dce1e4;
-  --button-active-bg: #ced0d4;
-  --scrollbar-track: #f0f2f5;
+  --button-bg: #FBEFE2;
+  --button-hover-bg: #F8E8D9;
+  --button-active-bg: #F5E1CE;
+  --scrollbar-track: #FDF6F0;
   --scrollbar-thumb: #ced0d4;
   --story-gradient-start: #f3e8ff;
   --story-gradient-end: #e9d8ff;
@@ -82,7 +84,7 @@ html, body {
 }
 
 body {
-  font-family: sans-serif;
+  font-family: 'Nunito', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0;
@@ -161,8 +163,8 @@ body.is-dragging, body.is-dragging * {
   font-size: 1rem;
   background: var(--panel-color);
   padding: 8px 16px;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  border-radius: 24px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
   align-items: center;
   /* flex: 1; */ /* Убираем растягивание, чтобы контейнер стал компактнее */
 }
@@ -239,7 +241,7 @@ body.is-dragging, body.is-dragging * {
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
   transition: transform 0.2s, background-color 0.2s;
 }
 .menu-btn:hover { background: var(--cell-color); transform: scale(1.1); }
@@ -263,11 +265,11 @@ body.is-dragging, body.is-dragging * {
 .game-toast {
   color: white;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 20px;
   width: 90%; /* Растягиваем уведомление на всю ширину контейнера */
   box-sizing: border-box; /* Чтобы padding не влиял на общую ширину */
   font-weight: bold;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
   opacity: 0;
   transform: translateY(-20px) scale(0.9);
   transition: all 0.3s ease-out;
@@ -308,11 +310,11 @@ body.is-dragging, body.is-dragging * {
 
 .orders-panel {
   background: var(--panel-color);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 8px;
   width: 100%;
   box-sizing: border-box;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
   display: flex;
   align-items: flex-start; /* Выравниваем по верху */
   position: relative;
@@ -335,7 +337,7 @@ body.is-dragging, body.is-dragging * {
   height: 55px;
   background: var(--button-bg);
   border: 1px solid var(--border-color-light);
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -390,7 +392,7 @@ body.is-dragging, body.is-dragging * {
 
 .order-card {
   background: var(--button-bg);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -447,7 +449,7 @@ body.is-dragging, body.is-dragging * {
 
 .order-target {
   background: var(--border-color);
-  border-radius: 4px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -482,7 +484,7 @@ body.is-dragging, body.is-dragging * {
   background: var(--success-color);
   border: none;
   color: var(--text-color-on-accent);
-  padding: 3px 6px;
+  padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
@@ -576,8 +578,8 @@ body.is-dragging, body.is-dragging * {
   gap: 6px;
   background: var(--panel-color);
   padding: 10px;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
   position: relative;
   width: 100%;
   box-sizing: border-box;
@@ -589,12 +591,12 @@ body.is-dragging, body.is-dragging * {
 
 .cell {
   background: var(--cell-color);
-  border-radius: 6px;
+  border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
   box-sizing: border-box;
   touch-action: none;
   aspect-ratio: 1 / 1;
@@ -753,7 +755,7 @@ body.is-dragging, body.is-dragging * {
   background: var(--badge-bg);
   color: var(--text-color-on-accent);
   padding: 1px 4px;
-  border-radius: 4px;
+  border-radius: 8px;
   pointer-events: none;
   font-weight: bold;
   z-index: 11;
@@ -795,7 +797,7 @@ body.is-dragging, body.is-dragging * {
   background: linear-gradient(135deg, #ffb703, #fb8500);
   color: #111;
   padding: 1px 4px;
-  border-radius: 4px;
+  border-radius: 8px;
   pointer-events: none;
   font-weight: 900;
   z-index: 11;
@@ -830,7 +832,7 @@ body.is-dragging, body.is-dragging * {
   background: var(--accent-color);
   color: #fff;
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: 6px;
   pointer-events: none;
   font-weight: bold;
   z-index: 11;
@@ -915,11 +917,11 @@ body.is-dragging, body.is-dragging * {
 .modal-content {
   background: var(--modal-bg);
   border-top: 3px solid var(--accent-color);
-  border-radius: 16px 16px 0 0;
+  border-radius: 24px 24px 0 0;
   width: 100%;
   max-width: 500px;
   padding: 12px 16px 20px 16px;
-  box-shadow: 0 -8px 35px rgba(0,0,0,0.8);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
   position: relative;
   box-sizing: border-box;
   pointer-events: auto;
@@ -934,7 +936,7 @@ body.is-dragging, body.is-dragging * {
 
 .modal-overlay.active .modal-content { transform: translateY(0); }
 .modal-close { position: absolute; top: 8px; right: 14px; font-size: 1.3rem; color: var(--text-color-light); cursor: pointer; line-height: 1; }
-.modal-icon { background: var(--button-bg); width: 50px; height: 50px; display: flex; justify-content: center; border-radius: 10px; align-items: center; }
+.modal-icon { background: var(--button-bg); width: 50px; height: 50px; display: flex; justify-content: center; border-radius: 14px; align-items: center; }
 
 .modal-icon img {
   width: 2.5rem;
@@ -970,9 +972,9 @@ body.is-dragging, body.is-dragging * {
 .modal-title { font-size: 1rem; font-weight: bold; color: var(--text-color); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .modal-subtitle { font-size: 0.7rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; }
 .modal-desc {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-color-light);
-  line-height: 1.25;
+  line-height: 1.2;
   margin: 0;
   max-height: 150px; /* Увеличиваем высоту для цепочек предметов */
   overflow-y: auto;   /* Добавляем скролл, если текст не помещается */
@@ -995,7 +997,7 @@ body.is-dragging, body.is-dragging * {
   width: 40px;
   height: 40px;
   background-color: var(--cell-color);
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1086,7 +1088,7 @@ body.is-dragging, body.is-dragging * {
   background: var(--success-color);
   border: none;
   color: var(--text-color-on-accent);
-  padding: 10px;
+  padding: 12px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
@@ -1109,7 +1111,7 @@ body.is-dragging, body.is-dragging * {
   border: none;
   color: var(--text-color-on-accent);
   padding: 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -1121,7 +1123,7 @@ body.is-dragging, body.is-dragging * {
   border: none;
   color: var(--text-color);
   padding: 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -1134,12 +1136,12 @@ body.is-dragging, body.is-dragging * {
 
 .menu-modal-content {
   background: var(--modal-bg);
-  border-radius: 16px;
+  border-radius: 24px;
   border-top: 3px solid var(--energy-color);
   width: 90%;
   max-width: 350px;
   padding: 16px 20px 24px;
-  box-shadow: 0 0 25px rgba(255, 183, 3, 0.25), 0 8px 35px rgba(0,0,0,0.8);
+  box-shadow: 0 0 30px rgba(255, 183, 3, 0.2), 0 10px 40px rgba(0,0,0,0.3);
   position: relative;
   box-sizing: border-box;
   transform: scale(0.9);
@@ -1177,7 +1179,7 @@ body.is-dragging, body.is-dragging * {
   border: 1px solid var(--border-color);
   color: var(--text-color);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: bold;
   cursor: pointer;
   text-align: left;
@@ -1234,10 +1236,10 @@ body.is-dragging, body.is-dragging * {
 .detail-modal-content {
   background: var(--modal-bg);
   border-top: 3px solid var(--accent-color);
-  border-radius: 16px 16px 0 0;
+  border-radius: 24px 24px 0 0;
   width: 100%;
   max-width: 500px;
-  box-shadow: 0 -8px 35px rgba(0,0,0,0.8);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
   box-sizing: border-box;
   pointer-events: auto;
   transform: translateY(100%);
@@ -1555,8 +1557,8 @@ body.is-dragging, body.is-dragging * {
   max-height: none; /* Убираем ограничение по высоте */
   padding-right: 0;
   margin-bottom: 20px;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 0.85rem;
+  line-height: 1.35;
 }
 
 .detail-modal-body .progression-container {
@@ -1597,7 +1599,7 @@ body.is-dragging, body.is-dragging * {
   border: none;
   border-bottom: 2px solid transparent;
   padding: 5px;
-  border-radius: 4px;
+  border-radius: 8px;
   transition: border-color 0.2s, background-color 0.2s;
   flex: 1;
 }
@@ -1620,7 +1622,7 @@ body.is-dragging, body.is-dragging * {
   align-items: center;
   background: var(--button-bg);
   padding: 10px 15px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 0.9rem;
 }
 
@@ -1657,7 +1659,7 @@ body.is-dragging, body.is-dragging * {
 /* --- Achievements Modal --- */
 .achievement-item {
   background: var(--button-bg);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 12px;
   margin-bottom: 12px;
   display: flex;
@@ -1678,7 +1680,7 @@ body.is-dragging, body.is-dragging * {
   align-items: center;
   justify-content: center;
   background: var(--panel-color);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .achievement-details {
@@ -1745,7 +1747,7 @@ body.is-dragging, body.is-dragging * {
   background: var(--energy-color);
   color: #111;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 12px;
   font-weight: bold;
   font-size: 0.8rem;
@@ -1986,8 +1988,8 @@ input[type="range"]::-moz-range-thumb {
 
 .story-text-bubble p {
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 0.85rem;
+  line-height: 1.35;
   color: var(--text-color-light);
 }
 
@@ -1997,7 +1999,7 @@ input[type="range"]::-moz-range-thumb {
   gap: 15px;
   background: var(--button-bg);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 12px;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -2031,8 +2033,8 @@ input[type="range"]::-moz-range-thumb {
 /* --- Tutorial Modal --- */
 #tutorial-modal .detail-modal-body {
   text-align: left;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .tutorial-section {
