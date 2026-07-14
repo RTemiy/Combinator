@@ -175,7 +175,7 @@ export function advanceStoryStep(fromModal = false) {
     const step = chapter.steps[progress.currentStep];
     if (!step) return;
 
-    // Обработка выполнения задаче
+    // Обработка выполнения задачb
     if (step.type === 'task') {
         if (step.task.type === 'spend_coins') {
             if (gameState.coins < step.task.amount) {
