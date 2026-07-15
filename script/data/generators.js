@@ -1,10 +1,12 @@
 export const GENERATORS_DATA = {
   'flowers': {
-    name: 'Кашпо с землей', desc: 'Простое кашпо, наполненное плодородной землей. Идеальная основа для будущих растений.', categories: ['flowers'],
-    partIcons: [
-      'assets/icons/categories/flowers/part_lvl_01.png',
-      'assets/icons/categories/flowers/part_lvl_02.png',
-      'assets/icons/categories/flowers/part_lvl_03.png',
+    name: 'Кашпо с землей',
+    desc: 'Простое кашпо, наполненное плодородной землей. Идеальная основа для будущих растений.',
+    categories: ['flowers'],
+    parts: [
+      { name: 'Земля', desc: 'Горсть плодородной земли, основа для любого растения.', icon: 'assets/icons/categories/flowers/part_lvl_01.png' },
+      { name: 'Маленькое кашпо с землей', desc: 'Простое кашпо с землей, готовое принять первые семена.', icon: 'assets/icons/categories/flowers/part_lvl_02.png' },
+      { name: 'Кашпо с удобренной землей', desc: 'Земля в этом кашпо обогащена питательными веществами для бурного роста.', icon: 'assets/icons/categories/flowers/part_lvl_03.png' }
     ],
     icons: [
       'assets/icons/categories/flowers/generator_lvl_01.png',
@@ -15,11 +17,13 @@ export const GENERATORS_DATA = {
     ]
   },
   'coffee': {
-    name: 'Кофейник', desc: 'Источник ароматного кофе. Чем выше уровень, тем сложнее и изысканнее напитки он может приготовить.', categories: ['coffee'],
-    partIcons: [
-      'assets/icons/categories/coffee/part_lvl_01.png',
-      'assets/icons/categories/coffee/part_lvl_02.png',
-      'assets/icons/categories/coffee/part_lvl_03.png',
+    name: 'Кофейник',
+    desc: 'Источник ароматного кофе. Чем выше уровень, тем сложнее и изысканнее напитки он может приготовить.',
+    categories: ['coffee'],
+    parts: [
+      { name: 'Турка', desc: 'Классическая турка для варки насыщенного и ароматного кофе.', icon: 'assets/icons/categories/coffee/part_lvl_01.png' },
+      { name: 'Кофемолка', desc: 'Ручная кофемолка, чтобы раскрыть весь аромат свежемолотых зерен.', icon: 'assets/icons/categories/coffee/part_lvl_02.png' },
+      { name: 'Кофемолка и питчер', desc: 'Набор бариста: кофемолка и питчер для взбивания идеальной молочной пенки.', icon: 'assets/icons/categories/coffee/part_lvl_03.png' }
     ],
     icons: [
       'assets/icons/categories/coffee/generator_lvl_01.png',
@@ -30,11 +34,14 @@ export const GENERATORS_DATA = {
     ]
   },
   'stationery': {
-    name: 'Коробка с канцелярией', desc: 'Коробка, полная полезных вещей для учебы и творчества. От скрепки до всяких бумажек.', categories: ['books', 'stationery'], isHybrid: true,
-    partIcons: [
-      'assets/icons/categories/writings/part_lvl_01.png',
-      'assets/icons/categories/writings/part_lvl_02.png',
-      'assets/icons/categories/writings/part_lvl_03.png',
+    name: 'Коробка с канцелярией',
+    desc: 'Коробка, полная полезных вещей для учебы и творчества. От скрепки до всяких бумажек.',
+    categories: ['books', 'stationery'],
+    isHybrid: true,
+    parts: [
+      { name: 'Карандаши и ручки', desc: 'Базовый набор для письма и рисования. С чего-то нужно начинать.', icon: 'assets/icons/categories/writings/part_lvl_01.png' },
+      { name: 'Карандаши, ручки, ластики и резинки', desc: 'Расширенный набор канцелярских принадлежностей. Теперь можно и ошибки исправлять.', icon: 'assets/icons/categories/writings/part_lvl_02.png' },
+      { name: 'Канцелярский хлам', desc: 'Целая гора всего необходимого для учебы и творчества. Пора наводить порядок!', icon: 'assets/icons/categories/writings/part_lvl_03.png' }
     ],
     icons: [
       'assets/icons/categories/writings/generator_lvl_01.png',
@@ -45,11 +52,14 @@ export const GENERATORS_DATA = {
     ]
   },
   'bakery': {
-    name: 'Планетарный миксер', desc: 'Мощный помощник для смешивания ингредиентов. Создает основу для выпечки и кондитерских изделий.', categories: ['bakery', 'pastry'], isHybrid: true,
-    partIcons: [
-      'assets/icons/categories/dough/part_lvl_01.png',
-      'assets/icons/categories/dough/part_lvl_02.png',
-      'assets/icons/categories/dough/part_lvl_03.png',
+    name: 'Планетарный миксер',
+    desc: 'Мощный помощник для смешивания ингредиентов. Создает основу для выпечки и кондитерских изделий.',
+    categories: ['bakery', 'pastry'],
+    isHybrid: true,
+    parts: [
+      { name: 'Вилка', desc: 'Простая вилка. Можно взбить яйцо, но для серьезной выпечки этого маловато.', icon: 'assets/icons/categories/dough/part_lvl_01.png' },
+      { name: 'Венчик для взбивания', desc: 'Ручной венчик для создания воздушных кремов и легкого теста.', icon: 'assets/icons/categories/dough/part_lvl_02.png' },
+      { name: 'Кухонный миксер', desc: 'Надежный ручной миксер, который значительно ускоряет процесс готовки.', icon: 'assets/icons/categories/dough/part_lvl_03.png' }
     ],
     icons: [
       'assets/icons/categories/dough/generator_lvl_01.png',
@@ -59,24 +69,25 @@ export const GENERATORS_DATA = {
       'assets/icons/categories/dough/generator_lvl_02.png',
     ]
   },
-  /*'alchemy_lab': {
-    name: 'Алхимическая лаборатория',
-    desc: 'Место, где наука встречается с магией. Только для посвященных.',
-    categories: ['alchemy'],
+  'beehive': {
+    name: 'Улей',
+    desc: 'Маленький домик для пчёл, источник сладкого мёда и ароматного воска.',
+    categories: ['honey', 'wax'],
+    isHybrid: true,
     isStoryOnly: true,
-    partIcons: [
-      'assets/icons/categories/writings/part_lvl_01.png',
-      'assets/icons/categories/writings/part_lvl_02.png',
-      'assets/icons/categories/writings/part_lvl_03.png',
+    parts: [
+      { name: 'Пчелиная матка', desc: 'Сердце и душа любой пчелиной семьи. Без нее улей не построить.', icon: 'assets/icons/categories/honey/part_lvl_01.png' },
+      { name: 'Сота', desc: 'Идеальная восковая ячейка, готовая для хранения мёда или выращивания потомства.', icon: 'assets/icons/categories/honey/part_lvl_02.png' },
+      { name: 'Короб с сотами', desc: 'Целый корпус, заполненный сотами. Пчелиная семья будет рада такому жилищу.', icon: 'assets/icons/categories/honey/part_lvl_03.png' }
     ],
     icons: [
-      'assets/icons/categories/writings/generator_lvl_01.png',
-      'assets/icons/categories/writings/generator_lvl_02.png',
-      'assets/icons/categories/writings/generator_lvl_02.png',
-      'assets/icons/categories/writings/generator_lvl_02.png',
-      'assets/icons/categories/writings/generator_lvl_02.png',
+      'assets/icons/categories/honey/generator_lvl_01.png',
+      'assets/icons/categories/honey/generator_lvl_02.png',
+      'assets/icons/categories/honey/generator_lvl_02.png',
+      'assets/icons/categories/honey/generator_lvl_02.png',
+      'assets/icons/categories/honey/generator_lvl_02.png',
     ]
-  },*/
+  },
   'bonus_chest': {
     name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true,
     icons: [

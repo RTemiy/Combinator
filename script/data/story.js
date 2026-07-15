@@ -3,6 +3,7 @@ export const STORY_DATA = {
     id: 'gardener_arc',
     title: "Ветвь Садоводства",
     description: "Помогите местному садовнику вырастить редкое дерево и откройте для себя новую категорию предметов.",
+    requiredLevel: 1,
     icon: 'assets/icons/characters/gardener.png',
     chapters: {
       1: {
@@ -23,34 +24,11 @@ export const STORY_DATA = {
       }
     }
   },
-  'alchemist_arc': {
-    id: 'alchemist_arc',
-    title: "Путь Алхимика",
-    description: "Загадочный незнакомец предлагает вам приобщиться к древнему искусству. Готовы ли вы рискнуть?",
-    icon: 'assets/icons/characters/magician.png',
-    chapters: {
-      1: {
-        title: "Предложение Алхимика",
-        steps: [
-          { type: 'dialogue', character: 'assets/icons/characters/magician.png', name: 'Таинственный Алхимик', text: 'Я вижу в тебе потенциал, юный комбинатор. Твои таланты могут служить не только мирским делам, но и великому искусству... Алхимии.' },
-          { type: 'dialogue', character: 'assets/icons/characters/magician.png', name: 'Таинственный Алхимик', text: 'Я готов поделиться с тобой секретами своего ремесла и предоставить необходимое оборудование. Но знания и редкие компоненты стоят дорого. Это будет стоить тебе...' },
-          /*{
-            type: 'task',
-            character: 'assets/icons/characters/special_01.png',
-            name: 'Таинственный Алхимик',
-            text: 'Если ты готов встать на путь трансформации, вложись в это предприятие. Ты получишь доступ к моей лаборатории и сможешь создавать невиданные доселе предметы.',
-            task: { type: 'spend_coins', amount: 1500, buttonText: 'Купить лабораторию' },
-            reward: { type: 'generator', key: 'alchemy_lab', level: 1 }
-          },
-          { type: 'dialogue', character: 'assets/icons/characters/special_01.png', name: 'Таинственный Алхимик', text: 'Мудрое решение! Вот ключ от лаборатории. Помни, алхимия не терпит спешки. Изучай, сочетай и, возможно, однажды ты создашь Философский камень! Теперь категория "Алхимия" доступна для заказов.' },*/
-        ]
-      }
-    }
-  },
   'neighbor_arc': {
     id: 'neighbor_arc',
     title: "Соседские сплетни",
     description: "Познакомьтесь с вашей новой соседкой. Кто знает, к чему приведёт это знакомство?",
+    requiredLevel: 2,
     icon: 'assets/icons/characters/neighbor.png',
     chapters: {
       1: {
@@ -67,6 +45,46 @@ export const STORY_DATA = {
             reward: { type: 'generator', key: 'bonus_chest', level: 1 }
           },
           { type: 'dialogue', character: 'assets/icons/characters/neighbor.png', name: 'Соседка', text: 'Договорились! Я так рада! Не волнуйтесь, с пустыми руками я не приду. Захвачу для вас небольшой, но очень полезный подарочек в знак нашей дружбы. До вечера!' },
+        ]
+      },
+      2: {
+        title: "Щедрое предложение",
+        steps: [
+          { type: 'dialogue', character: 'assets/icons/characters/neighbor.png', name: 'Соседка', text: 'Снова здравствуйте! Наш прошлый ужин был просто восхитителен! Вы настоящий мастер своего дела.' },
+          { type: 'dialogue', character: 'assets/icons/characters/neighbor.png', name: 'Соседка', text: 'Знаете, я тут на одной ярмарке видела просто потрясающую вещь... Она идеально впишется в ваш магазинчик. Я могу ее достать, но мне снова нужна ваша помощь с финансами.' },
+          {
+            type: 'task',
+            character: 'assets/icons/characters/neighbor.png',
+            name: 'Соседка',
+            text: 'Это будет стоить немного дороже, около 1000 монет. Но поверьте, оно того стоит! Вы получите кое-что действительно редкое и полезное. Ну что, поможете старой знакомой?',
+            task: { type: 'spend_coins', amount: 1000, buttonText: 'Помочь соседке' },
+            reward: { type: 'generator', key: 'bonus_chest', level: 2 }
+          },
+          { type: 'dialogue', character: 'assets/icons/characters/neighbor.png', name: 'Соседка', text: 'Я знала, что на вас можно положиться! Вот, держите. Это улучшенная версия моего прошлого подарка. Уверена, вы найдете ему применение. Обращайтесь, если что!' },
+        ]
+      }
+    }
+  },  'beekeeper_arc': {
+    id: 'beekeeper_arc',
+    title: "Ветка Пчеловода",
+    description: "Помогите старому пчеловоду основать новую пасеку и получите в награду свой собственный улей.",
+    requiredLevel: 4,
+    icon: 'assets/icons/characters/beekeeper.png',
+    chapters: {
+      1: {
+        title: "Сладкое дело",
+        steps: [
+          { type: 'dialogue', character: 'assets/icons/characters/beekeeper.png', name: 'Пчеловод', text: 'Добрый день! Я вижу, у вас тут процветающий бизнес. А я вот всю жизнь пчёлами занимаюсь. Душа поёт, когда они жужжат.' },
+          { type: 'dialogue', character: 'assets/icons/characters/beekeeper.png', name: 'Пчеловод', text: 'Хочу расширить свою пасеку, да вот средств не хватает на закупку нового оборудования и хорошей матки. Не хотите ли стать моим партнёром в этом сладком деле?' },
+          {
+            type: 'task',
+            character: 'assets/icons/characters/beekeeper.png',
+            name: 'Пчеловод',
+            text: 'Нужно всего 1750 монет. За это я не только пасеку расширю, но и вам один из своих лучших ульев отдам. Он будет давать вам и мёд, и воск. Что скажете?',
+            task: { type: 'spend_coins', amount: 1750, buttonText: 'Вложиться в пасеку' },
+            reward: { type: 'generator', key: 'beehive', level: 1 }
+          },
+          { type: 'dialogue', character: 'assets/icons/characters/beekeeper.png', name: 'Пчеловод', text: 'Вот это по-нашему! Спасибо за помощь! Держите обещанный улей. Ухаживайте за ним, и он вас щедро отблагодарит. Теперь можете ждать заказы на мёд и свечи!' },
         ]
       }
     }

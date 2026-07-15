@@ -97,6 +97,34 @@ export const CATEGORIES_CONFIG = {
       { level: 6, icon: 'assets/icons/categories/candies/eclairs.png', name: 'Упаковка эклеров', desc: 'Набор изысканных заварных пирожных с нежным кремом.' },
       { level: 7, icon: 'assets/icons/categories/candies/bento_cake.png', name: 'Бенто-торт', desc: 'Миниатюрный торт в коробочке, модный и вкусный десерт.' },
     ]
+  },
+  honey: {
+    name: 'Мёд',
+    color: '#ffb703',
+    generatorKey: 'beehive',
+    items: [
+      { level: 1, icon: 'assets/icons/categories/honey/nectar.png', name: 'Цветочный нектар', desc: 'Сладкая жидкость, собранная пчелами. Основа будущего мёда.' },
+      { level: 2, icon: 'assets/icons/categories/honey/honey_cell.png', name: 'Ячейка сот', desc: 'Одна восковая ячейка, доверху наполненная свежим мёдом.' },
+      { level: 3, icon: 'assets/icons/categories/honey/honeycomb.png', name: 'Кусочек сот', desc: 'Ароматный кусочек сот. Можно жевать прямо так!' },
+      { level: 4, icon: 'assets/icons/categories/honey/honey_jar.png', name: 'Баночка жидкого мёда', desc: 'Классический цветочный мёд, прозрачный и тягучий.' },
+      { level: 5, icon: 'assets/icons/categories/honey/creamed_honey.png', name: 'Крем-мёд', desc: 'Нежный взбитый мёд, который тает во рту. Идеально для тостов.' },
+      { level: 6, icon: 'assets/icons/categories/honey/honey_with_nuts.png', name: 'Мёд с орехами', desc: 'Питательное лакомство: отборные орехи в цветочном мёде.' },
+      { level: 7, icon: 'assets/icons/categories/honey/honey_barrel.png', name: 'Бочонок выдержанного мёда', desc: 'Большой бочонок редкого, выдержанного годами мёда. Настоящее сокровище.' },
+    ]
+  },
+  wax: {
+    name: 'Воск',
+    color: '#fca311',
+    generatorKey: 'beehive',
+    items: [
+      { level: 1, icon: 'assets/icons/categories/wax/propolis.png', name: 'Пчелиный клей (Прополис)', desc: 'Клейкое смолистое вещество, которое пчелы используют для дезинфекции улья.' },
+      { level: 2, icon: 'assets/icons/categories/wax/wax_piece.png', name: 'Кусочек воска', desc: 'Небольшой комочек натурального пчелиного воска.' },
+      { level: 3, icon: 'assets/icons/categories/wax/wax_sheet.png', name: 'Лист вощины', desc: 'Тонкий рифленый лист воска, основа для сот и свечей.' },
+      { level: 4, icon: 'assets/icons/categories/wax/wax_candle.png', name: 'Свеча из вощины', desc: 'Скрученная вручную свеча с приятным медовым ароматом.' },
+      { level: 5, icon: 'assets/icons/categories/wax/shaped_candle.png', name: 'Фигурная свеча', desc: 'Восковая свеча в форме цветка.' },
+      { level: 6, icon: 'assets/icons/categories/wax/sachet.png', name: 'Флорентийское саше', desc: 'Ароматная восковая плитка с сухоцветами и эфирными маслами для ароматизации белья или небольших помещений.' },
+      { level: 7, icon: 'assets/icons/categories/wax/candle_set.png', name: 'Набор свечей', desc: 'Коллекция декоративных свечей для уюта в доме.' },
+    ]
   }
   /* Заготовка
   candies: {

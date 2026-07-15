@@ -9,7 +9,8 @@ import {
   getItemType,
   hasUnclaimedAchievements,
   hasUnclaimedCollectionBonuses,
-  generateOrder
+  generateOrder,
+  getCurrentPlayerLevel
 } from './gameLogic.js';
 import { renderProfile, renderSettingsModal, renderAchievementsModal, renderCollectionModal } from './ui.js';
 import { saveGame, startNewGame } from './gameManager.js';
@@ -23,22 +24,40 @@ export function openStorySelectionModal() {
 
   const modal = DOMElements.storySelectionModal;
   let contentHTML = '';
+  const playerLevel = getCurrentPlayerLevel();
 
   for (const storyId in STORY_DATA) {
     const story = STORY_DATA[storyId];
-    const progress = gameState.storyState.progress[storyId] || { currentChapter: 1, currentStep: 0, completed: false };
-    const status = progress.completed ? 'Завершено' : 'В процессе';
+    const isLocked = story.requiredLevel && playerLevel < story.requiredLevel;
 
-    contentHTML += `
-      <div class="story-selection-card" data-story-id="${story.id}">
-        <img src="${story.icon}" class="story-selection-icon" alt="${story.title}">
-        <div class="story-selection-info">
-          <h4>${story.title}</h4>
-          <p>${story.description}</p>
-          <span class="story-status ${progress.completed ? 'completed' : ''}">${status}</span>
+    if (isLocked) {
+      contentHTML += `
+        <div class="story-selection-card locked">
+          <img src="${story.icon}" class="story-selection-icon" alt="${story.title}">
+          <div class="story-selection-info">
+            <h4>${story.title}</h4>
+            <p>${story.description}</p>
+            <div class="story-lock-reason">
+              <img src="assets/icons/lock.png" alt="Замок">
+              <span>Доступно с ${story.requiredLevel} уровня</span>
+            </div>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    } else {
+      const progress = gameState.storyState.progress[storyId] || { currentChapter: 1, currentStep: 0, completed: false };
+      const status = progress.completed ? 'Завершено' : 'Продолжить';
+      contentHTML += `
+        <div class="story-selection-card" data-story-id="${story.id}">
+          <img src="${story.icon}" class="story-selection-icon" alt="${story.title}">
+          <div class="story-selection-info">
+            <h4>${story.title}</h4>
+            <p>${story.description}</p>
+            <span class="story-status ${progress.completed ? 'completed' : ''}">${status}</span>
+          </div>
+        </div>
+      `;
+    }
   }
 
   modal.body.innerHTML = contentHTML;
@@ -431,14 +450,14 @@ function getBoosterModalOptions(item) {
 function getGeneratorPartModalOptions(item, index) {
   const genInfo = GENERATORS_DATA[item.generatorKey];
   const lvl = item.level || 1;
-  const iconPath = genInfo.partIcons[lvl - 1];
+  const partInfo = genInfo.parts[lvl - 1];
   const sellPrice = (item.level || 1) * 3;
 
   return {
-    icon: iconPath,
-    title: `Деталь для "${genInfo.name}"`,
+    icon: partInfo.icon,
+    title: partInfo.name,
     subtitle: `Деталь для сборки • Уровень ${item.level}`,
-    desc: 'Часть будущего генератора. Объединяйте с такими же деталями. ',
+    desc: partInfo.desc,
     dangerButtons: {
       confirmButtonText: `Продать (+${sellPrice}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
       onConfirm: () => deleteItem(index)
@@ -674,16 +693,16 @@ export function showGeneratorPartDetailModal(item) {
   const modal = DOMElements.detailModal;
   const genInfo = GENERATORS_DATA[item.generatorKey];
   const lvl = item.level || 1;
-  const iconPath = genInfo.partIcons[lvl - 1];
+  const partInfo = genInfo.parts[lvl - 1];
   
   // Setup modal shell
-  modal.icon.innerHTML = `<img src="${iconPath}" alt="Деталь для ${genInfo.name}">`;
-  modal.title.innerText = `Сборка: ${genInfo.name}`;
+  modal.icon.innerHTML = `<img src="${partInfo.icon}" alt="${partInfo.name}">`;
+  modal.title.innerText = `${partInfo.name} (Ур. ${lvl})`;
   modal.desc.style.display = 'block';
   modal.icon.style.display = 'flex';
 
   // Description
-  modal.desc.innerHTML = `<p class="modal-desc">Объединяйте детали, чтобы собрать полноценный генератор. Две детали 3-го уровня создают генератор 1-го уровня.</p>`;
+  modal.desc.innerHTML = `<p class="modal-desc">${partInfo.desc}</p>`;
 
   // Progression chain
   let progressionHTML = '';
@@ -691,11 +710,11 @@ export function showGeneratorPartDetailModal(item) {
   progressionHTML += `<div class="progression-container">`;
 
   const partHTML = (level) => {
-    const currentPartIconPath = genInfo.partIcons[level - 1];
+    const currentPartInfo = genInfo.parts[level - 1];
     return `
-        <div class="progression-item-square" title="Деталь, Ур. ${level}">
+        <div class="progression-item-square" title="${currentPartInfo.name}, Ур. ${level}">
             <div class="progression-item-icon">
-                <img src="${currentPartIconPath}" alt="Деталь для ${genInfo.name}">
+                <img src="${currentPartInfo.icon}" alt="${currentPartInfo.name}">
             </div>
             <div class="progression-item-level">${level}</div>
         </div>

@@ -140,11 +140,17 @@ export function hasUnclaimedAchievements() {
 }
 
 export function hasNewStoryUpdate() {
-    if (!gameState.storyState.unlocked) return false;
+    /*if (!gameState.storyState.unlocked) return false;
+    const playerLevel = getCurrentPlayerLevel();
 
     for (const storyId in STORY_DATA) {
         const story = STORY_DATA[storyId];
         const progress = gameState.storyState.progress[storyId] || { currentChapter: 1, currentStep: 0, completed: false };
+
+        // Пропускаем сюжет, если уровень игрока недостаточен
+        if (story.requiredLevel && playerLevel < story.requiredLevel) {
+            continue;
+        }
 
         if (progress.completed) continue;
 
@@ -152,7 +158,7 @@ export function hasNewStoryUpdate() {
         if (chapter && chapter.steps[progress.currentStep]) {
             return true; // Найдена доступная для продолжения история
         }
-    }
+    }*/
     return false;
 }
 
@@ -271,8 +277,8 @@ export function claimReward(rewardIndex, startElement) {
     else if (reward.isGeneratorPart) {
         const genInfo = GENERATORS_DATA[reward.generatorKey];
         const lvl = reward.level || 1;
-        const iconPath = genInfo.partIcons[lvl - 1];
-        icon = `<img src="${iconPath}" alt="">`;
+        const partInfo = genInfo.parts[lvl - 1];
+        icon = `<img src="${partInfo.icon}" alt="">`;
     } else if (reward.category && reward.level) {
         // Обычный предмет из категории
         const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];

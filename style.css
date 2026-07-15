@@ -2062,6 +2062,49 @@ input[type="range"]::-moz-range-thumb {
   color: var(--text-color-light);
 }
 
+.story-selection-card.locked {
+  cursor: not-allowed;
+  opacity: 0.6;
+  filter: grayscale(50%);
+}
+
+.story-selection-card.locked:hover {
+  background-color: var(--button-bg); /* Отключаем эффект наведения */
+}
+
+.story-lock-reason {
+  display: inline-flex; /* Чтобы блок был по размеру контента */
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--text-color);
+  background: rgba(0,0,0,0.2);
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.story-lock-reason img {
+  width: 16px;
+  height: 16px;
+}
+
+.story-status {
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--button-hover-bg);
+  color: var(--text-color-light);
+  display: inline-block;
+}
+
+.story-status.completed {
+  background: var(--success-color);
+  color: var(--text-color-on-accent);
+}
+
 
 /* --- Tutorial Modal --- */
 #tutorial-modal .detail-modal-body {

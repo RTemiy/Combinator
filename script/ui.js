@@ -106,8 +106,9 @@ export function renderRewardQueue() {
     } else if (reward.isGeneratorPart) {
         const genInfo = GENERATORS_DATA[reward.generatorKey];
         const lvl = reward.level || 1;
-        iconHTML = `<img src="${genInfo.partIcons[lvl - 1]}" alt="Деталь" style="width: 2.5rem; height: 2.5rem;">`;
-        title = `Забрать: Деталь для "${genInfo.name}"`;
+        const partInfo = genInfo.parts[lvl - 1];
+        iconHTML = `<img src="${partInfo.icon}" alt="${partInfo.name}" style="width: 2.5rem; height: 2.5rem;">`;
+        title = `Забрать: ${partInfo.name}`;
     } else if (reward.isUpgradePart) {
         iconHTML = `<img src="assets/icons/upgrade_part.png" alt="Новая деталь" style="width: 1.5rem; height: 1.5rem;">`;
         title = 'Забрать: Новая деталь';
@@ -422,8 +423,8 @@ export function renderGrid() {
       } else if (item.isGeneratorPart) {
         const genInfo = GENERATORS_DATA[item.generatorKey];
         const lvl = item.level || 1;
-        const iconPath = genInfo.partIcons[lvl - 1];
-        wrapper.innerHTML = `<img src="${iconPath}" alt="Деталь для ${genInfo.name}">`;
+        const partInfo = genInfo.parts[lvl - 1];
+        wrapper.innerHTML = `<img src="${partInfo.icon}" alt="${partInfo.name}">`;
 
         const levelBadge = document.createElement('span');
         levelBadge.classList.add('item-level');
