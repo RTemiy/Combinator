@@ -634,25 +634,11 @@ function handleSwap(fromIdx, toIdx, source, target) {
 const MERGE_HANDLERS = [
   // Слияние с заблокированным предметом
   {
-    canHandle: (s, t) => !s.isBlocked && t?.isBlocked && !s.isGenerator && !s.isItemGenerator && s.category === t.category && s.level === t.level,
+    canHandle: (s, t) => !s.isBlocked && t?.isBlocked && !s.isGenerator && !s.isItemGenerator && s.category === t.category && s.level === t.level && s.level < CONFIG.MAX_ITEM_LEVEL,
     execute: (from, to, src) => handleUnblockMerge(from, to, src)
   },
-  // Улучшение генератора деталью (в обе стороны)
   {
-    canHandle: (s, t) => s.isUpgradePart && t?.isGenerator && t.generatorKey !== 'bonus_chest',
-    execute: (from, to, src, trg) => handleGeneratorUpgrade(from, to, trg)
-  },
-  {
-    canHandle: (s, t) => t?.isUpgradePart && s.isGenerator && s.generatorKey !== 'bonus_chest',
-    execute: (from, to, src, trg) => handleGeneratorUpgrade(to, from, src)
-  },
-  // Улучшение предмета магическим инструментом (в обе стороны)
-  {
-    canHandle: (s, t) => s.isMagicTool && t && !t.isGenerator && !t.isBlocked && !t.isUpgradePart && !t.isMagicTool && !t.isGeneratorPart,
-    execute: (from, to, src, trg) => handleItemUpgradeWithTool(from, to, trg)
-  },
-  {
-    canHandle: (s, t) => t?.isMagicTool && s && !s.isGenerator && !s.isBlocked && !s.isUpgradePart && !s.isMagicTool && !s.isGeneratorPart,
+    canHandle: (s, t) => t?.isMagicTool && s && !s.isGenerator && !s.isBlocked && !s.isUpgradePart && !s.isMagicTool && !s.isGeneratorPart && s.level < CONFIG.MAX_ITEM_LEVEL,
     execute: (from, to, src, trg) => handleItemUpgradeWithTool(to, from, src)
   },
   // Слияние двух деталей генератора
@@ -662,12 +648,35 @@ const MERGE_HANDLERS = [
   },
   // Слияние двух генераторов
   {
-    canHandle: (s, t) => t && s.isGenerator && t.isGenerator && s.generatorKey === t.generatorKey && s.genLevel === t.genLevel,
+    canHandle: (s, t) => {
+      if (!t || !s.isGenerator || !t.isGenerator || s.generatorKey !== t.generatorKey || s.genLevel !== t.genLevel) {
+        return false;
+      }
+      // Now check if they are mergeable based on level
+      if (s.generatorKey === 'bonus_chest') {
+        return s.genLevel === 1; // Only level 1 bonus chests can be merged
+      }
+      return (s.genLevel || 1) < CONFIG.MAX_GENERATOR_LEVEL;
+    },
     execute: (from, to, src) => handleGeneratorMerge(from, to, src)
+  },
+  // Улучшение генератора деталью (в обе стороны)
+  {
+    canHandle: (s, t) => s.isUpgradePart && t?.isGenerator && t.generatorKey !== 'bonus_chest' && (t.genLevel || 1) < CONFIG.MAX_GENERATOR_LEVEL,
+    execute: (from, to, src, trg) => handleGeneratorUpgrade(from, to, trg)
+  },
+  {
+    canHandle: (s, t) => t?.isUpgradePart && s.isGenerator && s.generatorKey !== 'bonus_chest' && (s.genLevel || 1) < CONFIG.MAX_GENERATOR_LEVEL,
+    execute: (from, to, src, trg) => handleGeneratorUpgrade(to, from, src)
+  },
+  // Улучшение предмета магическим инструментом (в обе стороны)
+  {
+    canHandle: (s, t) => s.isMagicTool && t && !t.isGenerator && !t.isBlocked && !t.isUpgradePart && !t.isMagicTool && !t.isGeneratorPart && t.level < CONFIG.MAX_ITEM_LEVEL,
+    execute: (from, to, src, trg) => handleItemUpgradeWithTool(from, to, trg)
   },
   // Слияние двух обычных предметов (включая предметы-генераторы)
   {
-    canHandle: (s, t) => t && !s.isBlocked && !t.isBlocked && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && !s.isMagicTool && !t.isMagicTool && s.category === t.category && s.level === t.level,
+    canHandle: (s, t) => t && !s.isBlocked && !t.isBlocked && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && !s.isMagicTool && !t.isMagicTool && s.category === t.category && s.level === t.level && s.level < CONFIG.MAX_ITEM_LEVEL,
     execute: (from, to, src) => handleItemMerge(from, to, src)
   },
 ];
