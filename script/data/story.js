@@ -68,7 +68,7 @@ export const STORY_DATA = {
     id: 'beekeeper_arc',
     title: "Ветка Пчеловода",
     description: "Помогите старому пчеловоду основать новую пасеку и получите в награду свой собственный улей.",
-    requiredLevel: 4,
+    requiredLevel: 3,
     icon: 'assets/icons/characters/beekeeper.png',
     chapters: {
       1: {
