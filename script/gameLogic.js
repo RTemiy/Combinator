@@ -1391,3 +1391,25 @@ export function findMergeablePair() {
 
     return null; // No mergeable pair found
 }
+
+// --- DEBUG FUNCTIONS ---
+// This function will be available in the browser console for development purposes.
+function dev_addCoins(amount = 100000) {
+    if (typeof amount !== 'number' || amount <= 0) {
+        console.error("Please provide a positive number of coins to add.");
+        return;
+    }
+    gameState.coins += amount;
+    showToast(`✨ Добавлено ${amount.toLocaleString('ru-RU')} монет!`, 'success');
+    updateUI();
+    saveGame();
+}
+
+// Expose to console for debugging
+window.dev_addCoins = dev_addCoins;
+const levelContainerForCheat = document.querySelector('.menu-modal-title');
+if (levelContainerForCheat) {
+  levelContainerForCheat.addEventListener('click', () => {
+    dev_addCoins(100000);
+  });
+}
