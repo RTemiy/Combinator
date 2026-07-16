@@ -457,7 +457,7 @@ function getGeneratorPartModalOptions(item, index) {
     icon: partInfo.icon,
     title: partInfo.name,
     subtitle: `Деталь для сборки • Уровень ${item.level}`,
-    desc: partInfo.desc,
+    desc: 'Часть для сборки нового генератора.',
     dangerButtons: {
       confirmButtonText: `Продать (+${sellPrice}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
       onConfirm: () => deleteItem(index)

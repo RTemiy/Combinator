@@ -155,7 +155,7 @@ export function loadGame() {
     const loadedSettings = loaded.settings || {};
     gameSettings.musicVolume = loadedSettings.musicVolume !== undefined ? loadedSettings.musicVolume : 0.2;
     gameSettings.sfxVolume = loadedSettings.sfxVolume !== undefined ? loadedSettings.sfxVolume : 0.5;
-    gameSettings.theme = loadedSettings.theme || 'dark';
+    gameSettings.theme = loadedSettings.theme || 'light';
 
     const loadedProfile = loaded.profile || {};
     playerProfile.name = loadedProfile.name || 'Игрок';
@@ -211,11 +211,11 @@ export function startNewGame() {
   // Reset settings
   gameSettings.musicVolume = 0.2;
   gameSettings.sfxVolume = 0.5;
-  gameSettings.theme = 'dark';
+  gameSettings.theme = 'light';
   DOMElements.bgMusic.volume = gameSettings.musicVolume;
 
   // Сброс профиля
-  playerProfile.name = 'Игрок';
+  playerProfile.name = 'Ваше имя';
   playerProfile.icon = 'assets/icons/profile.png';
   playerProfile.startDate = Date.now();
   playerProfile.timePlayed = 0;

@@ -1062,10 +1062,10 @@ body.is-dragging, body.is-dragging * {
   font-size: 0.6rem;
   font-weight: bold;
   background: rgba(0,0,0,0.7);
-  color: var(--coin-color);
+  color: var(--text-color-on-accent); /* Более нейтральный цвет текста */
   padding: 1px 3px;
   border-radius: 3px;
-  animation: star-pulse 2s infinite;
+  /* animation: star-pulse 2s infinite; */ /* Убрана анимация для более нейтрального вида */
 }
 
 .unclaimed-bonus-icon.exploding {

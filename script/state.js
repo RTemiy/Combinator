@@ -35,12 +35,12 @@ export const gameState = {
 export const gameSettings = {
   musicVolume: 0.2,
   sfxVolume: 0.5,
-  theme: 'dark',
+  theme: 'light',
 };
 
 export const playerProfile = {
-  name: 'Игрок12345',
-  icon: '👤',
+  name: 'Ваше имя',
+  icon: 'assets/icons/profile.png',
   startDate: Date.now(),
   timePlayed: 0, // в миллисекундах
   totalMerges: 0,

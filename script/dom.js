@@ -97,6 +97,7 @@ export const DOMElements = {
   sfxCoin: document.getElementById('sfx-coin'),
   sfxDragStart: document.getElementById('sfx-drag-start'),
   sfxOrderReady: document.getElementById('sfx-order-ready'),
+  sfxFly: document.getElementById('sfx-fly'),
   // Добавьте новый объект для модального окна сюжета
   storyModal: {
     overlay: document.getElementById('story-modal'),
