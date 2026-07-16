@@ -35,6 +35,7 @@ import {
   triggerItemGenerator,
   claimReward
 } from './gameLogic.js';
+import * as haptics from './haptics.js';
 import { playSound } from './audio.js';
 import { renderGrid } from './ui.js';
 
@@ -197,6 +198,7 @@ export function addListeners() {
 
 function startDrag(e, index) {
   if (gameState.lockedCells.includes(index) || !gameState.gridData[index] || gameState.dragState.isDragging) return;
+  haptics.hapticLight();
 
   gameState.dragState.isDragging = true; // Блокировка
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -310,6 +312,7 @@ function endDrag(clientX, clientY) {
                         !isActionPossible(startIndex, dragTargetIndex);
 
   if (isInvalidDrop) {
+    haptics.hapticError();
     // Анимируем "призрак" обратно на исходную позицию
     const originalCell = DOMElements.grid.children[startIndex];
     const rect = originalCell.getBoundingClientRect();

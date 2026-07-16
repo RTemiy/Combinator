@@ -36,6 +36,7 @@ export const gameSettings = {
   musicVolume: 0.2,
   sfxVolume: 0.5,
   theme: 'light',
+  hapticsEnabled: true
 };
 
 export const playerProfile = {

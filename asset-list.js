@@ -165,6 +165,7 @@ const URLS_TO_CACHE = [
   "script/gameLogic.js",
   "script/gameManager.js",
   "script/modals.js",
+  "script/haptics.js",
   "script/script.js",
   "script/state.js",
   "script/ui.js",

@@ -12,6 +12,7 @@ import {
 } from './gameLogic.js';
 import { saveGame } from './gameManager.js';
 import { playSound } from './audio.js';
+import { hapticLight } from './haptics.js';
 
 export function applyTheme() {
   document.body.dataset.theme = gameSettings.theme;
@@ -620,6 +621,15 @@ export function renderSettingsModal() {
       </div>
     </div>
     <div class="settings-item">
+      <label for="haptics-toggle" class="settings-label">Вибрация</label>
+      <div class="settings-control">
+        <label class="switch">
+          <input type="checkbox" id="haptics-toggle" ${gameSettings.hapticsEnabled ? 'checked' : ''}>
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+    <div class="settings-item">
       <label for="theme-switch" class="settings-label">Светлая тема</label>
       <div class="settings-control">
         <label class="switch">
@@ -628,7 +638,6 @@ export function renderSettingsModal() {
         </label>
       </div>
     </div>
-    <!-- Future settings can go here -->
   `;
 
   const musicSlider = body.querySelector('#music-volume-slider');
@@ -667,6 +676,15 @@ export function renderSettingsModal() {
   themeSwitch.addEventListener('change', (e) => {
     gameSettings.theme = e.target.checked ? 'light' : 'dark';
     applyTheme();
+    saveGame();
+  });
+
+  const hapticsToggle = body.querySelector('#haptics-toggle');
+  hapticsToggle.addEventListener('change', (e) => {
+    gameSettings.hapticsEnabled = e.target.checked;
+    if (gameSettings.hapticsEnabled) {
+      hapticLight(); // Легкий виброотклик для подтверждения
+    }
     saveGame();
   });
 }

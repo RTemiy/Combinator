@@ -24,6 +24,7 @@ import {
 } from './ui.js';
 import { saveGame, startNewGame } from './gameManager.js';
 import { closeModal, openStoryModal } from './modals.js';
+import * as haptics from './haptics.js';
 
 export function getEmptyGridCells() {
     return gameState.gridData.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
@@ -190,6 +191,7 @@ export function advanceStoryStep(fromModal = false) {
             }
             gameState.coins -= step.task.amount;
             // В идеале, здесь должна быть отдельная статистика потраченных монет
+            haptics.hapticSuccess();
             playSound(DOMElements.sfxCoin);
             playSound(DOMElements.sfxOrderComplete);
         }
@@ -253,6 +255,7 @@ export function claimReward(rewardIndex, startElement) {
         return;
     }
 
+    haptics.hapticMedium();
     // Немедленно удаляем элемент из UI, чтобы избежать двойного клика
     startElement.style.pointerEvents = 'none';
     startElement.style.opacity = '0.5';
@@ -334,6 +337,7 @@ export function claimItemBonus(category, level, element) {
     // Добавляем монеты
     const bonusAmount = level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
     gameState.coins += bonusAmount;
+    haptics.hapticSuccess();
     playSound(DOMElements.sfxCoin);
     playerProfile.totalCoinsEarned += bonusAmount;
 
@@ -375,6 +379,7 @@ export function claimAchievementReward(achievementId, tierIndex, buttonElement) 
   if (progress >= tier.goal && !gameState.claimedAchievements[key]) {
     // Добавляем награду
     gameState.coins += tier.reward;
+    haptics.hapticSuccess();
     playSound(DOMElements.sfxCoin);
     // Отмечаем как полученную
     gameState.claimedAchievements[key] = true;
@@ -413,6 +418,7 @@ export function deleteItem(index) {
 
   // Теперь обновляем состояние игры
   gameState.coins += sellPrice;
+  haptics.hapticSuccess();
   playSound(DOMElements.sfxCoin);
   playerProfile.totalCoinsEarned += sellPrice;
   gameState.gridData[index] = null;
@@ -464,6 +470,7 @@ export function rechargeGeneratorWithCoins(index) {
   gameState.coins -= CONFIG.GENERATOR_RECHARGE_COST;
   item.genEnergy = config.max;
   item.lastRegenTime = Date.now();
+  haptics.hapticSuccess();
   playSound(DOMElements.sfxClaimReward);
 
   closeModal();
@@ -487,6 +494,7 @@ export function rechargePlayerEnergyWithCoins() {
 
   gameState.coins -= CONFIG.ENERGY_RECHARGE_COST_COINS;
   gameState.energy = CONFIG.MAX_ENERGY;
+  haptics.hapticSuccess();
   playSound(DOMElements.sfxClaimReward);
 
   closeModal();
@@ -523,6 +531,7 @@ function createUpgradedItem(category, level) {
 function handleUnblockMerge(fromIdx, toIdx, source) {
   if (source.level >= CONFIG.MAX_ITEM_LEVEL) return false;
   const nextLevel = source.level + 1;
+  haptics.hapticSuccess();
   playMergeSound(nextLevel);
   gameState.gridData[fromIdx] = null;
   const newItem = createUpgradedItem(source.category, nextLevel);
@@ -536,6 +545,7 @@ function handleUnblockMerge(fromIdx, toIdx, source) {
 function handleGeneratorUpgrade(partIdx, genIdx, generator) {
   const lvl = generator.genLevel || 1;
   if (lvl >= CONFIG.MAX_GENERATOR_LEVEL) return false;
+  haptics.hapticSuccess();
   playSound(DOMElements.sfxMerge);
   const nextLvl = lvl + 1;
   gameState.gridData[partIdx] = null;
@@ -552,6 +562,7 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
 }
 
 function handleGeneratorPartMerge(fromIdx, toIdx, source) {
+  haptics.hapticSuccess();
   playSound(DOMElements.sfxMerge);
   if (source.level >= 3) { // Max level for parts is 3. Merging two L3 parts.
     gameState.gridData[fromIdx] = null;
@@ -578,6 +589,7 @@ function handleGeneratorPartMerge(fromIdx, toIdx, source) {
 function handleItemUpgradeWithTool(toolIdx, itemIdx, regularItem) {
   if (regularItem.level >= CONFIG.MAX_ITEM_LEVEL) return false;
   const nextLvl = regularItem.level + 1;
+  haptics.hapticSuccess();
   playMergeSound(nextLvl);
   gameState.gridData[toolIdx] = null;
   gameState.gridData[itemIdx] = createUpgradedItem(regularItem.category, nextLvl);
@@ -590,6 +602,7 @@ function handleItemMerge(fromIdx, toIdx, source) {
   if (source.level >= CONFIG.MAX_ITEM_LEVEL) return false;
 
   const nextLevel = source.level + 1;
+  haptics.hapticSuccess();
   playMergeSound(nextLevel);
 
   // Стандартное слияние
@@ -601,6 +614,7 @@ function handleItemMerge(fromIdx, toIdx, source) {
 }
 
 function handleGeneratorMerge(fromIdx, toIdx, source) {
+  haptics.hapticSuccess();
   playSound(DOMElements.sfxMerge);
   if (source.generatorKey === 'bonus_chest') {
     if (source.genLevel !== 1) return false;
@@ -635,6 +649,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
 
 function handleSwap(fromIdx, toIdx, source, target) {
   if (target && target.isBlocked) return false;
+  haptics.hapticLight();
   [gameState.gridData[fromIdx], gameState.gridData[toIdx]] = [target, source];
   return true;
 }
@@ -815,6 +830,7 @@ export function triggerSpecialGenerator(generator, fromIndex) {
     return;
   }
 
+  haptics.hapticMedium();
   playSound(DOMElements.sfxGeneratorSpawn);
   generator.genCharges--;
 
@@ -853,6 +869,7 @@ export function triggerItemGenerator(generator, fromIndex) {
     return;
   }
 
+  haptics.hapticMedium();
   playSound(DOMElements.sfxGeneratorSpawn);
   gameState.energy--;
   playerProfile.totalEnergySpent++;
@@ -902,6 +919,7 @@ export function triggerRegularGenerator(generator, fromIndex) {
     return;
   }
 
+  haptics.hapticMedium();
   playSound(DOMElements.sfxGeneratorSpawn);
   if (generator.genEnergy === config.max) {
     generator.lastRegenTime = Date.now();
@@ -1333,6 +1351,7 @@ export function completeOrder(id) {
     // Воспроизводим звук успешной сдачи заказа
     playSound(DOMElements.sfxOrderComplete);
     playSound(DOMElements.sfxCoin);
+  haptics.hapticSuccess();
 
     // Анимация полета наград
     animateRewardFly(targetAvatarElement, DOMElements.coins.value, `<img src="assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
