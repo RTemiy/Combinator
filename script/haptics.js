@@ -22,7 +22,7 @@ export function hapticLight() {
  */
 export function hapticMedium() {
   if (!canVibrate()) return;
-  navigator.vibrate(40);
+  navigator.vibrate(12);
 }
 
 /**
@@ -30,7 +30,7 @@ export function hapticMedium() {
  */
 export function hapticSuccess() {
   if (!canVibrate()) return;
-  navigator.vibrate([50, 30, 50]); // Двойная короткая вибрация
+  navigator.vibrate([10, 4, 10]); // Двойная короткая вибрация
 }
 
 /**
@@ -38,5 +38,5 @@ export function hapticSuccess() {
  */
 export function hapticError() {
   if (!canVibrate()) return;
-  navigator.vibrate([20, 40, 20, 40, 20]); // "Дребезжание"
+  navigator.vibrate([50, 30, 50]); // "Дребезжание"
 }
