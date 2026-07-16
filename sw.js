@@ -1,9 +1,6 @@
-// Service Worker для кэширования ресурсов и работы оффлайн
 importScripts('./asset-list.js');
 
-// ВАЖНО: Эту версию нужно обновлять СИНХРОННО с CONFIG.GAME_VERSION в вашем файле config.js.
-// При каждом обновлении игры и изменении GAME_VERSION, меняйте и эту строку.
-const CACHE_VERSION = '1.2.7'; // Используйте вашу актуальную версию игры
+const CACHE_VERSION = '1.2.8'; // 1.2.7
 const CACHE_NAME = `combinator-cache-${CACHE_VERSION}`;
 
 // 1. Установка Service Worker: кэширование всех ресурсов
