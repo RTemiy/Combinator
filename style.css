@@ -678,8 +678,8 @@ body.is-dragging, body.is-dragging * {
 .cell.blocked::after {
   content: '';
   position: absolute;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 110%;
+  height: 110%;
   background-image: url('assets/icons/block.png');
   background-size: contain;
   background-repeat: no-repeat;
