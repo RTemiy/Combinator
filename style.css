@@ -2,6 +2,7 @@
 
 :root { /* Dark Theme */
   --bg-color: #2C2F33;
+  color-scheme: dark; /* Указываем, что это темная схема */
   --panel-color: #36393F;
   --cell-color: #40444B;
   --modal-bg: #32353B;
@@ -45,6 +46,7 @@
 
 body[data-theme="light"] {
   --bg-color: #FDF6F0;
+  color-scheme: light; /* Указываем, что это светлая схема */
   --panel-color: #FFFFFF;
   --cell-color: #FBEFE2;
   --modal-bg: #FFFFFF;
