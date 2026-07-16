@@ -1,17 +1,14 @@
 import { gameState, playerProfile } from './state.js';
 import { DOMElements } from './dom.js';
 import {
-  CONFIG,
   CATEGORIES_CONFIG,
   GENERATORS_DATA,
-  GEN_ENERGY_CONFIG,
-  SPAWN_CHANCES,
-  UNLOCK_THRESHOLDS,
   CHARACTERS,
   STORY_CHARACTERS,
   STORY_DATA,
-  ACHIEVEMENTS_DATA
+  ACHIEVEMENTS_DATA,
 } from './config.js';
+import { CONFIG, GEN_ENERGY_CONFIG, SPAWN_CHANCES, UNLOCK_THRESHOLDS, STORY_ORDER_CONFIG } from './data/gameConfig.js';
 import { playSound, playMergeSound } from './audio.js';
 import {
   showToast,
@@ -35,11 +32,14 @@ export function getAvailableEmptyCells() {
 }
 
 export function getCurrentPlayerLevel() {
-    let currentLvl = 1;
-    UNLOCK_THRESHOLDS.forEach(t => {
-        if (gameState.score >= t.score) currentLvl = t.level;
-    });
-    return currentLvl;
+    // Итерируем в обратном порядке для эффективности
+    for (let i = UNLOCK_THRESHOLDS.length - 1; i >= 0; i--) {
+        const levelInfo = UNLOCK_THRESHOLDS[i];
+        if (gameState.score >= levelInfo.scoreStart) {
+            return levelInfo.level;
+        }
+    }
+    return 1; // На случай, если что-то пойдет не так
 }
 
 export function isDiscovered(category, level) {
@@ -966,90 +966,82 @@ export function triggerGenerator(generator, fromIndex) {
   }
 }
 
+function spawnLevelUpBonus(level) {
+    gameState.rewardQueue.push({
+      isGenerator: true,
+      generatorKey: 'bonus_chest',
+      genLevel: 1,
+      genCharges: 1
+    });
+    markItemAsDiscovered('bonus_chest', 'generator');
+    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Уровень ${level}! Бонус: получена Подарочная коробка!`, "success");
+}
+
 export function checkProgressiveUnlocks() {
   UNLOCK_THRESHOLDS.forEach(threshold => {
-    if (gameState.score >= threshold.score && !threshold.unlocked) {
+    // Уровень считается достигнутым, если игрок набрал scoreStart этого уровня
+    if (gameState.score >= threshold.scoreStart && !threshold.unlocked) {
       threshold.unlocked = true;
-      if (gameState.lockedCategories.length > 0) {
-        // 1. Определяем, какой генератор будет разблокирован, по первой категории в списке.
-        const representativeCategory = gameState.lockedCategories[0];
-        const genKey = CATEGORIES_CONFIG[representativeCategory].generatorKey;
-        const generatorData = GENERATORS_DATA[genKey];
 
-        // 2. Находим ВСЕ категории, которые производит этот генератор.
-        const categoriesToUnlock = generatorData.categories;
+      // Воспроизводим звук, даем монеты и показываем тост при повышении уровня (кроме 1-го)
+      if (threshold.level > 1) {
+        playSound(DOMElements.sfxLevelUp); // Звук повышения уровня
+        const coinReward = threshold.level * CONFIG.LEVEL_UP_COIN_MULTIPLIER;
+        gameState.coins += coinReward;
+        playerProfile.totalCoinsEarned += coinReward;
+        // Анимация полета монет
+        animateRewardFly(DOMElements.level.container, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinReward / 10)), 'coin');
+        // Показываем отдельный тост о повышении уровня и награде в монетах
+        showToast(`<img src="assets/icons/level.png" class="toast-icon" alt=""> Уровень ${threshold.level}! +${coinReward} монет.`, "success");
+      }
 
-        // 3. Перемещаем все эти категории из locked в active.
-        categoriesToUnlock.forEach(catToUnlock => {
-          const indexInLocked = gameState.lockedCategories.indexOf(catToUnlock);
-          if (indexInLocked > -1) {
-            gameState.lockedCategories.splice(indexInLocked, 1);
-          }
-          if (!gameState.activeCategories.includes(catToUnlock)) {
-            gameState.activeCategories.push(catToUnlock);
-            gameState.newlyUnlockedCategories.push(catToUnlock);
-          }
-        });
-
-        // 4. Добавляем сам генератор в очередь наград.
-        gameState.rewardQueue.push({
-          isGenerator: true,
-          generatorKey: genKey,
-          genLevel: 1,
-          genEnergy: GEN_ENERGY_CONFIG[1].max,
-          lastRegenTime: Date.now()
-        });
-        markItemAsDiscovered(genKey, 'generator');
-        showToast(`<img src="assets/icons/level.png" class="toast-icon" alt=""> Уровень ${threshold.level}! Новый генератор: ${generatorData.name}!`, "success");
+      // Проверяем, должен ли этот уровень разблокировать генератор
+      if (threshold.unlocksGenerator && gameState.lockedCategories.length > 0) {
+        // Логика разблокировки нового генератора
+        unlockNewGenerator(threshold);
       } else {
-        spawnUpgradePart();
-        showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Уровень ${threshold.level}! Бонус: получена Новая деталь!`, "success");
+        // Если генератор не выдается или все уже открыты, даем другую награду
+        // Проверяем, что это не стартовый 1-й уровень
+        if (threshold.level > 1) {
+          spawnLevelUpBonus(threshold.level);
+        }
       }
       updateUI(); // Обновляем UI, чтобы показать награду в очереди
     }
   });
 }
 
-export function spawnBonusGenerator() {
-  // Проверяем, есть ли еще заблокированные категории для открытия
-  if (gameState.lockedCategories.length > 0) {
-    // 1. Определяем, какой генератор будет разблокирован, по первой категории в списке.
-    const representativeCategory = gameState.lockedCategories[0];
-    const genKey = CATEGORIES_CONFIG[representativeCategory].generatorKey;
-    const generatorData = GENERATORS_DATA[genKey];
+function unlockNewGenerator(threshold) {
+  // 1. Определяем, какой генератор будет разблокирован, по первой категории в списке.
+  const representativeCategory = gameState.lockedCategories[0];
+  const genKey = CATEGORIES_CONFIG[representativeCategory].generatorKey;
+  const generatorData = GENERATORS_DATA[genKey];
 
-    // 2. Находим ВСЕ категории, которые производит этот генератор.
-    const categoriesToUnlock = generatorData.categories;
+  // 2. Находим ВСЕ категории, которые производит этот генератор.
+  const categoriesToUnlock = generatorData.categories;
 
-    // 3. Перемещаем все эти категории из locked в active.
-    //    Это гарантирует, что новые заказы могут создаваться для этих категорий,
-    //    даже если сам генератор еще не получен игроком из очереди наград.
-    categoriesToUnlock.forEach(catToUnlock => {
-      const indexInLocked = gameState.lockedCategories.indexOf(catToUnlock);
-      if (indexInLocked > -1) {
-        gameState.lockedCategories.splice(indexInLocked, 1);
-      }
-      if (!gameState.activeCategories.includes(catToUnlock)) {
-        gameState.activeCategories.push(catToUnlock);
-        gameState.newlyUnlockedCategories.push(catToUnlock);
-      }
-    });
+  // 3. Перемещаем все эти категории из locked в active.
+  categoriesToUnlock.forEach(catToUnlock => {
+    const indexInLocked = gameState.lockedCategories.indexOf(catToUnlock);
+    if (indexInLocked > -1) {
+      gameState.lockedCategories.splice(indexInLocked, 1);
+    }
+    if (!gameState.activeCategories.includes(catToUnlock)) {
+      gameState.activeCategories.push(catToUnlock);
+      gameState.newlyUnlockedCategories.push(catToUnlock);
+    }
+  });
 
-    // 4. Добавляем сам генератор в очередь наград.
-    gameState.rewardQueue.push({
-      isGenerator: true,
-      generatorKey: genKey,
-      genLevel: 1,
-      genEnergy: GEN_ENERGY_CONFIG[1].max,
-      lastRegenTime: Date.now()
-    });
-    markItemAsDiscovered(genKey, 'generator');
-    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Вы открыли новый генератор: ${generatorData.name}!`, "story");
-  } else {
-    // Если все генераторы уже открыты, даем вместо этого деталь для улучшения
-    spawnUpgradePart();
-    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
-  }
+  // 4. Добавляем сам генератор в очередь наград.
+  gameState.rewardQueue.push({
+    isGenerator: true,
+    generatorKey: genKey,
+    genLevel: 1,
+    genEnergy: GEN_ENERGY_CONFIG[1].max,
+    lastRegenTime: Date.now()
+  });
+  markItemAsDiscovered(genKey, 'generator');
+  showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Бонус уровня: ${generatorData.name}!`, "success");
 }
 
 export function spawnRandomExistingGenerator() {
@@ -1195,14 +1187,15 @@ export function generateStoryOrder(step, fixedChar = null) {
 
   const requestedItems = [];
 
-  let targetLevel = Math.min(CONFIG.MAX_ITEM_LEVEL, step + 2);
-  const orderableCategories = [...gameState.activeCategories, ...gameState.unlockedItemGenCategories];
-  const randomCat = orderableCategories[Math.floor(Math.random() * orderableCategories.length)];
-  requestedItems.push({ category: randomCat, level: targetLevel });
-
-  if (step >= 2) {
-    const randomCat2 = orderableCategories[Math.floor(Math.random() * orderableCategories.length)];
-    requestedItems.push({ category: randomCat2, level: Math.max(1, targetLevel - 2) });
+  const orderConfig = STORY_ORDER_CONFIG[step];
+  if (orderConfig && orderConfig.levels) {
+    const orderableCategories = [...gameState.activeCategories, ...gameState.unlockedItemGenCategories];
+    orderConfig.levels.forEach(level => {
+      if (orderableCategories.length > 0) {
+        const randomCat = orderableCategories[Math.floor(Math.random() * orderableCategories.length)];
+        requestedItems.push({ category: randomCat, level: level });
+      }
+    });
   }
 
   requestedItems.sort((a, b) => a.level - b.level);
@@ -1381,8 +1374,9 @@ export function completeOrder(id) {
             });
             showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Вы получили Подарочную коробку!`, "story");
           } else if (rand < 0.5) {
-            // 25% шанс на новый генератор (или деталь, если все открыто)
-            spawnBonusGenerator();
+            // 25% шанс на деталь для улучшения (вместо нового генератора)
+            spawnUpgradePart();
+            showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
           } else if (rand < 0.75) {
             // 25% шанс на магические инструменты
             spawnMagicTool();

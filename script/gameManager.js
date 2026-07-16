@@ -1,4 +1,5 @@
-import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG, GENERATORS_DATA, CATEGORIES_CONFIG, STORY_DATA } from './config.js';
+import { GENERATORS_DATA, CATEGORIES_CONFIG, STORY_DATA } from './config.js';
+import { CONFIG, UNLOCK_THRESHOLDS, GEN_ENERGY_CONFIG } from './data/gameConfig.js';
 import { gameState, playerProfile, gameSettings } from './state.js';
 import { DOMElements } from './dom.js';
 import { addListeners } from './eventHandlers.js';
@@ -113,7 +114,7 @@ export function saveGame() {
     claimedCollectionBonuses: gameState.claimedCollectionBonuses,
     storyState: gameState.storyState,
     settings: gameSettings,
-    thresholds: UNLOCK_THRESHOLDS.map(t => ({ score: t.score, unlocked: t.unlocked, level: t.level }))
+    thresholds: UNLOCK_THRESHOLDS.map(t => ({ level: t.level, unlocked: t.unlocked }))
   };
   localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(saveData));
 }
@@ -181,8 +182,10 @@ export function loadGame() {
     }
 
     if (loaded.thresholds) {
-      loaded.thresholds.forEach((t, i) => {
-        if (UNLOCK_THRESHOLDS[i]) UNLOCK_THRESHOLDS[i].unlocked = t.unlocked;
+      // Безопасная загрузка по уровню, а не по индексу, для совместимости со старыми сохранениями
+      loaded.thresholds.forEach(savedThreshold => {
+        const gameThreshold = UNLOCK_THRESHOLDS.find(t => t.level === savedThreshold.level);
+        if (gameThreshold) gameThreshold.unlocked = savedThreshold.unlocked;
       });
     }
   } catch (e) {
@@ -196,7 +199,8 @@ export function startNewGame() {
   gameState.score = 0;
   gameState.coins = 0;
   gameState.energy = CONFIG.MAX_ENERGY;
-  UNLOCK_THRESHOLDS.forEach(t => t.unlocked = false);
+  // Сбрасываем прогресс уровней, оставляя разблокированным только 1-й уровень
+  UNLOCK_THRESHOLDS.forEach(t => t.unlocked = (t.level === 1));
   gameState.rewardQueue = [];
   gameState.newlyUnlockedCategories = [];
   gameState.unlockedItemGenCategories = [];

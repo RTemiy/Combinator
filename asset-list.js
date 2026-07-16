@@ -146,6 +146,7 @@ const URLS_TO_CACHE = [
   "assets/sfx/merge_lvl5.mp3",
   "assets/sfx/merge_lvl6.mp3",
   "assets/sfx/merge_lvl7.mp3",
+  "assets/sfx/level-up.mp3",
   "assets/sfx/order-complete.mp3",
   "assets/sfx/order-ready.mp3",
   "assets/sfx/spawn.mp3",

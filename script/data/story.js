@@ -1,34 +1,9 @@
 export const STORY_DATA = {
-  'gardener_arc': {
-    id: 'gardener_arc',
-    title: "Ветвь Садоводства",
-    description: "Помогите местному садовнику вырастить редкое дерево и откройте для себя новую категорию предметов.",
-    requiredLevel: 1,
-    icon: 'assets/icons/characters/gardener.png',
-    chapters: {
-      1: {
-        title: "Предложение садовника",
-        steps: [
-          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'Приветствую, коллега! Я вижу, у тебя тут своя лавочка. А я вот знаю способ, как можно расширить твой... ассортимент. И заработок, само собой.' },
-          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'У меня есть семена одного очень редкого дерева. Оно не просто красивое, но и плодоносит! Правда, чтобы его вырастить до нужного состояния, нужны особые условия и, скажем так, первоначальные инвестиции.' },
-          {
-            type: 'task',
-            character: 'assets/icons/characters/gardener.png',
-            name: 'Садовник',
-            text: 'Если вложишь 500 монет в наше общее дело, я подготовлю для тебя саженец, который быстро вырастет в могучее дерево. С него и начнется твой новый бизнес!',
-            task: { type: 'spend_coins', amount: 500, buttonText: 'Вложиться в саженец' },
-            reward: { type: 'item', category: 'flowers', level: 7 }
-          },
-          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'Отличный выбор! Вот, держи. Это не просто дерево, а настоящий генератор ягод! Ухаживай за ним, и оно принесет тебе немало выгоды. Удачи в новом начинании!' },
-        ]
-      }
-    }
-  },
   'neighbor_arc': {
     id: 'neighbor_arc',
     title: "Соседские сплетни",
     description: "Познакомьтесь с вашей новой соседкой. Кто знает, к чему приведёт это знакомство?",
-    requiredLevel: 2,
+    requiredLevel: 3,
     icon: 'assets/icons/characters/neighbor.png',
     chapters: {
       1: {
@@ -64,11 +39,37 @@ export const STORY_DATA = {
         ]
       }
     }
-  },  'beekeeper_arc': {
+  },
+  'gardener_arc': {
+    id: 'gardener_arc',
+    title: "Ветвь Садоводства",
+    description: "Помогите местному садовнику вырастить редкое дерево и откройте для себя новую категорию предметов.",
+    requiredLevel: 5,
+    icon: 'assets/icons/characters/gardener.png',
+    chapters: {
+      1: {
+        title: "Предложение садовника",
+        steps: [
+          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'Приветствую, коллега! Я вижу, у тебя тут своя лавочка. А я вот знаю способ, как можно расширить твой... ассортимент. И заработок, само собой.' },
+          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'У меня есть семена одного очень редкого дерева. Оно не просто красивое, но и плодоносит! Правда, чтобы его вырастить до нужного состояния, нужны особые условия и, скажем так, первоначальные инвестиции.' },
+          {
+            type: 'task',
+            character: 'assets/icons/characters/gardener.png',
+            name: 'Садовник',
+            text: 'Если вложишь 500 монет в наше общее дело, я подготовлю для тебя саженец, который быстро вырастет в могучее дерево. С него и начнется твой новый бизнес!',
+            task: { type: 'spend_coins', amount: 500, buttonText: 'Вложиться в саженец' },
+            reward: { type: 'item', category: 'flowers', level: 7 }
+          },
+          { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'Отличный выбор! Вот, держи. Это не просто дерево, а настоящий генератор ягод! Ухаживай за ним, и оно принесет тебе немало выгоды. Удачи в новом начинании!' },
+        ]
+      }
+    }
+  },
+  'beekeeper_arc': {
     id: 'beekeeper_arc',
     title: "Ветка Пчеловода",
     description: "Помогите старому пчеловоду основать новую пасеку и получите в награду свой собственный улей.",
-    requiredLevel: 3,
+    requiredLevel: 8,
     icon: 'assets/icons/characters/beekeeper.png',
     chapters: {
       1: {

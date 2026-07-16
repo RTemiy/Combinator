@@ -1,6 +1,7 @@
 import { DOMElements } from './dom.js';
 import { gameState, playerProfile, gameSettings } from './state.js';
-import { CONFIG, CATEGORIES_CONFIG, GENERATORS_DATA, ACHIEVEMENTS_DATA, UNLOCK_THRESHOLDS } from './config.js';
+import { CATEGORIES_CONFIG, GENERATORS_DATA, ACHIEVEMENTS_DATA } from './config.js';
+import { CONFIG, UNLOCK_THRESHOLDS } from './data/gameConfig.js';
 import {
   hasUnclaimedAchievements,
   hasUnclaimedCollectionBonuses,
@@ -47,19 +48,25 @@ export function createGrid() {
 export function updateLevelProgressBar() {
   const currentLvl = getCurrentPlayerLevel();
   const barFill = DOMElements.level.bar;
+  
+  // Находим конфиг для ТЕКУЩЕГО уровня
+  const levelConfig = UNLOCK_THRESHOLDS.find(t => t.level === currentLvl);
 
-  if (currentLvl >= CONFIG.MAX_ITEM_LEVEL) {
-    barFill.style.width = '100%';
-    DOMElements.level.score.innerText = gameState.score;
-    return;
-  }
+  if (levelConfig) {
+    const min = levelConfig.scoreStart;
+    const max = levelConfig.scoreEnd;
 
-  const currentThreshold = UNLOCK_THRESHOLDS.find(t => t.level === currentLvl + 1);
-  if (currentThreshold) {
-    const min = currentThreshold.prevLimit;
-    const max = currentThreshold.score;
-    const percentage = Math.max(0, ((gameState.score - min) / (max - min)) * 100);
-    barFill.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
+    if (max === Infinity) {
+      // Для максимального уровня полоска всегда заполнена
+      barFill.style.width = '100%';
+    } else {
+      const range = max - min;
+      const progress = gameState.score - min;
+      const percentage = range > 0 ? (progress / range) * 100 : 0;
+      barFill.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
+    }
+  } else {
+    barFill.style.width = '0%'; // Fallback
   }
   DOMElements.level.score.innerText = gameState.score;
 }
