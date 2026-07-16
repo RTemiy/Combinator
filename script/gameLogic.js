@@ -683,7 +683,7 @@ const MERGE_HANDLERS = [
     },
     execute: (from, to, src) => handleGeneratorMerge(from, to, src)
   },
-/*  // Улучшение генератора деталью (в обе стороны)
+  // Улучшение генератора деталью (в обе стороны)
   {
     canHandle: (s, t) => s.isUpgradePart && t?.isGenerator && t.generatorKey !== 'bonus_chest' && (t.genLevel || 1) < CONFIG.MAX_GENERATOR_LEVEL,
     execute: (from, to, src, trg) => handleGeneratorUpgrade(from, to, trg)
@@ -696,7 +696,7 @@ const MERGE_HANDLERS = [
   {
     canHandle: (s, t) => s.isMagicTool && t && !t.isGenerator && !t.isBlocked && !t.isUpgradePart && !t.isMagicTool && !t.isGeneratorPart && t.level < CONFIG.MAX_ITEM_LEVEL,
     execute: (from, to, src, trg) => handleItemUpgradeWithTool(from, to, trg)
-  },*/
+  },
   // Слияние двух обычных предметов (включая предметы-генераторы)
   {
     canHandle: (s, t) => t && !s.isBlocked && !t.isBlocked && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && !s.isMagicTool && !t.isMagicTool && s.category === t.category && s.level === t.level && s.level < CONFIG.MAX_ITEM_LEVEL,
