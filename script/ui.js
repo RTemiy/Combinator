@@ -171,28 +171,47 @@ export function triggerMergeEffects(idx, category) {
     const targetCell = DOMElements.grid.children[idx];
     if (targetCell) {
       const themeColor = CATEGORIES_CONFIG[category] ? CATEGORIES_CONFIG[category].color : '#ff477e';
+
+      // 1. Улучшенная вспышка
       const flash = document.createElement('div');
       flash.classList.add('merge-flash');
       flash.style.setProperty('--flash-color', themeColor);
       targetCell.appendChild(flash);
-      setTimeout(() => flash.remove(), CONFIG.ANIMATION.FADE_DURATION);
+      setTimeout(() => flash.remove(), 600); // Длительность анимации вспышки
+
+      // 2. Новая "ударная волна"
+      const shockwave = document.createElement('div');
+      shockwave.classList.add('merge-shockwave');
+      shockwave.style.borderColor = themeColor;
+      targetCell.appendChild(shockwave);
+      setTimeout(() => shockwave.remove(), 600); // Длительность анимации волны
 
       const rect = targetCell.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
-      for (let i = 0; i < CONFIG.ANIMATION.PARTICLE_COUNT; i++) {
+      // 3. Новые частицы-звездочки
+      const particleCount = (CONFIG.ANIMATION.PARTICLE_COUNT || 10) + 5; // Увеличим количество
+      for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.classList.add('merge-particle');
-        particle.style.backgroundColor = themeColor;
+        particle.innerHTML = '✦'; // Используем символ звездочки
+        particle.style.color = themeColor;
         particle.style.left = `${centerX}px`;
         particle.style.top = `${centerY}px`;
+
         const angle = Math.random() * Math.PI * 2;
-        const speed = 20 + Math.random() * 40;
+        const speed = 30 + Math.random() * 70; // Увеличим скорость и разброс
+        const rotation = Math.random() * 360;
+        const scale = 0.5 + Math.random() * 1;
+
         particle.style.setProperty('--x', `${Math.cos(angle) * speed}px`);
         particle.style.setProperty('--y', `${Math.sin(angle) * speed}px`);
+        particle.style.setProperty('--rotation', `${rotation}deg`);
+        particle.style.setProperty('--scale', scale);
+
         document.body.appendChild(particle);
-        setTimeout(() => particle.remove(), CONFIG.ANIMATION.PARTICLE_DURATION);
+        setTimeout(() => particle.remove(), 800); // Увеличим время жизни
       }
     }
   }, 0);
