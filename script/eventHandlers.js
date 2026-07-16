@@ -30,6 +30,7 @@ import {
   claimAchievementReward,
   completeOrder,
   executeMergeOrSwap,
+  isActionPossible,
   triggerGenerator,
   triggerItemGenerator,
   claimReward
@@ -301,8 +302,12 @@ function endDrag(clientX, clientY) {
   const targetCell = elementUnder ? elementUnder.closest('.cell') : null;
   const dragTargetIndex = targetCell ? parseInt(targetCell.dataset.index) : -1;
 
-  // Условие для невалидного броска (за пределы поля, на себя, на заблокированную ячейку)
-  const isInvalidDrop = !targetCell || startIndex === dragTargetIndex || gameState.lockedCells.includes(dragTargetIndex);
+  // Условие для невалидного броска: за пределы поля, на себя, на временно заблокированную ячейку,
+  // или на ячейку, с которой невозможно действие (слияние или обмен).
+  const isInvalidDrop = !targetCell ||
+                        startIndex === dragTargetIndex ||
+                        gameState.lockedCells.includes(dragTargetIndex) ||
+                        !isActionPossible(startIndex, dragTargetIndex);
 
   if (isInvalidDrop) {
     // Анимируем "призрак" обратно на исходную позицию

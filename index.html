@@ -277,14 +277,6 @@
 <audio id="sfx-fly" src="assets/sfx/fly.mp3"></audio>
 
 <script type="module" src="./script/script.js"></script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => {})
-        .catch(err => {});
-    });
-  }
-</script>
+
 </body>
 </html>

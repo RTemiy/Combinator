@@ -689,6 +689,29 @@ const MERGE_HANDLERS = [
   },
 ];
 
+export function isActionPossible(fromIdx, toIdx) {
+    const source = gameState.gridData[fromIdx];
+    const target = gameState.gridData[toIdx];
+
+    if (!source) return false; // Нельзя перетаскивать пустую ячейку
+
+    // Проверка на слияние
+    for (const handler of MERGE_HANDLERS) {
+        if (handler.canHandle(source, target)) {
+            return true;
+        }
+    }
+
+    // Проверка на обмен
+    // Нельзя меняться местами с заблокированным предметом
+    if (target && target.isBlocked) {
+        return false;
+    }
+
+    // Можно меняться с пустой ячейкой или другим незаблокированным предметом
+    return true;
+}
+
 export function executeMergeOrSwap(fromIdx, toIdx) {
   const source = gameState.gridData[fromIdx];
   const target = gameState.gridData[toIdx];
