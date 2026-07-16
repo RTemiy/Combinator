@@ -1,7 +1,6 @@
 // ВНИМАНИЕ! Этот файл генерируется автоматически.
 // Не редактируйте его вручную. Запустите "node generate-asset-list.js" для обновления.
-export const URLS_TO_CACHE = [
-  "/",
+const URLS_TO_CACHE = [
   "assets/favicon.png",
   "assets/icon.png",
   "assets/icons/achievements.png",
@@ -135,7 +134,6 @@ export const URLS_TO_CACHE = [
   "assets/icons/upgrade_part.png",
   "assets/icons/warning.png",
   "assets/music/bg.mp3",
-  "assets/music/desktop.ini",
   "assets/sfx/claim-reward.mp3",
   "assets/sfx/coin.mp3",
   "assets/sfx/drag-start.mp3",

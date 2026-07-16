@@ -1,5 +1,5 @@
 // Service Worker для кэширования ресурсов и работы оффлайн
-import { URLS_TO_CACHE } from './asset-list.js';
+importScripts('./asset-list.js');
 
 // ВАЖНО: Эту версию нужно обновлять СИНХРОННО с CONFIG.GAME_VERSION в вашем файле config.js.
 // При каждом обновлении игры и изменении GAME_VERSION, меняйте и эту строку.

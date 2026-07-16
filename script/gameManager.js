@@ -45,60 +45,6 @@ export function startGameAndAudio() {
 }
 
 export function initGame() {
-  // Регистрируем Service Worker для работы оффлайн
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js', { type: 'module' }) // Указываем, что SW является модулем
-        .then(registration => {
-          console.log('ServiceWorker: регистрация успешна, scope: ', registration.scope);
-
-          // Функция для отображения уведомления
-          const showUpdateNotification = (worker) => {
-            const notificationBar = document.createElement('div');
-            notificationBar.id = 'update-notification';
-            notificationBar.innerHTML = `
-              <span>Доступна новая версия игры!</span>
-              <button id="reload-button">Обновить</button>
-            `;
-            document.body.appendChild(notificationBar);
-
-            document.getElementById('reload-button').addEventListener('click', () => {
-              notificationBar.style.display = 'none';
-              worker.postMessage({ action: 'skipWaiting' });
-            });
-          };
-
-          // --- Логика для уведомления об обновлении ---
-          let refreshing;
-          // 1. Слушаем смену контроллера, чтобы перезагрузить страницу
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (refreshing) return;
-            window.location.reload();
-            refreshing = true;
-          });
-
-          // 2. Проверяем, не ждет ли уже новый SW активации (если зашли на страницу, а он уже был скачан)
-          if (registration.waiting) {
-            showUpdateNotification(registration.waiting);
-          }
-
-          // 3. Слушаем событие 'updatefound', чтобы отловить установку нового SW в реальном времени
-          registration.onupdatefound = () => {
-            const installingWorker = registration.installing;
-            installingWorker.onstatechange = () => {
-              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // Новый SW установлен и ждет, пока мы покажем уведомление
-                showUpdateNotification(installingWorker);
-              }
-            };
-          };
-        })
-        .catch(err => {
-          console.error('ServiceWorker: ошибка регистрации: ', err);
-        });
-    });
-  }
-
   createGrid();
   const isNewPlayer = !localStorage.getItem(CONFIG.SAVE_KEY);
 
