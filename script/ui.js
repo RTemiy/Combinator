@@ -101,25 +101,25 @@ export function renderRewardQueue() {
     if (reward.isGenerator) {
         const genInfo = GENERATORS_DATA[reward.generatorKey];
         const lvl = reward.genLevel || 1;
-        iconHTML = `<img src="${genInfo.icons[lvl - 1]}" alt="${genInfo.name}" style="width: 2.5rem; height: 2.5rem;">`;
+        iconHTML = `<img src="${genInfo.icons[lvl - 1]}" alt="${genInfo.name}" style="width: 90%; height: 90%;">`;
         title = `Забрать: ${genInfo.name}`;
     } else if (reward.isGeneratorPart) {
         const genInfo = GENERATORS_DATA[reward.generatorKey];
         const lvl = reward.level || 1;
         const partInfo = genInfo.parts[lvl - 1];
-        iconHTML = `<img src="${partInfo.icon}" alt="${partInfo.name}" style="width: 2.5rem; height: 2.5rem;">`;
+        iconHTML = `<img src="${partInfo.icon}" alt="${partInfo.name}" style="width: 90%; height: 90%;">`;
         title = `Забрать: ${partInfo.name}`;
     } else if (reward.isUpgradePart) {
-        iconHTML = `<img src="assets/icons/upgrade_part.png" alt="Новая деталь" style="width: 1.5rem; height: 1.5rem;">`;
+        iconHTML = `<img src="assets/icons/upgrade_part.png" alt="Новая деталь" style="width: 90%; height: 90%;">`;
         title = 'Забрать: Новая деталь';
     } else if (reward.isMagicTool) {
-        iconHTML = `<img src="assets/icons/magic_tool.png" alt="Магические инструменты" style="width: 1.5rem; height: 1.5rem;">`;
+        iconHTML = `<img src="assets/icons/magic_tool.png" alt="Магические инструменты" style="width: 90%; height: 90%;">`;
         title = 'Забрать: Магические инструменты';
     } else if (reward.category && reward.level) {
         // Обычный предмет или предмет-генератор
         const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
         if (itemInfo) {
-            iconHTML = `<img src="${itemInfo.icon}" alt="${itemInfo.name}" style="width: 2.5rem; height: 2.5rem;">`;
+            iconHTML = `<img src="${itemInfo.icon}" alt="${itemInfo.name}" style="width: 90%; height: 90%;">`;
             title = `Забрать: ${itemInfo.name}`;
         }
     }
