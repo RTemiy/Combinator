@@ -123,6 +123,9 @@ export function renderRewardQueue() {
     } else if (reward.isMagicTool) {
         iconHTML = `<img src="assets/icons/magic_tool.png" alt="Магические инструменты" style="width: 90%; height: 90%;">`;
         title = 'Забрать: Магические инструменты';
+    } else if (reward.isCopyBubble) {
+        iconHTML = `<img src="assets/icons/copy_bubble.png" alt="Копирующий пузырь" style="width: 90%; height: 90%;">`;
+        title = 'Забрать: Копирующий пузырь';
     } else if (reward.category && reward.level) {
         // Обычный предмет или предмет-генератор
         const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
@@ -280,7 +283,7 @@ function renderGeneratorBadges(cell, item) {
   cell.appendChild(levelBadge);
 
   // Для подарочной коробки уровень 2 - максимальный
-  if (item.generatorKey === 'bonus_chest' && lvl === 2) {
+  if (item.generatorKey === 'bonus_chest' && lvl === 3) {
     lvl = CONFIG.MAX_GENERATOR_LEVEL;
   }
 
@@ -396,7 +399,7 @@ export function renderGrid() {
         cell.classList.add('blocked');
       } else if (item.isGeneratorPart) {
         cell.classList.add('generator-part-cell');
-      } else if (item.isUpgradePart || item.isMagicTool) {
+      } else if (item.isUpgradePart || item.isMagicTool || item.isCopyBubble) {
         cell.classList.add('booster-cell');
       }
 
@@ -457,9 +460,13 @@ export function renderGrid() {
         levelBadge.classList.add('item-level');
         levelBadge.innerText = item.level;
         cell.appendChild(levelBadge);
-      } else if (item.isUpgradePart || item.isMagicTool) {
+      } else if (item.isUpgradePart || item.isMagicTool || item.isCopyBubble) {
         // Общая логика для деталей и инструментов
-        wrapper.innerHTML = item.isUpgradePart ? `<img src="assets/icons/upgrade_part.png" alt="">` : `<img src="assets/icons/magic_tool.png" alt="">`;
+        let iconSrc = 'assets/icons/question.png';
+        if (item.isUpgradePart) iconSrc = 'assets/icons/upgrade_part.png';
+        if (item.isMagicTool) iconSrc = 'assets/icons/magic_tool.png';
+        if (item.isCopyBubble) iconSrc = 'assets/icons/copy_bubble.png';
+        wrapper.innerHTML = `<img src="${iconSrc}" alt="">`;
 
         // Добавляем звездочку, так как их нельзя улучшить
         const starBadge = document.createElement('span');
@@ -770,7 +777,9 @@ export function renderAchievementsModal() {
 export function renderCollectionModal() {
   const modal = DOMElements.collectionModal;
   let contentHTML = '';
+  let hasContent = false;
 
+  // --- Секция 1: Предметы из категорий ---
   const allCategories = Object.keys(CATEGORIES_CONFIG);
 
   allCategories.forEach(key => {
@@ -779,6 +788,9 @@ export function renderCollectionModal() {
     const isCategoryVisible = category.items.some(item => isDiscovered(key, item.level));
 
     if (isCategoryVisible) {
+      if (hasContent) {
+        contentHTML += `<hr style="border-color: #333; margin: 15px 0 10px;">`;
+      }
       contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">${category.name}</h4>`;
       contentHTML += `<div class="progression-container">`;
       category.items.forEach((item, itemIndex) => {
@@ -819,9 +831,123 @@ export function renderCollectionModal() {
           contentHTML += '<div class="progression-arrow-h">→</div>';
         }
       });
-      contentHTML += `</div><hr style="border-color: #333; margin: 15px 0 10px;">`;
+      contentHTML += `</div>`;
+      hasContent = true;
     }
   });
+
+  // --- Секция 2: Генераторы ---
+  if (hasContent) {
+    contentHTML += `<hr style="border-color: #333; margin: 15px 0 10px;">`;
+  }
+  contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Улучшения генераторов</h4>`;
+  
+  for (const genKey in GENERATORS_DATA) {
+    const genData = GENERATORS_DATA[genKey];
+    // Проверяем, открыт ли хоть один уровень этого генератора
+    const isGeneratorVisible = genData.icons.some((icon, index) => isDiscovered(genKey, index + 1));
+
+    if (isGeneratorVisible) {
+      contentHTML += `<div class="progression-container" style="margin-top: 5px; margin-bottom: 10px;">`;
+
+      genData.icons.forEach((iconPath, index) => {
+        const level = index + 1;
+        const romanLevel = CONFIG.ROMAN_NUMERALS[level];
+        const discovered = isDiscovered(genKey, level);
+        const undiscoveredClass = discovered ? '' : 'undiscovered';
+        const title = discovered ? `${genData.name} ${romanLevel}` : 'Не открыто';
+        const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+
+        contentHTML += `
+          <div class="progression-item-square ${undiscoveredClass}" title="${title}">
+            <div class="progression-item-icon">${itemIcon}</div>
+            <div class="progression-item-level">${romanLevel}</div>
+          </div>
+        `;
+        if (index < genData.icons.length - 1) {
+          contentHTML += '<div class="progression-arrow-h">→</div>';
+        }
+      });
+      contentHTML += `</div>`;
+    }
+  }
+  hasContent = true;
+
+  // --- Секция 3: Части генераторов ---
+  contentHTML += `<hr style="border-color: #333; margin: 15px 0 10px;">`;
+  contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Сборка генераторов</h4>`;
+
+  for (const genKey in GENERATORS_DATA) {
+    const genData = GENERATORS_DATA[genKey];
+    if (!genData.parts) continue;
+
+    const discoveryKey = `${genKey}_part`;
+    const arePartsVisible = genData.parts.some((part, index) => isDiscovered(discoveryKey, index + 1));
+
+    if (arePartsVisible) {
+      contentHTML += `<div class="progression-container" style="margin-top: 5px; margin-bottom: 10px;">`;
+
+      genData.parts.forEach((part, index) => {
+        const level = index + 1;
+        const discovered = isDiscovered(discoveryKey, level);
+        const undiscoveredClass = discovered ? '' : 'undiscovered';
+        const title = discovered ? part.name : 'Не открыто';
+        const itemIcon = discovered ? `<img src="${part.icon}" alt="${title}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+
+        contentHTML += `
+          <div class="progression-item-square ${undiscoveredClass}" title="${title}">
+            <div class="progression-item-icon">${itemIcon}</div>
+            <div class="progression-item-level">${level}</div>
+          </div>
+        `;
+        if (index < genData.parts.length - 1) {
+          contentHTML += '<div class="progression-arrow-h">→</div>';
+        }
+      });
+
+      contentHTML += '<div class="progression-arrow-h">→</div>';
+      const finalGenDiscovered = isDiscovered(genKey, 1);
+      const finalGenUndiscoveredClass = finalGenDiscovered ? '' : 'undiscovered';
+      const finalGenTitle = finalGenDiscovered ? `${genData.name} I` : 'Не открыто';
+      const finalGenIcon = finalGenDiscovered ? `<img src="${genData.icons[0]}" alt="${finalGenTitle}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+
+      contentHTML += `
+        <div class="progression-item-square ${finalGenUndiscoveredClass}" title="${finalGenTitle}">
+          <div class="progression-item-icon">${finalGenIcon}</div>
+          <div class="progression-item-level">I</div>
+        </div>
+      `;
+
+      contentHTML += `</div>`;
+    }
+  }
+
+  // --- Секция 4: Бустеры ---
+  const boosters = [
+    { key: 'upgrade_part', name: 'Новая деталь', icon: 'assets/icons/upgrade_part.png' },
+    { key: 'magic_tool', name: 'Магические инструменты', icon: 'assets/icons/magic_tool.png' },
+    { key: 'copy_bubble', name: 'Копирующий пузырь', icon: 'assets/icons/copy_bubble.png' }
+  ];
+
+  if (hasContent) {
+    contentHTML += `<hr style="border-color: #333; margin: 15px 0 10px;">`;
+  }
+  contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Бустеры</h4>`;
+  contentHTML += `<div class="progression-container">`;
+
+  boosters.forEach(booster => {
+    const discovered = isDiscovered(booster.key, 1);
+    const undiscoveredClass = discovered ? '' : 'undiscovered';
+    const title = discovered ? booster.name : 'Не открыто';
+    const iconSrc = discovered ? booster.icon : 'assets/icons/question.png';
+
+    contentHTML += `
+      <div class="progression-item-square ${undiscoveredClass}" title="${title}">
+        <div class="progression-item-icon"><img src="${iconSrc}" alt="${title}"></div>
+      </div>
+    `;
+  });
+  contentHTML += `</div>`;
 
   modal.body.innerHTML = contentHTML;
   modal.footer.innerHTML = ''; // Очищаем футер, кнопка больше не нужна

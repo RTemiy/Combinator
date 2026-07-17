@@ -9,6 +9,8 @@ const URLS_TO_CACHE = [
   "assets/icons/block.png",
   "assets/icons/bonus_chest_lvl1.png",
   "assets/icons/bonus_chest_lvl2.png",
+  "assets/icons/bonus_chest_lvl3.png",
+  "assets/icons/copy_bubble.png",
   "assets/icons/box.png",
   "assets/icons/categories/apples/apple.png",
   "assets/icons/categories/apples/box.png",

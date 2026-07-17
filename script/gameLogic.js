@@ -203,18 +203,27 @@ export function advanceStoryStep(fromModal = false) {
 
                 if (generatorData && generatorData.isSpecial) {
                     // Специальный генератор (например, bonus_chest) с конечными зарядами
+                    let charges = 1; // Значение по умолчанию
+                    if (step.reward.key === 'bonus_chest') {
+                        if (rewardLevel === 2) {
+                            charges = 3;
+                        } else if (rewardLevel === 3) {
+                            charges = 5;
+                        }
+                    }
+
                     gameState.rewardQueue.push({
                         isGenerator: true,
                         generatorKey: step.reward.key,
                         genLevel: rewardLevel,
-                        genCharges: 1 // По умолчанию для сундука 1-го уровня
+                        genCharges: charges
                     });
                 } else {
                     // Обычный, перезаряжаемый генератор
                     gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: rewardLevel, genEnergy: GEN_ENERGY_CONFIG[rewardLevel].max, lastRegenTime: Date.now() });
                 }
 
-                markItemAsDiscovered(step.reward.key, 'generator');
+                markItemAsDiscovered(step.reward.key, rewardLevel);
                 // Если генератор сюжетный, сразу разблокируем его категории для заказов
                 if (generatorData && generatorData.isStoryOnly) {
                     generatorData.categories.forEach(cat => {
@@ -276,6 +285,8 @@ export function claimReward(rewardIndex, startElement) {
         icon = `<img src="assets/icons/upgrade_part.png" alt="">`;
     } else if (reward.isMagicTool) {
         icon = `<img src="assets/icons/magic_tool.png" alt="">`;
+    } else if (reward.isCopyBubble) {
+      icon = `<img src="assets/icons/copy_bubble.png" alt="">`;
     }
     else if (reward.isGeneratorPart) {
         const genInfo = GENERATORS_DATA[reward.generatorKey];
@@ -402,7 +413,7 @@ export function claimAchievementReward(achievementId, tierIndex, buttonElement) 
 export function deleteItem(index) {
   const item = gameState.gridData[index];
   // Проверяем, что предмет существует и его можно продать (не генератор, не заблокирован)
-  if (index === -1 || !item || item.isGenerator || item.isBlocked || item.isUpgradePart || item.isMagicTool) {
+  if (index === -1 || !item || item.isGenerator || item.isBlocked || item.isUpgradePart || item.isMagicTool || item.isCopyBubble) {
     closeModal();
     return;
   }
@@ -555,7 +566,7 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
     genEnergy: GEN_ENERGY_CONFIG[nextLvl].max,
     lastRegenTime: Date.now()
   };
-  markItemAsDiscovered(generator.generatorKey, 'generator'); // Re-mark to ensure it's counted
+  markItemAsDiscovered(generator.generatorKey, nextLvl);
   triggerMergeEffects(genIdx, GENERATORS_DATA[generator.generatorKey].categories[0]);
   // showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
   return true;
@@ -574,12 +585,13 @@ function handleGeneratorPartMerge(fromIdx, toIdx, source) {
       genEnergy: GEN_ENERGY_CONFIG[1].max,
       lastRegenTime: Date.now()
     };
-    markItemAsDiscovered(source.generatorKey, 'generator');
+    markItemAsDiscovered(source.generatorKey, 1);
     triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
     // showToast(`🛠️ Собран новый генератор!`, "success");
     return true;
   } else { // Levels 1 and 2 merge up
     gameState.gridData[fromIdx] = null;
+    markItemAsDiscovered(`${source.generatorKey}_part`, source.level + 1);
     gameState.gridData[toIdx] = { isGeneratorPart: true, generatorKey: source.generatorKey, level: source.level + 1 };
     triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
     return true;
@@ -617,17 +629,31 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
   haptics.hapticSuccess();
   playSound(DOMElements.sfxMerge);
   if (source.generatorKey === 'bonus_chest') {
-    if (source.genLevel !== 1) return false;
-    gameState.gridData[fromIdx] = null;
-    gameState.gridData[toIdx] = {
-      isGenerator: true,
-      generatorKey: 'bonus_chest',
-      genLevel: 2,
-      genCharges: 3,
-    };
-    triggerMergeEffects(toIdx, 'stationery');
-    markItemAsDiscovered('bonus_chest', 'generator');
-    return true;
+    const currentLevel = source.genLevel || 1;
+    if (currentLevel === 1) { // Слияние L1 -> L2
+      gameState.gridData[fromIdx] = null;
+      gameState.gridData[toIdx] = {
+        isGenerator: true,
+        generatorKey: 'bonus_chest',
+        genLevel: 2,
+        genCharges: 3,
+      };
+      triggerMergeEffects(toIdx, 'stationery');
+      markItemAsDiscovered('bonus_chest', 2);
+      return true;
+    } else if (currentLevel === 2) { // Слияние L2 -> L3
+      gameState.gridData[fromIdx] = null;
+      gameState.gridData[toIdx] = {
+        isGenerator: true,
+        generatorKey: 'bonus_chest',
+        genLevel: 3,
+        genCharges: 5,
+      };
+      triggerMergeEffects(toIdx, 'stationery');
+      markItemAsDiscovered('bonus_chest', 3);
+      return true;
+    }
+    return false; // Нельзя объединять L3 и выше
   }
 
   const lvl = source.genLevel || 1;
@@ -641,7 +667,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
     genEnergy: GEN_ENERGY_CONFIG[nextLvl].max,
     lastRegenTime: Date.now()
   };
-  markItemAsDiscovered(source.generatorKey, 'generator');
+  markItemAsDiscovered(source.generatorKey, nextLvl);
   triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
   // showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
   return true;
@@ -677,7 +703,8 @@ const MERGE_HANDLERS = [
       }
       // Now check if they are mergeable based on level
       if (s.generatorKey === 'bonus_chest') {
-        return s.genLevel === 1; // Only level 1 bonus chests can be merged
+        const level = s.genLevel || 1;
+        return level === 1 || level === 2; // Можно объединять сундуки 1 и 2 уровней
       }
       return (s.genLevel || 1) < CONFIG.MAX_GENERATOR_LEVEL;
     },
@@ -697,9 +724,22 @@ const MERGE_HANDLERS = [
     canHandle: (s, t) => s.isMagicTool && t && !t.isGenerator && !t.isBlocked && !t.isUpgradePart && !t.isMagicTool && !t.isGeneratorPart && t.level < CONFIG.MAX_ITEM_LEVEL,
     execute: (from, to, src, trg) => handleItemUpgradeWithTool(from, to, trg)
   },
+  // Копирование предмета пузырем (перетаскивание предмета НА пузырь)
+  {
+    canHandle: (s, t) => t?.isCopyBubble && s && !s.isGenerator && !s.isBlocked && !s.isGeneratorPart && !s.isUpgradePart && !s.isMagicTool && !s.isCopyBubble && (s.isItemGenerator || s.level < CONFIG.MAX_ITEM_LEVEL),
+    execute: (from, to, src, trg) => {
+      haptics.hapticSuccess();
+      playSound(DOMElements.sfxMerge);
+      // Пузырь в ячейке 'to' заменяется копией предмета из ячейки 'from'.
+      // Предмет в 'from' НЕ удаляется, что приводит к дублированию.
+      gameState.gridData[to] = {...src};
+      triggerMergeEffects(to, src.category);
+      return true;
+    }
+  },
   // Слияние двух обычных предметов (включая предметы-генераторы)
   {
-    canHandle: (s, t) => t && !s.isBlocked && !t.isBlocked && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && !s.isMagicTool && !t.isMagicTool && s.category === t.category && s.level === t.level && s.level < CONFIG.MAX_ITEM_LEVEL,
+    canHandle: (s, t) => t && !s.isBlocked && !t.isBlocked && !s.isGenerator && !t.isGenerator && !s.isUpgradePart && !t.isUpgradePart && !s.isGeneratorPart && !t.isGeneratorPart && !s.isMagicTool && !t.isMagicTool && !s.isCopyBubble && !t.isCopyBubble && s.category === t.category && s.level === t.level && s.level < CONFIG.MAX_ITEM_LEVEL,
     execute: (from, to, src) => handleItemMerge(from, to, src)
   },
 ];
@@ -791,7 +831,7 @@ export function getItemType(item) {
   if (item.isGenerator) return 'generator';
   if (item.isItemGenerator) return 'itemGenerator';
   if (item.isGeneratorPart) return 'generatorPart';
-  if (item.isUpgradePart || item.isMagicTool) return 'booster';
+  if (item.isUpgradePart || item.isMagicTool || item.isCopyBubble) return 'booster';
   return 'regular';
 }
 
@@ -824,6 +864,12 @@ export function triggerSpecialGenerator(generator, fromIndex) {
     return;
   }
 
+  const genData = GENERATORS_DATA[generator.generatorKey];
+  if (!genData || !genData.drops || genData.drops.length === 0) {
+    console.error(`No drops defined for special generator: ${generator.generatorKey}`);
+    return;
+  }
+
   const emptyCells = getAvailableEmptyCells();
   if (emptyCells.length === 0) {
     showToast("Нет места для создания предмета!", "error");
@@ -837,11 +883,30 @@ export function triggerSpecialGenerator(generator, fromIndex) {
   const targetCellIndex = findClosestEmptyCell(fromIndex, emptyCells);
   gameState.lockedCells.push(targetCellIndex);
 
-  const rand = Math.random();
-  const newItem = rand < 0.5 ? { isUpgradePart: true, icon: 'assets/icons/upgrade_part.png', name: 'Новая деталь' } : { isMagicTool: true, icon: 'assets/icons/magic_tool.png', name: 'Магические инструменты' };
+  // --- NEW LOGIC: Weighted random drop ---
+  const drops = genData.drops;
+  const totalWeight = drops.reduce((sum, drop) => sum + drop.weight, 0);
+  let random = Math.random() * totalWeight;
+  let chosenDrop;
+
+  for (const drop of drops) {
+    if (random < drop.weight) {
+      chosenDrop = drop;
+      break;
+    }
+    random -= drop.weight;
+  }
+  if (!chosenDrop) { // Fallback
+    chosenDrop = drops[drops.length - 1];
+  }
+  const newItem = { ...chosenDrop.item }; // Create a copy
 
   moveItem3D(DOMElements.grid.children[fromIndex], DOMElements.grid.children[targetCellIndex], `<img src="${newItem.icon}" alt="">`).then(() => {
-    markItemAsDiscovered(newItem.isUpgradePart ? 'upgrade_part' : 'magic_tool', 1);
+    if (newItem.discoveryKey) {
+      markItemAsDiscovered(newItem.discoveryKey, 1);
+    }
+    delete newItem.discoveryKey; // Clean up the object before placing it on the grid
+
     gameState.gridData[targetCellIndex] = newItem;
     gameState.lockedCells = gameState.lockedCells.filter(idx => idx !== targetCellIndex);
     if (generator.genCharges <= 0) {
@@ -973,7 +1038,7 @@ function spawnLevelUpBonus(level) {
       genLevel: 1,
       genCharges: 1
     });
-    markItemAsDiscovered('bonus_chest', 'generator');
+    markItemAsDiscovered('bonus_chest', 1);
     showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Уровень ${level}! Бонус: получена Подарочная коробка!`, "success");
 }
 
@@ -1040,7 +1105,7 @@ function unlockNewGenerator(threshold) {
     genEnergy: GEN_ENERGY_CONFIG[1].max,
     lastRegenTime: Date.now()
   });
-  markItemAsDiscovered(genKey, 'generator');
+  markItemAsDiscovered(genKey, 1);
   showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Бонус уровня: ${generatorData.name}!`, "success");
 }
 
@@ -1064,7 +1129,7 @@ export function spawnRandomExistingGenerator() {
       genEnergy: GEN_ENERGY_CONFIG[1].max,
       lastRegenTime: Date.now()
     });
-    markItemAsDiscovered(randomGenKey, 'generator');
+    markItemAsDiscovered(randomGenKey, 1);
     showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Бонус: получен генератор "${generatorData.name}"!`, "story");
   } else {
     // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
@@ -1091,6 +1156,15 @@ export function spawnMagicTool() {
   markItemAsDiscovered('magic_tool', 1);
 }
 
+export function spawnCopyBubble() {
+  gameState.rewardQueue.push({
+    isCopyBubble: true,
+    icon: 'assets/icons/copy_bubble.png',
+    name: 'Копирующий пузырь'
+  });
+  markItemAsDiscovered('copy_bubble', 1);
+}
+
 export function spawnGeneratorPart() {
   // 1. Get all unique generator keys from active categories.
   const activeGeneratorKeys = [...new Set(gameState.activeCategories.map(cat => CATEGORIES_CONFIG[cat].generatorKey))];
@@ -1109,7 +1183,7 @@ export function spawnGeneratorPart() {
       generatorKey: randomGenKey,
       level: 1
     });
-    markItemAsDiscovered(randomGenKey, 'part');
+    markItemAsDiscovered(`${randomGenKey}_part`, 1);
     // showToast(`⚙️ Получена деталь для "${generatorData.name}"!`, "success");
   }
 }
@@ -1226,7 +1300,7 @@ export function checkOrdersAvailability() {
 
     item.isAllocatedToOrder = false; // Сброс
 
-    const isAvailableForOrder = item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !item.isGeneratorPart && !item.isMagicTool && !gameState.lockedCells.includes(idx);
+    const isAvailableForOrder = item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !item.isGeneratorPart && !item.isMagicTool && !item.isCopyBubble && !gameState.lockedCells.includes(idx);
     if (!isAvailableForOrder) return;
 
     const key = `${item.category}-${item.level}`;
@@ -1365,24 +1439,28 @@ export function completeOrder(id) {
           showToast(`Часть серии выполнена! Шаг ${currentStep + 1}/3 начался.`, "story");
         } else {
           const rand = Math.random();
-          if (rand < 0.25) {
-            // 25% шанс на подарочную коробку
+          if (rand < 0.20) {
+            // 20% шанс на подарочную коробку
             gameState.rewardQueue.push({
               isGenerator: true,
               generatorKey: 'bonus_chest',
               genLevel: 1, genCharges: 1
             });
             showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Вы получили Подарочную коробку!`, "story");
-          } else if (rand < 0.5) {
-            // 25% шанс на деталь для улучшения (вместо нового генератора)
+          } else if (rand < 0.40) {
+            // 20% шанс на деталь для улучшения
             spawnUpgradePart();
             showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
-          } else if (rand < 0.75) {
-            // 25% шанс на магические инструменты
+          } else if (rand < 0.60) {
+            // 20% шанс на магические инструменты
             spawnMagicTool();
             showToast(`<img src="assets/icons/magic_tool.png" class="toast-icon" alt=""> Серия завершена! Бонус: получены Магические инструменты!`, "story");
+          } else if (rand < 0.80) {
+            // 20% шанс на копирующий пузырь
+            spawnCopyBubble();
+            showToast(`<img src="assets/icons/copy_bubble.png" class="toast-icon" alt=""> Серия завершена! Бонус: получен Копирующий пузырь!`, "story");
           } else {
-            // 25% шанс на случайный уже открытый генератор
+            // 20% шанс на случайный уже открытый генератор
             spawnRandomExistingGenerator();
           }
           generateOrder();

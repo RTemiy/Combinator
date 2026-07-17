@@ -243,8 +243,8 @@ export function startNewGame() {
   // Создаем два генератора на основе этих категорий
   startingGenerators.push({ isGenerator: true, generatorKey: genKey1, genLevel: 1, genEnergy: GEN_ENERGY_CONFIG[1].max, lastRegenTime: Date.now() });
   startingGenerators.push({ isGenerator: true, generatorKey: genKey2, genLevel: 1, genEnergy: GEN_ENERGY_CONFIG[1].max, lastRegenTime: Date.now() });
-  markItemAsDiscovered(genKey1, 'generator');
-  markItemAsDiscovered(genKey2, 'generator');
+  markItemAsDiscovered(genKey1, 1);
+  markItemAsDiscovered(genKey2, 1);
 
   [genKey1, genKey2].forEach(key => GENERATORS_DATA[key].categories.forEach(cat => activeCategoriesSet.add(cat)));
   gameState.activeCategories = Array.from(activeCategoriesSet);

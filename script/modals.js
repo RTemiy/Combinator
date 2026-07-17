@@ -444,6 +444,15 @@ function getBoosterModalOptions(item) {
       isBlocking: false
     };
   }
+  if (item.isCopyBubble) {
+    return {
+      icon: 'assets/icons/copy_bubble.png',
+      title: 'Копирующий пузырь',
+      subtitle: 'Бустер-дубликатор',
+      desc: 'Перетащите любой предмет (кроме генераторов и других бустеров) на этот пузырь, чтобы создать его точную копию. Пузырь при этом исчезнет.',
+      isBlocking: false
+    };
+  }
   return {};
 }
 

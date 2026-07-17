@@ -107,10 +107,45 @@ export const GENERATORS_DATA = {
     ]
   },
   'bonus_chest': {
-    name: 'Подарочная коробка', desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.', categories: [], isSpecial: true,
+    name: 'Подарочная коробка',
+    desc: 'Коробка с сюрпризом. Содержит редкие предметы, но имеет ограниченное количество зарядов.',
+    categories: [],
+    isSpecial: true,
     icons: [
       'assets/icons/bonus_chest_lvl1.png',
       'assets/icons/bonus_chest_lvl2.png',
+      'assets/icons/bonus_chest_lvl3.png',
+    ],
+    // Таблица добычи. 'weight' - относительный шанс выпадения.
+    drops: [
+      {
+        weight: 33,
+        item: {
+          isUpgradePart: true,
+          icon: 'assets/icons/upgrade_part.png',
+          name: 'Новая деталь',
+          discoveryKey: 'upgrade_part'
+        }
+      },
+      {
+        weight: 33,
+        item: {
+          isMagicTool: true,
+          icon: 'assets/icons/magic_tool.png',
+          name: 'Магические инструменты',
+          discoveryKey: 'magic_tool'
+        }
+      }
+      ,
+      {
+        weight: 34,
+        item: {
+          isCopyBubble: true,
+          icon: 'assets/icons/copy_bubble.png',
+          name: 'Копирующий пузырь',
+          discoveryKey: 'copy_bubble'
+        }
+      }
     ]
   },
 };
