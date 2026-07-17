@@ -1,6 +1,6 @@
 importScripts('./asset-list.js');
 
-const CACHE_VERSION = '1.3.04'; // 1.3.03
+const CACHE_VERSION = '1.3.05'; // 1.3.04
 const CACHE_NAME = `combinator-cache-${CACHE_VERSION}`;
 
 // 1. Установка Service Worker: кэширование всех ресурсов

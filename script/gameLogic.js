@@ -575,6 +575,10 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
 function handleGeneratorPartMerge(fromIdx, toIdx, source) {
   haptics.hapticSuccess();
   playSound(DOMElements.sfxMerge);
+
+  // Гарантируем, что исходная деталь, которую мы сливаем, будет добавлена в коллекцию.
+  markItemAsDiscovered(`${source.generatorKey}_part`, source.level);
+
   if (source.level >= 3) { // Max level for parts is 3. Merging two L3 parts.
     gameState.gridData[fromIdx] = null;
     // Create a new L1 generator
