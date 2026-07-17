@@ -843,6 +843,7 @@ export function renderCollectionModal() {
   contentHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Улучшения генераторов</h4>`;
   
   for (const genKey in GENERATORS_DATA) {
+    if (genKey === 'bonus_chest') continue;
     const genData = GENERATORS_DATA[genKey];
     // Проверяем, открыт ли хоть один уровень этого генератора
     const isGeneratorVisible = genData.icons.some((icon, index) => isDiscovered(genKey, index + 1));
@@ -948,6 +949,34 @@ export function renderCollectionModal() {
     `;
   });
   contentHTML += `</div>`;
+
+  // --- Добавляем цепочку bonus_chest в эту же секцию ---
+  const bonusChestData = GENERATORS_DATA['bonus_chest'];
+  const isBonusChestVisible = bonusChestData.icons.some((icon, index) => isDiscovered('bonus_chest', index + 1));
+
+  if (isBonusChestVisible) {
+    contentHTML += `<div class="progression-container" style="margin-top: 10px;">`;
+
+    bonusChestData.icons.forEach((iconPath, index) => {
+      const level = index + 1;
+      const romanLevel = CONFIG.ROMAN_NUMERALS[level];
+      const discovered = isDiscovered('bonus_chest', level);
+      const undiscoveredClass = discovered ? '' : 'undiscovered';
+      const title = discovered ? `${bonusChestData.name} ${romanLevel}` : 'Не открыто';
+      const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+
+      contentHTML += `
+        <div class="progression-item-square ${undiscoveredClass}" title="${title}">
+          <div class="progression-item-icon">${itemIcon}</div>
+          <div class="progression-item-level">${romanLevel}</div>
+        </div>
+      `;
+      if (index < bonusChestData.icons.length - 1) {
+        contentHTML += '<div class="progression-arrow-h">→</div>';
+      }
+    });
+    contentHTML += `</div>`;
+  }
 
   modal.body.innerHTML = contentHTML;
   modal.footer.innerHTML = ''; // Очищаем футер, кнопка больше не нужна
