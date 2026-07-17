@@ -44,7 +44,7 @@ export const CONFIG = {
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.2.8',
+  GAME_VERSION: '1.3.0',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },

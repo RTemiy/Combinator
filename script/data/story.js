@@ -58,7 +58,7 @@ export const STORY_DATA = {
             name: 'Садовник',
             text: 'Если вложишь 500 монет в наше общее дело, я подготовлю для тебя саженец, который быстро вырастет в могучее дерево. С него и начнется твой новый бизнес!',
             task: { type: 'spend_coins', amount: 500, buttonText: 'Вложиться в саженец' },
-            reward: { type: 'item', category: 'flowers', level: 7 }
+            reward: { type: 'generator', key: 'currant', level: 1 }
           },
           { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'Отличный выбор! Вот, держи. Это не просто дерево, а настоящий генератор ягод! Ухаживай за ним, и оно принесет тебе немало выгоды. Удачи в новом начинании!' },
         ]

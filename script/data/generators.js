@@ -69,6 +69,24 @@ export const GENERATORS_DATA = {
       'assets/icons/categories/dough/generator_lvl_02.png',
     ]
   },
+  'currant': {
+    name: 'Куст смородины',
+    desc: 'Пышный куст, дающий сочные ягоды смородины. Источник витаминов и вдохновения для летних десертов.',
+    categories: ['currant'],
+    isStoryOnly: true,
+    parts: [
+      { name: 'Ветка с почками', desc: 'Крепкая ветка с набухшими почками, предвещающая богатый урожай.', icon: 'assets/icons/categories/currant/part_lvl_01.png' },
+      { name: 'Черенок смородины', desc: 'Маленький черенок, готовый пустить корни и стать большим кустом.', icon: 'assets/icons/categories/currant/part_lvl_02.png' },
+      { name: 'Саженец смородины', desc: 'Молодой саженец, уже с несколькими листочками. Ему нужен уход и забота.', icon: 'assets/icons/categories/currant/part_lvl_03.png' }
+    ],
+    icons: [
+      'assets/icons/categories/currant/generator_lvl_01.png',
+      'assets/icons/categories/currant/generator_lvl_02.png',
+      'assets/icons/categories/currant/generator_lvl_03.png',
+      'assets/icons/categories/currant/generator_lvl_03.png',
+      'assets/icons/categories/currant/generator_lvl_03.png',
+    ]
+  },
   'beehive': {
     name: 'Улей',
     desc: 'Маленький домик для пчёл, источник сладкого мёда и ароматного воска.',
