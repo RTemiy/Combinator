@@ -103,13 +103,13 @@ export const CATEGORIES_CONFIG = {
     color: '#8c00ff',
     generatorKey: 'currant',
     items: [
-      { level: 1, icon: 'assets/icons/categories/berries/single_berry.png', name: 'Ягодка смородины', desc: 'Одна-единственная спелая и блестящая ягодка.' },
-      { level: 2, icon: 'assets/icons/categories/berries/bunch.png', name: 'Гроздь смородины', desc: 'Целая веточка, усыпанная кисло-сладкими ягодами.' },
-      { level: 3, icon: 'assets/icons/categories/berries/handful.png', name: 'Горсть смородины', desc: 'Несколько ягод, которых хватит, чтобы распробовать вкус лета.' },
-      { level: 4, icon: 'assets/icons/categories/berries/bowl.png', name: 'Миска со смородиной', desc: 'Полная миска свежесобранных ягод, посыпанных сахаром.' },
-      { level: 5, icon: 'assets/icons/categories/berries/basket.png', name: 'Корзинка смородины', desc: 'Небольшая плетеная корзинка, доверху наполненная урожаем.' },
-      { level: 6, icon: 'assets/icons/categories/berries/jam_jar.png', name: 'Банка варенья', desc: 'Густое и сладкое смородиновое варенье, заготовленное на зиму.' },
-      { level: 7, icon: 'assets/icons/categories/berries/pie.png', name: 'Пирог со смородиной', desc: 'Домашний пирог с ароматной ягодной начинкой.' },
+      { level: 1, icon: 'assets/icons/categories/currant/single_berry.png', name: 'Ягодка смородины', desc: 'Одна-единственная спелая и блестящая ягодка.' },
+      { level: 2, icon: 'assets/icons/categories/currant/bunch.png', name: 'Гроздь смородины', desc: 'Целая веточка, усыпанная кисло-сладкими ягодами.' },
+      { level: 3, icon: 'assets/icons/categories/currant/handful.png', name: 'Горсть смородины', desc: 'Несколько ягод, которых хватит, чтобы распробовать вкус лета.' },
+      { level: 4, icon: 'assets/icons/categories/currant/bowl.png', name: 'Миска со смородиной', desc: 'Полная миска свежесобранных ягод, посыпанных сахаром.' },
+      { level: 5, icon: 'assets/icons/categories/currant/basket.png', name: 'Корзинка смородины', desc: 'Небольшая плетеная корзинка, доверху наполненная урожаем.' },
+      { level: 6, icon: 'assets/icons/categories/currant/jam_jar.png', name: 'Банка варенья', desc: 'Густое и сладкое смородиновое варенье, заготовленное на зиму.' },
+      { level: 7, icon: 'assets/icons/categories/currant/pie.png', name: 'Пирог со смородиной', desc: 'Домашний пирог с ароматной ягодной начинкой.' },
     ]
   },
   honey: {
