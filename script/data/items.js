@@ -16,7 +16,8 @@ export const CATEGORIES_CONFIG = {
   apples: {
     name: 'Яблочное производство',
     color: '#ff0000',
-    generatorKey: 'apples',
+    generatorKey: null,
+    isItemGenerated: true,
     items: [
       { level: 1, icon: 'assets/icons/categories/apples/slice.png', name: 'Долька яблока', desc: 'Сочный кусочек яблока, идеален для быстрого перекуса.' },
       { level: 2, icon: 'assets/icons/categories/apples/apple.png', name: 'Целое яблоко', desc: 'Спелое и хрустящее яблоко, полное витаминов.' },

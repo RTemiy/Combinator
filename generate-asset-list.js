@@ -47,8 +47,8 @@ assetFolders.forEach(folder => {
 const uniqueFiles = [...new Set(allFiles)].sort();
 const fileContent = `// ВНИМАНИЕ! Этот файл генерируется автоматически.
 // Не редактируйте его вручную. Запустите "node generate-asset-list.js" для обновления.
-export const URLS_TO_CACHE = ${JSON.stringify(uniqueFiles, null, 2)};`;
-const outputPath = path.join('script', 'asset-list.js');
+const URLS_TO_CACHE = ${JSON.stringify(uniqueFiles, null, 2)};`;
+const outputPath =  'asset-list.js'
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, fileContent);
 console.log(`✅ Список из ${uniqueFiles.length} файлов успешно создан: ${outputPath}`);

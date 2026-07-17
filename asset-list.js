@@ -1,4 +1,4 @@
-export const URLS_TO_CACHE = [
+const URLS_TO_CACHE = [
   "assets/favicon.png",
   "assets/icon.png",
   "assets/icons/achievements.png",

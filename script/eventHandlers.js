@@ -238,7 +238,7 @@ function handleDragMove(clientX, clientY) {
       gameState.dragState.element.style.top = `${rect.top}px`;
       document.body.appendChild(gameState.dragState.element);
 
-      originalWrapper.style.opacity = '0.3';
+      originalWrapper.style.opacity = '0';
     }
   }
 
