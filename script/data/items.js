@@ -47,14 +47,29 @@ export const CATEGORIES_CONFIG = {
     color: '#0fffd4',
     generatorKey: 'stationery',
     items: [
-      { level: 1, icon: 'assets/icons/categories/writings/clip.png', name: 'Скрепка', desc: 'Маленький металлический помощник, удерживающий листы вместе.' },
-      { level: 2, icon: 'assets/icons/categories/writings/eraser.png', name: 'Ластик', desc: 'Стирает ошибки и неудачные наброски, давая второй шанс.' },
-      { level: 3, icon: 'assets/icons/categories/writings/pencil.png', name: 'Карандаш', desc: 'Простой инструмент для письма и рисования, основа творчества.' },
-      { level: 4, icon: 'assets/icons/categories/writings/pen.png', name: 'Ручка', desc: 'Оставляет четкий и уверенный след, идеальна для важных записей.' },
-      { level: 5, icon: 'assets/icons/categories/writings/scissors.png', name: 'Ножницы', desc: 'Острые лезвия для точной резки бумаги и картона.' },
-      { level: 6, icon: 'assets/icons/categories/writings/pencil_case.png', name: 'Пенал', desc: 'Вместилище для всех письменных сокровищ, поддерживает порядок.' },
-      { level: 7, icon: 'assets/icons/categories/writings/organizer.png', name: 'Подставка для письменных принадлежностей', desc: 'Органайзер, который собирает все инструменты в одном месте.' },
+      { level: 1, icon: 'assets/icons/categories/stationery/clip.png', name: 'Скрепка', desc: 'Маленький металлический помощник, удерживающий листы вместе.' },
+      { level: 2, icon: 'assets/icons/categories/stationery/eraser.png', name: 'Ластик', desc: 'Стирает ошибки и неудачные наброски, давая второй шанс.' },
+      { level: 3, icon: 'assets/icons/categories/stationery/pencil.png', name: 'Карандаш', desc: 'Простой инструмент для письма и рисования, основа творчества.' },
+      { level: 4, icon: 'assets/icons/categories/stationery/pen.png', name: 'Ручка', desc: 'Оставляет четкий и уверенный след, идеальна для важных записей.' },
+      { level: 5, icon: 'assets/icons/categories/stationery/scissors.png', name: 'Ножницы', desc: 'Острые лезвия для точной резки бумаги и картона.' },
+      { level: 6, icon: 'assets/icons/categories/stationery/pencil_case.png', name: 'Пенал', desc: 'Вместилище для всех письменных сокровищ, поддерживает порядок.' },
+      { level: 7, icon: 'assets/icons/categories/stationery/organizer.png', name: 'Органайзер', desc: 'Подставка для письменных принадлежностей, которая собирает все инструменты в одном месте.', becomesGenerator: { category: 'gadgets', charges: 13 } },
     ]
+  },
+  gadgets: {
+    name: 'Гаджеты',
+    color: '#00ffb2',
+    generatorKey: null,
+    isItemGenerated: true,
+    items: [
+      { level: 1, icon: 'assets/icons/categories/gadgets/usb_cable.png', name: 'USB-кабель', desc: 'Универсальный провод для зарядки и передачи данных. Без него никуда.' },
+      { level: 2, icon: 'assets/icons/categories/gadgets/powerbank.png', name: 'Powerbank', desc: 'Портативный аккумулятор, который спасет в самый нужный момент.' },
+      { level: 3, icon: 'assets/icons/categories/gadgets/mouse.png', name: 'Беспроводная мышь', desc: 'Удобный манипулятор, дающий свободу от проводов.' },
+      { level: 4, icon: 'assets/icons/categories/gadgets/headphones.png', name: 'Беспроводные наушники', desc: 'Погрузитесь в музыку или подкаст, не мешая окружающим.' },
+      { level: 5, icon: 'assets/icons/categories/gadgets/smartwatch.png', name: 'Умные часы', desc: 'Стильный аксессуар, который следит за активностью и показывает уведомления.' },
+      { level: 6, icon: 'assets/icons/categories/gadgets/tablet.png', name: 'Планшет', desc: 'Большой экран для работы, игр и просмотра фильмов.' },
+      { level: 7, icon: 'assets/icons/categories/gadgets/laptop.png', name: 'Ноутбук', desc: 'Мощный портативный компьютер для решения любых задач.' },
+      ]
   },
   books: {
     name: 'Книги',

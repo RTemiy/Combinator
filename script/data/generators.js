@@ -39,16 +39,16 @@ export const GENERATORS_DATA = {
     categories: ['books', 'stationery'],
     isHybrid: true,
     parts: [
-      { name: 'Карандаши и ручки', desc: 'Базовый набор для письма и рисования. С чего-то нужно начинать.', icon: 'assets/icons/categories/writings/part_lvl_01.png' },
-      { name: 'Карандаши, ручки, ластики и резинки', desc: 'Расширенный набор канцелярских принадлежностей. Теперь можно и ошибки исправлять.', icon: 'assets/icons/categories/writings/part_lvl_02.png' },
-      { name: 'Канцелярский хлам', desc: 'Целая гора всего необходимого для учебы и творчества. Пора наводить порядок!', icon: 'assets/icons/categories/writings/part_lvl_03.png' }
+      { name: 'Карандаши и ручки', desc: 'Базовый набор для письма и рисования. С чего-то нужно начинать.', icon: 'assets/icons/categories/stationery/part_lvl_01.png' },
+      { name: 'Карандаши, ручки, ластики и резинки', desc: 'Расширенный набор канцелярских принадлежностей. Теперь можно и ошибки исправлять.', icon: 'assets/icons/categories/stationery/part_lvl_02.png' },
+      { name: 'Канцелярский хлам', desc: 'Целая гора всего необходимого для учебы и творчества. Пора наводить порядок!', icon: 'assets/icons/categories/stationery/part_lvl_03.png' }
     ],
     icons: [
-      'assets/icons/categories/writings/generator_lvl_01.png',
-      'assets/icons/categories/writings/generator_lvl_02.png',
-      'assets/icons/categories/writings/generator_lvl_03.png',
-      'assets/icons/categories/writings/generator_lvl_03.png',
-      'assets/icons/categories/writings/generator_lvl_03.png',
+      'assets/icons/categories/stationery/generator_lvl_01.png',
+      'assets/icons/categories/stationery/generator_lvl_02.png',
+      'assets/icons/categories/stationery/generator_lvl_03.png',
+      'assets/icons/categories/stationery/generator_lvl_03.png',
+      'assets/icons/categories/stationery/generator_lvl_03.png',
     ]
   },
   'bakery': {
