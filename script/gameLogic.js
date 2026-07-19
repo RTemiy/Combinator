@@ -19,8 +19,8 @@ import {
   animateRewardFly,
   renderGrid, updateMenuNotification
 } from './ui.js';
-import { saveGame, startNewGame } from './gameManager.js';
-import { closeModal, openStoryModal } from './modals.js';
+import { saveGame } from './gameManager.js';
+import { closeModal, openLevelUpModal, openStoryModal } from './modals.js';
 import * as haptics from './haptics.js';
 
 export function getEmptyGridCells() {
@@ -1035,21 +1035,11 @@ export function triggerGenerator(generator, fromIndex) {
   }
 }
 
-function spawnLevelUpBonus(level) {
-    gameState.rewardQueue.push({
-      isGenerator: true,
-      generatorKey: 'bonus_chest',
-      genLevel: 1,
-      genCharges: 1
-    });
-    markItemAsDiscovered('bonus_chest', 1);
-    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Уровень ${level}! Бонус: получена Подарочная коробка!`, "success");
-}
-
 export function checkProgressiveUnlocks() {
   UNLOCK_THRESHOLDS.forEach(threshold => {
     // Уровень считается достигнутым, если игрок набрал scoreStart этого уровня
     if (gameState.score >= threshold.scoreStart && !threshold.unlocked) {
+      const previousLevel = threshold.level - 1;
       threshold.unlocked = true;
 
       // Воспроизводим звук, даем монеты и показываем тост при повышении уровня (кроме 1-го)
@@ -1058,22 +1048,36 @@ export function checkProgressiveUnlocks() {
         const coinReward = threshold.level * CONFIG.LEVEL_UP_COIN_MULTIPLIER;
         gameState.coins += coinReward;
         playerProfile.totalCoinsEarned += coinReward;
-        // Анимация полета монет
-        animateRewardFly(DOMElements.level.container, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinReward / 10)), 'coin');
-        // Показываем отдельный тост о повышении уровня и награде в монетах
-        showToast(`<img src="assets/icons/level.png" class="toast-icon" alt=""> Уровень ${threshold.level}! +${coinReward} монет.`, "success");
-      }
 
-      // Проверяем, должен ли этот уровень разблокировать генератор
-      if (threshold.unlocksGenerator && gameState.lockedCategories.length > 0) {
-        // Логика разблокировки нового генератора
-        unlockNewGenerator(threshold);
-      } else {
-        // Если генератор не выдается или все уже открыты, даем другую награду
-        // Проверяем, что это не стартовый 1-й уровень
-        if (threshold.level > 1) {
+        let hasGiftBox = false;
+        let hasNewGenerator = false;
+        let newGeneratorName = '';
+        let newGeneratorIcon = '';
+
+        // Проверяем, должен ли этот уровень разблокировать генератор
+        if (threshold.unlocksGenerator && gameState.lockedCategories.length > 0) {
+          // Логика разблокировки нового генератора
+          const newGenData = unlockNewGenerator(threshold);
+          if (newGenData) {
+            hasNewGenerator = true;
+            newGeneratorName = newGenData.name;
+            newGeneratorIcon = newGenData.icon;
+          }
+        } else {
+          // Если генератор не выдается или все уже открыты, даем другую награду
           spawnLevelUpBonus(threshold.level);
+          hasGiftBox = true;
         }
+
+        openLevelUpModal(previousLevel, threshold.level, {
+          coins: coinReward,
+          giftBox: hasGiftBox,
+          newGenerator: hasNewGenerator,
+          newGeneratorName: newGeneratorName,
+          newGeneratorIcon: newGeneratorIcon
+        });
+
+        animateRewardFly(DOMElements.level.container, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinReward / 10)), 'coin');
       }
       updateUI(); // Обновляем UI, чтобы показать награду в очереди
     }
@@ -1110,7 +1114,11 @@ function unlockNewGenerator(threshold) {
     lastRegenTime: Date.now()
   });
   markItemAsDiscovered(genKey, 1);
-  showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Бонус уровня: ${generatorData.name}!`, "success");
+  // showToast - убрали, теперь это в модальном окне
+  return {
+    name: generatorData.name,
+    icon: generatorData.icons[0]
+  };
 }
 
 export function spawnRandomExistingGenerator() {
@@ -1140,6 +1148,16 @@ export function spawnRandomExistingGenerator() {
     spawnUpgradePart();
     showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
   }
+}
+
+function spawnLevelUpBonus(level) {
+    gameState.rewardQueue.push({
+      isGenerator: true,
+      generatorKey: 'bonus_chest',
+      genLevel: 1,
+      genCharges: 1
+    });
+    markItemAsDiscovered('bonus_chest', 1);
 }
 
 export function spawnUpgradePart() {

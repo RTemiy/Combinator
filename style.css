@@ -2229,6 +2229,148 @@ input[type="range"]::-moz-range-thumb {
     }
 }
 
+/* Level Up Modal */
+.modal-overlay#level-up-modal-overlay {
+  align-items: center;
+  background: var(--modal-overlay-bg);
+  transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.modal-overlay#level-up-modal-overlay:not(.active) {
+  background: transparent;
+  /* Добавляем это правило, чтобы гарантированно убрать кликабельность при закрытии */
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.modal-overlay#level-up-modal-overlay.active {
+}
+
+.level-up-modal {
+  text-align: center;
+  padding: 20px 30px;
+  background: var(--modal-bg);
+  border-radius: 20px;
+  border: 2px solid var(--accent-color);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  max-width: 380px;
+  width: 90%;
+  box-sizing: border-box;
+  pointer-events: auto;
+  transform: scale(0.9);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.1, 0.76, 0.55, 0.94), opacity 0.2s ease;
+}
+
+.modal-overlay.active .level-up-modal {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.level-up-header {
+  margin-bottom: 15px;
+}
+
+.level-up-title {
+  font-size: 2em;
+  color: var(--accent-color);
+  margin: 0;
+  text-shadow: 0 0 10px var(--accent-color);
+}
+
+.level-up-transition {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.level-badge {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #fff;
+  background: #555;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #777;
+}
+
+.level-badge.new {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+.level-up-arrow {
+  font-size: 2em;
+  color: #888;
+}
+
+.level-up-congrats {
+  margin-bottom: 20px;
+}
+
+.level-up-rewards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.level-up-reward-item {
+  display: flex;
+  align-items: center;
+  background: var(--panel-color);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.reward-icon-container {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cell-color);
+  border-radius: 8px;
+}
+
+.reward-icon-container img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.reward-info {
+  text-align: left;
+}
+
+.reward-name {
+  display: block;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.reward-name em {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #ccc;
+}
+
+.reward-amount {
+  display: block;
+  font-size: 0.9em;
+  color: var(--text-color-light);
+}
+
 #update-notification button {
     background-color: var(--accent-color);
     color: var(--text-color-on-accent);

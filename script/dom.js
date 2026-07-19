@@ -38,6 +38,10 @@ export const DOMElements = {
     storyNotificationDot: document.getElementById('story-notification-dot'),
     tutorialBtn: document.getElementById('tutorial-btn'),
   },
+  levelUpModal: {
+    overlay: document.getElementById('level-up-modal-overlay'),
+    body: document.getElementById('level-up-modal-body'),
+  },
   settingsModal: {
     overlay: document.getElementById('settings-modal'),
     closeBtn: document.getElementById('s-m-close'),

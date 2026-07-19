@@ -230,23 +230,20 @@ export function startNewGame() {
   playerProfile.mergeCounts = {};
 
   playerProfile.hasSeenTutorial = false;
-  // --- Новая логика генерации стартовых генераторов ---
   const allGeneratorKeys = Object.keys(GENERATORS_DATA).filter(k => k !== 'bonus_chest' && !GENERATORS_DATA[k].isStoryOnly);
   const startingGenerators = [];
   const activeCategoriesSet = new Set();
 
-  // Выбираем 2 уникальные случайные категории
+  // Выбираем N уникальных случайных генераторов
   const shuffledGenKeys = [...allGeneratorKeys].sort(() => 0.5 - Math.random());
-  const genKey1 = shuffledGenKeys[0];
-  const genKey2 = shuffledGenKeys[1];
+  const startingGenKeys = shuffledGenKeys.slice(0, CONFIG.STARTING_GENERATORS_COUNT);
 
-  // Создаем два генератора на основе этих категорий
-  startingGenerators.push({ isGenerator: true, generatorKey: genKey1, genLevel: 1, genEnergy: GEN_ENERGY_CONFIG[1].max, lastRegenTime: Date.now() });
-  startingGenerators.push({ isGenerator: true, generatorKey: genKey2, genLevel: 1, genEnergy: GEN_ENERGY_CONFIG[1].max, lastRegenTime: Date.now() });
-  markItemAsDiscovered(genKey1, 1);
-  markItemAsDiscovered(genKey2, 1);
+  startingGenKeys.forEach(genKey => {
+    startingGenerators.push({ isGenerator: true, generatorKey: genKey, genLevel: 1, genEnergy: GEN_ENERGY_CONFIG[1].max, lastRegenTime: Date.now() });
+    markItemAsDiscovered(genKey, 1);
+    GENERATORS_DATA[genKey].categories.forEach(cat => activeCategoriesSet.add(cat));
+  });
 
-  [genKey1, genKey2].forEach(key => GENERATORS_DATA[key].categories.forEach(cat => activeCategoriesSet.add(cat)));
   gameState.activeCategories = Array.from(activeCategoriesSet);
   gameState.lockedCategories = Object.keys(CATEGORIES_CONFIG).filter(cat => {
     const genKey = CATEGORIES_CONFIG[cat].generatorKey;
@@ -254,7 +251,6 @@ export function startNewGame() {
     return !gameState.activeCategories.includes(cat) && !CATEGORIES_CONFIG[cat].isItemGenerated && !isStoryGenerator;
   });
   shuffleArray(gameState.lockedCategories);
-  // --- Конец новой логики ---
 
   let availableIndices = Array.from({length: CONFIG.GRID_COLS * CONFIG.GRID_ROWS}, (_, i) => i);
 

@@ -275,6 +275,75 @@ function closeAllModals() {
     closeStorySelectionModal();
     closeTutorialModal();
     closeMenuModal();
+    closeLevelUpModal();
+}
+
+export function openLevelUpModal(fromLevel, toLevel, rewards) {
+  const modal = DOMElements.levelUpModal;
+
+  let rewardsHTML = '';
+  if (rewards.coins > 0) {
+    rewardsHTML += `
+          <div class="level-up-reward-item">
+              <div class="reward-icon-container coin-reward"><img src="assets/icons/coin.png" alt="Монеты"></div>
+              <div class="reward-info">
+                  <span class="reward-name">Монеты</span>
+                  <span class="reward-amount">+${rewards.coins.toLocaleString('ru-RU')}</span>
+              </div>
+          </div>
+      `;
+  }
+  if (rewards.giftBox) {
+    rewardsHTML += `
+          <div class="level-up-reward-item">
+              <div class="reward-icon-container"><img src="assets/icons/bonus_chest_lvl1.png" alt="Подарочная коробка"></div>
+              <div class="reward-info">
+                  <span class="reward-name">Подарочная коробка</span>
+                  <span class="reward-amount">+1</span>
+              </div>
+          </div>
+      `;
+  }
+  if (rewards.newGenerator) {
+    rewardsHTML += `
+          <div class="level-up-reward-item">
+              <div class="reward-icon-container"><img src="${rewards.newGeneratorIcon}" alt="${rewards.newGeneratorName}"></div>
+              <div class="reward-info">
+                  <span class="reward-name">Новый генератор!<br><em>${rewards.newGeneratorName}</em></span>
+                  <span class="reward-amount">+1</span>
+              </div>
+          </div>
+      `;
+  }
+
+  modal.body.innerHTML = `
+    <div class="level-up-header">
+        <h2 class="level-up-title">Новый уровень!</h2>
+        <div class="level-up-transition">
+            <span class="level-badge">${fromLevel}</span>
+            <span class="level-up-arrow">→</span>
+            <span class="level-badge new">${toLevel}</span>
+        </div>
+    </div>
+    <div class="level-up-congrats">
+        <p>Поздравляем! Вы достигли нового уровня и получили награды:</p>
+    </div>
+    <div class="level-up-rewards">
+        ${rewardsHTML}
+    </div>
+    <button id="level-up-close-btn" class="modal-action-btn">Продолжить</button>
+  `;
+
+  modal.overlay.classList.add('active', 'blocking');
+
+  const closeBtn = modal.body.querySelector('#level-up-close-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeLevelUpModal, { once: true });
+  }
+}
+
+export function closeLevelUpModal() {
+  DOMElements.levelUpModal.overlay.classList.remove('active', 'blocking');
 }
 
 export function confirmReset() {

@@ -5,16 +5,17 @@ export const CONFIG = {
   MAX_ITEM_LEVEL: 7,
   MAX_GENERATOR_LEVEL: 5,
   STARTING_ITEMS_COUNT: 2,
+  STARTING_GENERATORS_COUNT: 1,
   BLOCKED_ITEMS_AT_START: 40,
   BLOCKED_UNLOCKED_CATEGORY_ITEMS_AT_START: 0.35,
 
   // Energy
   MAX_ENERGY: 100,
-  ENERGY_REGEN_INTERVAL: 20000, // Снижаем скорость регенерации
+  ENERGY_REGEN_INTERVAL: 30000,
   ENERGY_REGEN_AMOUNT: 1,
-  STORY_ORDER_ENERGY_REWARD: 7, // Увеличиваем награду за сюжетные заказы
+  STORY_ORDER_ENERGY_REWARD: 7,
   ORDER_ENERGY_REWARD: 1,
-  OFFLINE_ENERGY_REGEN_RATE: 15000,
+  OFFLINE_ENERGY_REGEN_RATE: 30000,
 
   // Coins
   COIN_MULTIPLIER: 5,
@@ -44,7 +45,7 @@ export const CONFIG = {
 
   // System
   VERSION_KEY: 'merge_game_version',
-  GAME_VERSION: '1.3.0',
+  GAME_VERSION: '1.3.1',
   SAVE_KEY: 'merge_game_save',
   LAST_LOGIN_KEY: 'last_login_time',
   ROMAN_NUMERALS: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' },
@@ -70,20 +71,20 @@ export const UNLOCK_THRESHOLDS = [
   // level: номер уровня
   // scoreStart: количество очков для начала этого уровня
   // scoreEnd: количество очков для перехода на следующий уровень
-  { level: 1, unlocked: true,  scoreStart: 0,     scoreEnd: 500,    orderLevels: { min: 2, max: 2 }, unlocksGenerator: false },
-  { level: 2, unlocked: false, scoreStart: 500,   scoreEnd: 3000,   orderLevels: { min: 2, max: 3 }, unlocksGenerator: false },
-  { level: 3, unlocked: false, scoreStart: 3000,  scoreEnd: 8000,  orderLevels: { min: 2, max: 7 }, unlocksGenerator: false },
-  { level: 4, unlocked: false, scoreStart: 8000, scoreEnd: 13000,  orderLevels: { min: 2, max: 4 }, unlocksGenerator: true  },
-  { level: 5, unlocked: false, scoreStart: 13000, scoreEnd: 18000,  orderLevels: { min: 3, max: 7 }, unlocksGenerator: false },
-  { level: 6, unlocked: false, scoreStart: 18000, scoreEnd: 23000,  orderLevels: { min: 3, max: 5 }, unlocksGenerator: true  },
-  { level: 7, unlocked: false, scoreStart: 23000, scoreEnd: 28000, orderLevels: { min: 3, max: 7 }, unlocksGenerator: false },
-  { level: 8, unlocked: false, scoreStart: 28000, scoreEnd: 33000, orderLevels: { min: 3, max: 6 }, unlocksGenerator: true },
-  { level: 9, unlocked: false, scoreStart: 33000, scoreEnd: 38000, orderLevels: { min: 4, max: 7 }, unlocksGenerator: false },
-  { level: 10, unlocked: false, scoreStart: 38000, scoreEnd: 43000, orderLevels: { min: 4, max: 7 }, unlocksGenerator: true },
-  { level: 11, unlocked: false, scoreStart: 43000, scoreEnd: 48000, orderLevels: { min: 5, max: 7 }, unlocksGenerator: false },
-  { level: 12, unlocked: false, scoreStart: 48000, scoreEnd: 53000, orderLevels: { min: 6, max: 7 }, unlocksGenerator: true },
-  { level: 13, unlocked: false, scoreStart: 53000, scoreEnd: 58000, orderLevels: { min: 7, max: 7 }, unlocksGenerator: false },
-  { level: 14, unlocked: false, scoreStart: 58000, scoreEnd: Infinity, orderLevels: { min: 7, max: 7 }, unlocksGenerator: false },
+  { level: 1, unlocked: true,  scoreStart: 0,     scoreEnd: 500,    orderLevels: { min: 1, max: 2 }, unlocksGenerator: false },
+  { level: 2, unlocked: false, scoreStart: 500,   scoreEnd: 1250,   orderLevels: { min: 2, max: 3 }, unlocksGenerator: false },
+  { level: 3, unlocked: false, scoreStart: 1250,  scoreEnd: 5000,  orderLevels: { min: 2, max: 7 }, unlocksGenerator: false },
+  { level: 4, unlocked: false, scoreStart: 5000, scoreEnd: 10000,  orderLevels: { min: 2, max: 4 }, unlocksGenerator: true  },
+  { level: 5, unlocked: false, scoreStart: 10000, scoreEnd: 15000,  orderLevels: { min: 3, max: 7 }, unlocksGenerator: false },
+  { level: 6, unlocked: false, scoreStart: 15000, scoreEnd: 20000,  orderLevels: { min: 3, max: 5 }, unlocksGenerator: true  },
+  { level: 7, unlocked: false, scoreStart: 20000, scoreEnd: 25000, orderLevels: { min: 3, max: 7 }, unlocksGenerator: false },
+  { level: 8, unlocked: false, scoreStart: 25000, scoreEnd: 30000, orderLevels: { min: 3, max: 6 }, unlocksGenerator: true },
+  { level: 9, unlocked: false, scoreStart: 30000, scoreEnd: 35000, orderLevels: { min: 4, max: 7 }, unlocksGenerator: false },
+  { level: 10, unlocked: false, scoreStart: 35000, scoreEnd: 40000, orderLevels: { min: 4, max: 7 }, unlocksGenerator: true },
+  { level: 11, unlocked: false, scoreStart: 40000, scoreEnd: 45000, orderLevels: { min: 5, max: 7 }, unlocksGenerator: false },
+  { level: 12, unlocked: false, scoreStart: 45000, scoreEnd: 50000, orderLevels: { min: 6, max: 7 }, unlocksGenerator: true },
+  { level: 13, unlocked: false, scoreStart: 50000, scoreEnd: 55000, orderLevels: { min: 7, max: 7 }, unlocksGenerator: false },
+  { level: 14, unlocked: false, scoreStart: 55000, scoreEnd: Infinity, orderLevels: { min: 7, max: 7 }, unlocksGenerator: false },
 ];
 
 export const STORY_ORDER_CONFIG = {
