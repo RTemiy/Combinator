@@ -114,7 +114,7 @@ export function openStoryModal() {
   if (step.type === 'dialogue') {
     modal.actions.innerHTML = `<button id="story-continue-btn" class="modal-action-btn">Продолжить</button>`;
   } else if (step.type === 'task' && step.task.type === 'spend_coins') {
-    modal.actions.innerHTML = `<button id="story-task-btn" class="modal-action-btn">${step.task.buttonText} (${step.task.amount} <img src="assets/icons/coin.png" class="inline-icon" />)</button>`;
+    modal.actions.innerHTML = `<button id="story-task-btn" class="modal-action-btn">${step.task.buttonText} (${step.task.amount}<img src="assets/icons/coin.png" class="inline-icon" />)</button>`;
   } else {
     modal.actions.innerHTML = '';
   }

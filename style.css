@@ -2229,6 +2229,22 @@ input[type="range"]::-moz-range-thumb {
     }
 }
 
+/* Стили для прогресс-бара загрузки обновления */
+#update-notification .progress-bar-container {
+    width: 100%;
+    height: 5px;
+    background-color: var(--scrollbar-track);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+#update-notification .progress-bar {
+    height: 100%;
+    background-color: var(--accent-color);
+    transition: width 0.1s linear;
+}
+
 /* Level Up Modal */
 .modal-overlay#level-up-modal-overlay {
   align-items: center;

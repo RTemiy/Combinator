@@ -3,7 +3,7 @@ export const STORY_DATA = {
     id: 'neighbor_arc',
     title: "Соседские сплетни",
     description: "Познакомьтесь с вашей новой соседкой. Кто знает, к чему приведёт это знакомство?",
-    requiredLevel: 3,
+    requiredLevel: 1,
     icon: 'assets/icons/characters/neighbor.png',
     chapters: {
       1: {
@@ -15,8 +15,8 @@ export const STORY_DATA = {
             type: 'task',
             character: 'assets/icons/characters/neighbor.png',
             name: 'Соседка',
-            text: 'Правда? Замечательно! Чтобы произвести впечатление, нужно как следует подготовиться. Думаю, 750 монет хватит на закупку лучших продуктов для нашего ужина.',
-            task: { type: 'spend_coins', amount: 750, buttonText: 'Подготовиться к ужину' },
+            text: 'Правда? Замечательно! Чтобы произвести впечатление, нужно как следует подготовиться. Думаю, 1000 монет хватит на закупку лучших продуктов для нашего ужина.',
+            task: { type: 'spend_coins', amount: 1000, buttonText: 'Подготовиться к ужину' },
             reward: { type: 'generator', key: 'bonus_chest', level: 1 }
           },
           { type: 'dialogue', character: 'assets/icons/characters/neighbor.png', name: 'Соседка', text: 'Договорились! Я так рада! Не волнуйтесь, с пустыми руками я не приду. Захвачу для вас небольшой, но очень полезный подарочек в знак нашей дружбы. До вечера!' },
@@ -31,8 +31,8 @@ export const STORY_DATA = {
             type: 'task',
             character: 'assets/icons/characters/neighbor.png',
             name: 'Соседка',
-            text: 'Это будет стоить немного дороже, около 1000 монет. Но поверьте, оно того стоит! Вы получите кое-что действительно редкое и полезное. Ну что, поможете старой знакомой?',
-            task: { type: 'spend_coins', amount: 1000, buttonText: 'Помочь соседке' },
+            text: 'Это будет стоить немного дороже, около 1250 монет. Но поверьте, оно того стоит! Вы получите кое-что действительно редкое и полезное. Ну что, поможете старой знакомой?',
+            task: { type: 'spend_coins', amount: 1250, buttonText: 'Помочь соседке' },
             reward: { type: 'generator', key: 'bonus_chest', level: 2 }
           },
           { type: 'dialogue', character: 'assets/icons/characters/neighbor.png', name: 'Соседка', text: 'Я знала, что на вас можно положиться! Вот, держите. Это улучшенная версия моего прошлого подарка. Уверена, вы найдете ему применение. Обращайтесь, если что!' },
@@ -56,8 +56,8 @@ export const STORY_DATA = {
             type: 'task',
             character: 'assets/icons/characters/gardener.png',
             name: 'Садовник',
-            text: 'Если вложишь 500 монет в наше общее дело, я подготовлю для тебя саженец черной смородины, который быстро вырастет в плодоносящий куст. С него и начнется твой новый бизнес!',
-            task: { type: 'spend_coins', amount: 800, buttonText: 'Вложиться в саженец смородины' },
+            text: 'Если вложишь 875 монет в наше общее дело, я подготовлю для тебя саженец черной смородины, который быстро вырастет в плодоносящий куст. С него и начнется твой новый бизнес!',
+            task: { type: 'spend_coins', amount: 875, buttonText: 'Вложиться в саженец смородины' },
             reward: { type: 'generator', key: 'currant', level: 1 }
           },
           { type: 'dialogue', character: 'assets/icons/characters/gardener.png', name: 'Садовник', text: 'Отличный выбор! Вот, держи. Это не просто куст, а настоящий генератор ягод! Ухаживай за ним, и он принесет тебе немало выгоды. Удачи в новом начинании!' },
@@ -81,8 +81,8 @@ export const STORY_DATA = {
             type: 'task',
             character: 'assets/icons/characters/beekeeper.png',
             name: 'Пчеловод',
-            text: 'Нужно всего 1750 монет. За это я не только пасеку расширю, но и вам один из своих лучших ульев отдам. Он будет давать вам и мёд, и воск. Что скажете?',
-            task: { type: 'spend_coins', amount: 1750, buttonText: 'Вложиться в пасеку' },
+            text: 'Нужно всего 2000 монет. За это я не только пасеку расширю, но и вам один из своих лучших ульев отдам. Он будет давать вам и мёд, и воск. Что скажете?',
+            task: { type: 'spend_coins', amount: 2000, buttonText: 'Вложиться в пасеку' },
             reward: { type: 'generator', key: 'beehive', level: 1 }
           },
           { type: 'dialogue', character: 'assets/icons/characters/beekeeper.png', name: 'Пчеловод', text: 'Вот это по-нашему! Спасибо за помощь! Держите обещанный улей. Ухаживайте за ним, и он вас щедро отблагодарит. Теперь можете ждать заказы на мёд и свечи!' },
