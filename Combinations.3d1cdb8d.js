@@ -5404,7 +5404,7 @@ function generateOrder() {
         });
     }
     requestedItems.sort((a, b)=>a.level - b.level);
-    (0, _stateJs.gameState).orders.push({
+    (0, _stateJs.gameState).orders.unshift({
         id: (0, _stateJs.gameState).orderIdCounter++,
         character: char,
         items: requestedItems,
@@ -5441,7 +5441,7 @@ function generateStoryOrder(step, fixedChar = null) {
         });
     }
     requestedItems.sort((a, b)=>a.level - b.level);
-    (0, _stateJs.gameState).orders.push({
+    (0, _stateJs.gameState).orders.unshift({
         id: (0, _stateJs.gameState).orderIdCounter++,
         character: char,
         items: requestedItems,
@@ -6151,21 +6151,25 @@ function renderOrders() {
     // Получаем список старых ID для сохранения структуры
     const currentCards = Array.from(ordersList.children);
     // Создаем временный список доступных на поле предметов для проверки
-    const availableItemsOnGrid = (0, _stateJs.gameState).gridData.filter((item)=>item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !item.isMagicTool);
+    const availableItemsOnGrid = (0, _stateJs.gameState).gridData.filter((item)=>item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !item.isGeneratorPart && !item.isMagicTool && !item.isCopyBubble);
     // Создаем или обновляем карточки на основе отсортированного массива
     (0, _stateJs.gameState).orders.forEach((order, index)=>{
         const cardId = `order-card-${order.id}`;
         let card = document.getElementById(cardId);
+        let isNew = false;
         // Создаем копию доступных предметов для этого конкретного заказа, чтобы не влиять на другие
         let tempAvailable = [
             ...availableItemsOnGrid
         ];
         if (!card) {
+            isNew = true;
             card = document.createElement('div');
             card.id = cardId;
             card.dataset.orderId = order.id;
             card.classList.add('order-card');
             if (order.isStory) card.classList.add('story-card');
+            // Добавляем начальный класс для анимации
+            card.classList.add('is-entering');
             ordersList.appendChild(card);
         }
         // Перемещаем карточку в правильный индекс в DOM для CSS transition
@@ -6196,6 +6200,12 @@ function renderOrders() {
           </div>
       </div>
     `;
+        // Если карточка новая, запускаем анимацию
+        if (isNew) // Небольшая задержка, чтобы браузер успел отрисовать элемент
+        // перед тем, как мы уберем класс и запустим transition.
+        setTimeout(()=>{
+            card.classList.remove('is-entering');
+        }, 10);
     });
     // Удаляем карточки, которых больше нет в логике игры
     const activeIds = (0, _stateJs.gameState).orders.map((o)=>`order-card-${o.id}`);

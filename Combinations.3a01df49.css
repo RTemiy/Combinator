@@ -394,7 +394,7 @@ body.is-dragging, body.is-dragging * {
   background: var(--button-bg);
   border: 1px solid var(--border-color-light);
   pointer-events: none;
-  opacity: .7;
+  opacity: 0;
   border-radius: 12px;
   justify-content: center;
   align-items: center;
@@ -439,8 +439,10 @@ body.is-dragging, body.is-dragging * {
 
 #orders-list {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
   flex: 1;
   gap: 10px;
+  min-height: 120px;
   padding-bottom: 5px;
   display: flex;
   position: relative;
@@ -469,12 +471,17 @@ body.is-dragging, body.is-dragging * {
   flex-shrink: 0;
   gap: 4px;
   width: 180px;
-  min-height: 100px;
+  min-height: 90px;
   padding: 8px;
   transition: transform .5s cubic-bezier(.25, 1, .5, 1), opacity .5s cubic-bezier(.25, 1, .5, 1);
   display: flex;
   position: relative;
   overflow: hidden;
+}
+
+.order-card.is-entering {
+  opacity: 0;
+  transform: scale(.8) translateX(-30px);
 }
 
 .order-card.fade-out {
@@ -520,6 +527,7 @@ body.is-dragging, body.is-dragging * {
 .order-items-list {
   flex-wrap: wrap;
   gap: 4px;
+  padding-top: 15px;
   display: flex;
 }
 
@@ -625,7 +633,7 @@ body.is-dragging, body.is-dragging * {
 
 .order-avatar-container img {
   width: auto;
-  height: 100%;
+  height: 95%;
   position: absolute;
   top: 0;
   left: 50%;
@@ -1784,8 +1792,8 @@ body.is-dragging, body.is-dragging * {
   .order-card {
     width: 140px;
     min-width: 140px;
-    height: 90px;
-    min-height: 90px;
+    height: 80px;
+    min-height: 80px;
   }
 
   .grid {
