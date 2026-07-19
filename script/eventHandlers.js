@@ -2,6 +2,7 @@ import { DOMElements } from './dom.js';
 import { gameSettings, gameState } from './state.js';
 import { CONFIG } from './config.js';
 import { saveGame, startGameAndAudio } from './gameManager.js';
+import { coinIconUrl, energyIconUrl, levelIconUrl } from './data/assetUrls.js';
 import {
   showModal,
   closeModal,
@@ -70,22 +71,22 @@ export function addListeners() {
 
   DOMElements.energy.container.addEventListener('click', () => {
     const modalOptions = {
-      icon: 'assets/icons/energy.png',
+      icon: energyIconUrl,
       title: 'Энергия',
       subtitle: 'Вечный движитель',
       desc: `За каждое использование генератора тратится 1 ед. энергии. Каждые ${CONFIG.ENERGY_REGEN_INTERVAL / 1000} сек. восстанавливается ${CONFIG.ENERGY_REGEN_AMOUNT} ед. энергии. За каждый выполненный сюжетный заказ вы получаете ${CONFIG.STORY_ORDER_ENERGY_REWARD} ед. энергии.`
     };
     if (gameState.energy < CONFIG.MAX_ENERGY) {
       modalOptions.actionButton = {
-        text: `Восстановить энергию (-${CONFIG.ENERGY_RECHARGE_COST_COINS}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+        text: `Восстановить энергию (-${CONFIG.ENERGY_RECHARGE_COST_COINS}<img src="${coinIconUrl}" class="inline-icon" alt="монета">)`,
         onClick: rechargePlayerEnergyWithCoins
       };
     }
     showModal(modalOptions);
   });
 
-  DOMElements.level.container.addEventListener('click', () => showModal({ icon: 'assets/icons/level.png', title: 'Уровень', subtitle: 'Главный показатель эффективности', desc: 'За сдачу заказов выдаются очки. Чем сложнее заказ, тем больше очков получается. При получении определенного количества очков, уровень повышается.' }));
-  DOMElements.coins.container.addEventListener('click', () => showModal({ icon: 'assets/icons/coin.png', title: 'Монеты', subtitle: 'Игровая валюта', desc: `Монеты зарабатываются за выполнение заказов.` }));
+  DOMElements.level.container.addEventListener('click', () => showModal({ icon: levelIconUrl, title: 'Уровень', subtitle: 'Главный показатель эффективности', desc: 'За сдачу заказов выдаются очки. Чем сложнее заказ, тем больше очков получается. При получении определенного количества очков, уровень повышается.' }));
+  DOMElements.coins.container.addEventListener('click', () => showModal({ icon: coinIconUrl, title: 'Монеты', subtitle: 'Игровая валюта', desc: `Монеты зарабатываются за выполнение заказов.` }));
 
   DOMElements.infoModal.closeBtn.addEventListener('click', closeModal);
   DOMElements.infoModal.cancelBtn.addEventListener('click', closeModal);

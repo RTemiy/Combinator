@@ -1,9 +1,16 @@
+import {
+  coinsAchievementIconUrl,
+  energyAchievementIconUrl,
+  mergeAchievementIconUrl,
+  orderAchievementIconUrl
+} from './assetUrls.js';
+
 export const ACHIEVEMENTS_DATA = {
   totalMerges: {
     id: 'totalMerges',
     name: 'Мастер комбинаций',
     desc: 'Совершите определенное количество слияний.',
-    icon: 'assets/icons/achievements/merge_achievement.png',
+    icon: mergeAchievementIconUrl,
     tiers: [
       { goal: 50, reward: 75 },
       { goal: 250, reward: 250 },
@@ -15,7 +22,7 @@ export const ACHIEVEMENTS_DATA = {
     id: 'totalOrdersCompleted',
     name: 'Надежный поставщик',
     desc: 'Выполните определенное количество заказов.',
-    icon: 'assets/icons/achievements/order_achievement.png',
+    icon: orderAchievementIconUrl,
     tiers: [
       { goal: 10, reward: 50 },
       { goal: 50, reward: 300 },
@@ -27,7 +34,7 @@ export const ACHIEVEMENTS_DATA = {
     id: 'totalCoinsEarned',
     name: 'Богач',
     desc: 'Заработайте определенное количество монет за все время.',
-    icon: 'assets/icons/achievements/coins_achievement.png',
+    icon: coinsAchievementIconUrl,
     tiers: [
       { goal: 1000, reward: 100 },
       { goal: 5000, reward: 250 },
@@ -39,7 +46,7 @@ export const ACHIEVEMENTS_DATA = {
     id: 'totalEnergySpent',
     name: 'Энерджайзер',
     desc: 'Потратьте определенное количество энергии.',
-    icon: 'assets/icons/achievements/energy_achievement.png',
+    icon: energyAchievementIconUrl,
     tiers: [
       { goal: 500, reward: 50 },
       { goal: 2000, reward: 150 },

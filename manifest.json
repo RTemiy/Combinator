@@ -2,7 +2,7 @@
   "name": "Комбинации: Собирай заказы",
   "short_name": "Комбинации",
   "description": "Увлекательная игра-головоломка: объединяйте предметы, выполняйте заказы и прокачивайте свой уровень!",
-  "start_url": "https://rtemiy.github.io/Combinator/",
+  "start_url": ".",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#121212",
@@ -17,7 +17,7 @@
   "shortcuts": [
     {
       "name": "Продолжить игру",
-      "url": "https://rtemiy.github.io/Combinator/",
+      "url": ".",
       "icons": [{ "src": "assets/icon.png", "sizes": "256x256" }]
     }
   ]

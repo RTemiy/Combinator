@@ -1,85 +1,38 @@
-importScripts('./asset-list.js');
+import { precacheAndRoute } from 'workbox-precaching';
+import { registerRoute, NavigationRoute } from 'workbox-routing';
+import { NetworkFirst } from 'workbox-strategies';
+import { clientsClaim } from 'workbox-core';
 
-const CACHE_VERSION = '1.3.12'; // 1.3.11
-const CACHE_NAME = `combinator-cache-${CACHE_VERSION}`;
+// Эта команда заставляет SW немедленно брать под контроль страницу после активации.
+clientsClaim();
 
-// 1. Установка Service Worker: кэширование всех ресурсов
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(CACHE_NAME);
-      console.log(`[SW] Кэширование файлов для версии ${CACHE_VERSION}`);
-      const totalFiles = URLS_TO_CACHE.length;
+// 1. Предварительное кэширование всех статических ассетов (JS, CSS, картинки и т.д.).
+// self.__WB_MANIFEST — это массив файлов, который Parcel автоматически подставит сюда при сборке.
+precacheAndRoute(self.__WB_MANIFEST || []);
 
-      // Функция для отправки прогресса всем клиентам
-      const sendProgress = async (progress) => {
-        const clients = await self.clients.matchAll({ includeUncontrolled: true });
-        clients.forEach(client => {
-          client.postMessage({
-            type: 'caching-progress',
-            progress: progress
-          });
-        });
-      };
-
-      // Отправляем начальный прогресс
-      await sendProgress(0);
-
-      for (let i = 0; i < totalFiles; i++) {
-        const url = URLS_TO_CACHE[i];
-        try {
-          await cache.add(url);
-          const progress = (i + 1) / totalFiles;
-          await sendProgress(progress);
-        } catch (error) {
-          console.error(`[SW] Не удалось закэшировать ${url}`, error);
-          throw error; // Прерываем установку, если файл не закэшировался
-        }
-      }
-      console.log('[SW] Все файлы успешно закэшированы.');
-    })()
-  );
+// 2. Настройка кэширования для HTML-страницы (навигационных запросов).
+// Мы используем стратегию NetworkFirst:
+// - Сначала пытаемся загрузить страницу из сети.
+// - Если сеть недоступна, отдаем последнюю сохраненную версию из кэша.
+const navigationStrategy = new NetworkFirst({
+  cacheName: 'pages', // Кэш для хранения HTML-страниц
+  plugins: [
+    // Сюда можно добавить плагины, например, для кэширования только успешных ответов (статус 200)
+  ],
 });
 
-// Слушаем сообщение от клиента, чтобы активировать новый SW по команде
+// Создаем маршрут, который будет применять эту стратегию ко всем навигационным запросам.
+const navigationRoute = new NavigationRoute(navigationStrategy, {
+  // denylist по-прежнему полезен, чтобы этот маршрут не срабатывал для прямых запросов к файлам (например, style.css)
+  denylist: [new RegExp('/[^/?]+\\.[^/]+$')],
+});
+
+// Регистрируем маршрут в Workbox.
+registerRoute(navigationRoute);
+
+// 3. Логика для обновления Service Worker по команде от пользователя.
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.action === 'skipWaiting') {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-});
-
-// 2. Активация Service Worker: удаление старых кэшей (когда он становится активным)
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    (async () => {
-      const cacheNames = await caches.keys();
-      await Promise.all(
-        cacheNames.map((cacheName) => {
-          // Если имя кэша не совпадает с текущим, удаляем его.
-          if (cacheName !== CACHE_NAME) {
-            console.log('[SW] Удаление старого кэша:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-      // Захватываем контроль над открытыми страницами.
-      await self.clients.claim();
-      // Сообщаем клиентам, что можно перезагружаться
-      const clients = await self.clients.matchAll({ type: 'window' });
-      clients.forEach((client) => {
-        client.postMessage({ type: 'SW_ACTIVATED' });
-      });
-    })()
-  );
-});
-
-// 3. Обработка запросов (стратегия "Cache First")
-self.addEventListener('fetch', (event) => {
-  // Отвечаем на запрос из кэша, если он там есть. Иначе - идем в сеть.
-  event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        return cachedResponse || fetch(event.request);
-      })
-  );
 });

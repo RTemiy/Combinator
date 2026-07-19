@@ -8,6 +8,15 @@ import {
   STORY_DATA,
   ACHIEVEMENTS_DATA,
 } from './config.js';
+import {
+  coinIconUrl,
+  energyIconUrl,
+  upgradePartIconUrl,
+  magicToolIconUrl,
+  copyBubbleIconUrl,
+  boxIconUrl,
+  checkmarkIconUrl
+} from './data/assetUrls.js';
 import { CONFIG, GEN_ENERGY_CONFIG, SPAWN_CHANCES, UNLOCK_THRESHOLDS, STORY_ORDER_CONFIG } from './data/gameConfig.js';
 import { playSound, playMergeSound } from './audio.js';
 import {
@@ -24,359 +33,359 @@ import { closeModal, openLevelUpModal, openStoryModal } from './modals.js';
 import * as haptics from './haptics.js';
 
 export function getEmptyGridCells() {
-    return gameState.gridData.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
+  return gameState.gridData.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
 }
 
 export function getAvailableEmptyCells() {
-    return gameState.gridData.map((val, idx) => (val === null && !gameState.lockedCells.includes(idx)) ? idx : null).filter(val => val !== null);
+  return gameState.gridData.map((val, idx) => (val === null && !gameState.lockedCells.includes(idx)) ? idx : null).filter(val => val !== null);
 }
 
 export function getCurrentPlayerLevel() {
-    // Итерируем в обратном порядке для эффективности
-    for (let i = UNLOCK_THRESHOLDS.length - 1; i >= 0; i--) {
-        const levelInfo = UNLOCK_THRESHOLDS[i];
-        if (gameState.score >= levelInfo.scoreStart) {
-            return levelInfo.level;
-        }
+  // Итерируем в обратном порядке для эффективности
+  for (let i = UNLOCK_THRESHOLDS.length - 1; i >= 0; i--) {
+    const levelInfo = UNLOCK_THRESHOLDS[i];
+    if (gameState.score >= levelInfo.scoreStart) {
+      return levelInfo.level;
     }
-    return 1; // На случай, если что-то пойдет не так
+  }
+  return 1; // На случай, если что-то пойдет не так
 }
 
 export function isDiscovered(category, level) {
-    const key = `${category}-${level}`;
-    return !!gameState.discoveredItems[key];
+  const key = `${category}-${level}`;
+  return !!gameState.discoveredItems[key];
 }
 
 export function markItemAsDiscovered(category, level) {
-    const key = `${category}-${level}`;
-    if (!gameState.discoveredItems[key]) {
-        gameState.discoveredItems[key] = true;
-    }
+  const key = `${category}-${level}`;
+  if (!gameState.discoveredItems[key]) {
+    gameState.discoveredItems[key] = true;
+  }
 }
 
 export function regenerateEnergy() {
-    if (gameState.energy < CONFIG.MAX_ENERGY) {
-        gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + CONFIG.ENERGY_REGEN_AMOUNT);
-        saveGame();
-        DOMElements.energy.value.innerText = gameState.energy;
-    }
+  if (gameState.energy < CONFIG.MAX_ENERGY) {
+    gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + CONFIG.ENERGY_REGEN_AMOUNT);
+    saveGame();
+    DOMElements.energy.value.innerText = gameState.energy;
+  }
 }
 
 export function restoreGeneratorsEnergy() {
-    let changed = false;
-    const now = Date.now();
-    gameState.gridData.forEach(item => {
-        if (item && item.isGenerator && item.generatorKey !== 'bonus_chest') {
-            const lvl = item.genLevel || 1;
-            const config = GEN_ENERGY_CONFIG[lvl];
-            if (item.genEnergy === undefined) item.genEnergy = config.max;
-            if (!item.lastRegenTime) item.lastRegenTime = now;
+  let changed = false;
+  const now = Date.now();
+  gameState.gridData.forEach(item => {
+    if (item && item.isGenerator && item.generatorKey !== 'bonus_chest') {
+      const lvl = item.genLevel || 1;
+      const config = GEN_ENERGY_CONFIG[lvl];
+      if (item.genEnergy === undefined) item.genEnergy = config.max;
+      if (!item.lastRegenTime) item.lastRegenTime = now;
 
-            if (item.genEnergy < config.max) {
-                const timePassed = now - item.lastRegenTime;
-                const earnedCharges = Math.floor(timePassed / config.cooldown);
-                if (earnedCharges > 0) {
-                    item.genEnergy = Math.min(config.max, item.genEnergy + earnedCharges);
-                    item.lastRegenTime = item.lastRegenTime + (earnedCharges * config.cooldown);
-                    changed = true;
-                }
-            } else {
-                item.lastRegenTime = now;
-            }
+      if (item.genEnergy < config.max) {
+        const timePassed = now - item.lastRegenTime;
+        const earnedCharges = Math.floor(timePassed / config.cooldown);
+        if (earnedCharges > 0) {
+          item.genEnergy = Math.min(config.max, item.genEnergy + earnedCharges);
+          item.lastRegenTime = item.lastRegenTime + (earnedCharges * config.cooldown);
+          changed = true;
         }
-    });
-    if (changed) saveGame();
+      } else {
+        item.lastRegenTime = now;
+      }
+    }
+  });
+  if (changed) saveGame();
 }
 
 export function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
 export function formatTimePlayed(ms) {
-    if (!ms || ms < 1000) return "меньше минуты";
-    const seconds = Math.floor((ms / 1000) % 60);
-    const minutes = Math.floor((ms / (1000 * 60)) % 60);
-    const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
-    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
-    let parts = [];
-    if (days > 0) parts.push(`${days} д`);
-    if (hours > 0) parts.push(`${hours} ч`);
-    if (minutes > 0) parts.push(`${minutes} м`);
-    if (parts.length === 0 && seconds > 0) return `${seconds} сек`;
-    return parts.slice(0, 2).join(' ');
+  if (!ms || ms < 1000) return "меньше минуты";
+  const seconds = Math.floor((ms / 1000) % 60);
+  const minutes = Math.floor((ms / (1000 * 60)) % 60);
+  const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+  let parts = [];
+  if (days > 0) parts.push(`${days} д`);
+  if (hours > 0) parts.push(`${hours} ч`);
+  if (minutes > 0) parts.push(`${minutes} м`);
+  if (parts.length === 0 && seconds > 0) return `${seconds} сек`;
+  return parts.slice(0, 2).join(' ');
 }
 
 export function hasUnclaimedCollectionBonuses() {
-    for (const catKey in CATEGORIES_CONFIG) {
-        const category = CATEGORIES_CONFIG[catKey];
-        for (const item of category.items) {
-            const itemKey = `${catKey}-${item.level}`;
-            const discovered = isDiscovered(catKey, item.level);
-            const bonusClaimed = !!gameState.claimedCollectionBonuses[itemKey];
-            if (discovered && !bonusClaimed) {
-                return true;
-            }
-        }
+  for (const catKey in CATEGORIES_CONFIG) {
+    const category = CATEGORIES_CONFIG[catKey];
+    for (const item of category.items) {
+      const itemKey = `${catKey}-${item.level}`;
+      const discovered = isDiscovered(catKey, item.level);
+      const bonusClaimed = !!gameState.claimedCollectionBonuses[itemKey];
+      if (discovered && !bonusClaimed) {
+        return true;
+      }
     }
-    return false;
+  }
+  return false;
 }
 
 export function hasUnclaimedAchievements() {
-    for (const key in ACHIEVEMENTS_DATA) {
-        const achievement = ACHIEVEMENTS_DATA[key];
-        const progress = playerProfile[key] || 0;
-        for (let i = 0; i < achievement.tiers.length; i++) {
-            const tier = achievement.tiers[i];
-            const isUnlocked = progress >= tier.goal;
-            const isClaimed = gameState.claimedAchievements[`${achievement.id}_${i}`];
-            if (isUnlocked && !isClaimed) {
-                return true;
-            }
-        }
+  for (const key in ACHIEVEMENTS_DATA) {
+    const achievement = ACHIEVEMENTS_DATA[key];
+    const progress = playerProfile[key] || 0;
+    for (let i = 0; i < achievement.tiers.length; i++) {
+      const tier = achievement.tiers[i];
+      const isUnlocked = progress >= tier.goal;
+      const isClaimed = gameState.claimedAchievements[`${achievement.id}_${i}`];
+      if (isUnlocked && !isClaimed) {
+        return true;
+      }
     }
-    return false;
+  }
+  return false;
 }
 
 export function hasNewStoryUpdate() {
-    /*if (!gameState.storyState.unlocked) return false;
-    const playerLevel = getCurrentPlayerLevel();
+  /*if (!gameState.storyState.unlocked) return false;
+  const playerLevel = getCurrentPlayerLevel();
 
-    for (const storyId in STORY_DATA) {
-        const story = STORY_DATA[storyId];
-        const progress = gameState.storyState.progress[storyId] || { currentChapter: 1, currentStep: 0, completed: false };
+  for (const storyId in STORY_DATA) {
+      const story = STORY_DATA[storyId];
+      const progress = gameState.storyState.progress[storyId] || { currentChapter: 1, currentStep: 0, completed: false };
 
-        // Пропускаем сюжет, если уровень игрока недостаточен
-        if (story.requiredLevel && playerLevel < story.requiredLevel) {
-            continue;
-        }
+      // Пропускаем сюжет, если уровень игрока недостаточен
+      if (story.requiredLevel && playerLevel < story.requiredLevel) {
+          continue;
+      }
 
-        if (progress.completed) continue;
+      if (progress.completed) continue;
 
-        const chapter = story.chapters[progress.currentChapter];
-        if (chapter && chapter.steps[progress.currentStep]) {
-            return true; // Найдена доступная для продолжения история
-        }
-    }*/
-    return false;
+      const chapter = story.chapters[progress.currentChapter];
+      if (chapter && chapter.steps[progress.currentStep]) {
+          return true; // Найдена доступная для продолжения история
+      }
+  }*/
+  return false;
 }
 
 export function advanceStoryStep(fromModal = false) {
-    const activeStoryId = gameState.storyState.activeStoryId;
-    if (!gameState.storyState.unlocked || !activeStoryId) return;
+  const activeStoryId = gameState.storyState.activeStoryId;
+  if (!gameState.storyState.unlocked || !activeStoryId) return;
 
-    const story = STORY_DATA[activeStoryId];
-    // Если прогресса для этой истории еще нет, создаем его "на лету"
-    if (!gameState.storyState.progress[activeStoryId]) {
-        gameState.storyState.progress[activeStoryId] = { currentChapter: 1, currentStep: 0, completed: false };
+  const story = STORY_DATA[activeStoryId];
+  // Если прогресса для этой истории еще нет, создаем его "на лету"
+  if (!gameState.storyState.progress[activeStoryId]) {
+    gameState.storyState.progress[activeStoryId] = { currentChapter: 1, currentStep: 0, completed: false };
+  }
+  const progress = gameState.storyState.progress[activeStoryId];
+
+  if (!story || progress.completed) return;
+
+  const chapter = story.chapters[progress.currentChapter];
+  if (!chapter) return;
+
+  const step = chapter.steps[progress.currentStep];
+  if (!step) return;
+
+  // Обработка выполнения задач
+  if (step.type === 'task') {
+    if (step.task.type === 'spend_coins') {
+      if (gameState.coins < step.task.amount) {
+        showToast(`Недостаточно монет! Нужно ${step.task.amount}`, 'error');
+        return;
+      }
+      gameState.coins -= step.task.amount;
+      // В идеале, здесь должна быть отдельная статистика потраченных монет
+      haptics.hapticSuccess();
+      playSound(DOMElements.sfxCoin);
+      playSound(DOMElements.sfxOrderComplete);
     }
-    const progress = gameState.storyState.progress[activeStoryId];
+    // Обработка награды
+    if (step.reward) {
+      if (step.reward.type === 'generator') {
+        const generatorData = GENERATORS_DATA[step.reward.key];
+        const rewardLevel = step.reward.level;
 
-    if (!story || progress.completed) return;
-
-    const chapter = story.chapters[progress.currentChapter];
-    if (!chapter) return;
-
-    const step = chapter.steps[progress.currentStep];
-    if (!step) return;
-
-    // Обработка выполнения задач
-    if (step.type === 'task') {
-        if (step.task.type === 'spend_coins') {
-            if (gameState.coins < step.task.amount) {
-                showToast(`Недостаточно монет! Нужно ${step.task.amount}`, 'error');
-                return;
+        if (generatorData && generatorData.isSpecial) {
+          // Специальный генератор (например, bonus_chest) с конечными зарядами
+          let charges = 1; // Значение по умолчанию
+          if (step.reward.key === 'bonus_chest') {
+            if (rewardLevel === 2) {
+              charges = 3;
+            } else if (rewardLevel === 3) {
+              charges = 5;
             }
-            gameState.coins -= step.task.amount;
-            // В идеале, здесь должна быть отдельная статистика потраченных монет
-            haptics.hapticSuccess();
-            playSound(DOMElements.sfxCoin);
-            playSound(DOMElements.sfxOrderComplete);
+          }
+
+          gameState.rewardQueue.push({
+            isGenerator: true,
+            generatorKey: step.reward.key,
+            genLevel: rewardLevel,
+            genCharges: charges
+          });
+        } else {
+          // Обычный, перезаряжаемый генератор
+          gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: rewardLevel, genEnergy: GEN_ENERGY_CONFIG[rewardLevel].max, lastRegenTime: Date.now() });
         }
-        // Обработка награды
-        if (step.reward) {
-            if (step.reward.type === 'generator') {
-                const generatorData = GENERATORS_DATA[step.reward.key];
-                const rewardLevel = step.reward.level;
 
-                if (generatorData && generatorData.isSpecial) {
-                    // Специальный генератор (например, bonus_chest) с конечными зарядами
-                    let charges = 1; // Значение по умолчанию
-                    if (step.reward.key === 'bonus_chest') {
-                        if (rewardLevel === 2) {
-                            charges = 3;
-                        } else if (rewardLevel === 3) {
-                            charges = 5;
-                        }
-                    }
-
-                    gameState.rewardQueue.push({
-                        isGenerator: true,
-                        generatorKey: step.reward.key,
-                        genLevel: rewardLevel,
-                        genCharges: charges
-                    });
-                } else {
-                    // Обычный, перезаряжаемый генератор
-                    gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: rewardLevel, genEnergy: GEN_ENERGY_CONFIG[rewardLevel].max, lastRegenTime: Date.now() });
-                }
-
-                markItemAsDiscovered(step.reward.key, rewardLevel);
-                // Если генератор сюжетный, сразу разблокируем его категории для заказов
-                if (generatorData && generatorData.isStoryOnly) {
-                    generatorData.categories.forEach(cat => {
-                        if (!gameState.activeCategories.includes(cat)) {
-                            gameState.activeCategories.push(cat);
-                        }
-                    });
-                }
-            } else if (step.reward.type === 'item') {
-                gameState.rewardQueue.push({ category: step.reward.category, level: step.reward.level });
-                markItemAsDiscovered(step.reward.category, step.reward.level);
+        markItemAsDiscovered(step.reward.key, rewardLevel);
+        // Если генератор сюжетный, сразу разблокируем его категории для заказов
+        if (generatorData && generatorData.isStoryOnly) {
+          generatorData.categories.forEach(cat => {
+            if (!gameState.activeCategories.includes(cat)) {
+              gameState.activeCategories.push(cat);
             }
+          });
         }
+      } else if (step.reward.type === 'item') {
+        gameState.rewardQueue.push({ category: step.reward.category, level: step.reward.level });
+        markItemAsDiscovered(step.reward.category, step.reward.level);
+      }
     }
+  }
 
-    // Переход к следующему шагу
-    progress.currentStep++;
-    if (progress.currentStep >= chapter.steps.length) {
-        progress.currentChapter++;
-        progress.currentStep = 0;
-        // Если следующей главы нет, помечаем сюжет как завершенный
-        if (!story.chapters[progress.currentChapter]) {
-            progress.completed = true;
-        }
+  // Переход к следующему шагу
+  progress.currentStep++;
+  if (progress.currentStep >= chapter.steps.length) {
+    progress.currentChapter++;
+    progress.currentStep = 0;
+    // Если следующей главы нет, помечаем сюжет как завершенный
+    if (!story.chapters[progress.currentChapter]) {
+      progress.completed = true;
     }
+  }
 
-    // Перерисовываем модальное окно с новым шагом, если оно было открыто
-    if (fromModal) openStoryModal();
-    updateMenuNotification();
-    updateUI();
-    saveGame();
+  // Перерисовываем модальное окно с новым шагом, если оно было открыто
+  if (fromModal) openStoryModal();
+  updateMenuNotification();
+  updateUI();
+  saveGame();
 }
 
 export function claimReward(rewardIndex, startElement) {
-    const emptyCells = getEmptyGridCells();
-    if (emptyCells.length === 0) {
-        showToast("Нет свободного места на поле!", "error");
-        return;
+  const emptyCells = getEmptyGridCells();
+  if (emptyCells.length === 0) {
+    showToast("Нет свободного места на поле!", "error");
+    return;
+  }
+
+  haptics.hapticMedium();
+  // Немедленно удаляем элемент из UI, чтобы избежать двойного клика
+  startElement.style.pointerEvents = 'none';
+  startElement.style.opacity = '0.5';
+
+  playSound(DOMElements.sfxClaimReward);
+
+  const reward = gameState.rewardQueue[rewardIndex];
+  const targetCellIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  const targetCellElement = DOMElements.grid.children[targetCellIndex];
+
+  let icon = '';
+  if (reward.isGenerator) {
+    const genInfo = GENERATORS_DATA[reward.generatorKey];
+    const lvl = reward.genLevel || 1;
+    const iconPath = genInfo.icons[lvl - 1];
+    icon = `<img src="${iconPath}" alt="">`;
+  } else if (reward.isUpgradePart) {
+    icon = `<img src="${upgradePartIconUrl}" alt="">`;
+  } else if (reward.isMagicTool) {
+    icon = `<img src="${magicToolIconUrl}" alt="">`;
+  } else if (reward.isCopyBubble) {
+    icon = `<img src="${copyBubbleIconUrl}" alt="">`;
+  }
+  else if (reward.isGeneratorPart) {
+    const genInfo = GENERATORS_DATA[reward.generatorKey];
+    const lvl = reward.level || 1;
+    const partInfo = genInfo.parts[lvl - 1];
+    icon = `<img src="${partInfo.icon}" alt="">`;
+  } else if (reward.category && reward.level) {
+    // Обычный предмет из категории
+    const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
+    if (itemInfo) {
+      icon = `<img src="${itemInfo.icon}" alt="">`;
     }
+  }
 
-    haptics.hapticMedium();
-    // Немедленно удаляем элемент из UI, чтобы избежать двойного клика
-    startElement.style.pointerEvents = 'none';
-    startElement.style.opacity = '0.5';
+  moveItem3D(startElement, targetCellElement, icon).then(() => {
+    // Удаляем награду из массива только после завершения анимации
+    gameState.rewardQueue.splice(rewardIndex, 1);
 
-    playSound(DOMElements.sfxClaimReward);
+    let finalItem = reward;
+    // Проверяем, не должен ли предмет стать генератором предметов
+    if (reward.category && reward.level) {
+      const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
+      if (itemInfo && itemInfo.becomesGenerator) {
+        const genInfo = itemInfo.becomesGenerator;
+        finalItem = {
+          isItemGenerator: true,
+          category: reward.category,
+          level: reward.level,
+          generatedCategory: genInfo.category,
+          charges: genInfo.charges,
+        };
 
-    const reward = gameState.rewardQueue[rewardIndex];
-    const targetCellIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    const targetCellElement = DOMElements.grid.children[targetCellIndex];
-
-    let icon = '';
-    if (reward.isGenerator) {
-        const genInfo = GENERATORS_DATA[reward.generatorKey];
-        const lvl = reward.genLevel || 1;
-        const iconPath = genInfo.icons[lvl - 1];
-        icon = `<img src="${iconPath}" alt="">`;
-    } else if (reward.isUpgradePart) {
-        icon = `<img src="assets/icons/upgrade_part.png" alt="">`;
-    } else if (reward.isMagicTool) {
-        icon = `<img src="assets/icons/magic_tool.png" alt="">`;
-    } else if (reward.isCopyBubble) {
-      icon = `<img src="assets/icons/copy_bubble.png" alt="">`;
-    }
-    else if (reward.isGeneratorPart) {
-        const genInfo = GENERATORS_DATA[reward.generatorKey];
-        const lvl = reward.level || 1;
-        const partInfo = genInfo.parts[lvl - 1];
-        icon = `<img src="${partInfo.icon}" alt="">`;
-    } else if (reward.category && reward.level) {
-        // Обычный предмет из категории
-        const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
-        if (itemInfo) {
-            icon = `<img src="${itemInfo.icon}" alt="">`;
+        // Разблокируем новую категорию для заказов, если это впервые
+        if (!gameState.unlockedItemGenCategories.includes(genInfo.category)) {
+          gameState.unlockedItemGenCategories.push(genInfo.category);
+          showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
         }
+      }
     }
+    gameState.gridData[targetCellIndex] = finalItem;
 
-    moveItem3D(startElement, targetCellElement, icon).then(() => {
-        // Удаляем награду из массива только после завершения анимации
-        gameState.rewardQueue.splice(rewardIndex, 1);
-
-        let finalItem = reward;
-        // Проверяем, не должен ли предмет стать генератором предметов
-        if (reward.category && reward.level) {
-            const itemInfo = CATEGORIES_CONFIG[reward.category]?.items[reward.level - 1];
-            if (itemInfo && itemInfo.becomesGenerator) {
-                const genInfo = itemInfo.becomesGenerator;
-                finalItem = {
-                    isItemGenerator: true,
-                    category: reward.category,
-                    level: reward.level,
-                    generatedCategory: genInfo.category,
-                    charges: genInfo.charges,
-                };
-
-                // Разблокируем новую категорию для заказов, если это впервые
-                if (!gameState.unlockedItemGenCategories.includes(genInfo.category)) {
-                    gameState.unlockedItemGenCategories.push(genInfo.category);
-                    showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
-                }
-            }
-        }
-        gameState.gridData[targetCellIndex] = finalItem;
-
-        saveGame();
-        updateUI(); // Перерисовывает и очередь, и поле
-        animateCellPop(targetCellIndex);
-        playSound(DOMElements.sfxSpawn);
-    });
+    saveGame();
+    updateUI(); // Перерисовывает и очередь, и поле
+    animateCellPop(targetCellIndex);
+    playSound(DOMElements.sfxSpawn);
+  });
 }
 
 export function claimItemBonus(category, level, element) {
-    const key = `${category}-${level}`;
-    // Проверяем, что бонус еще не был получен
-    if (gameState.claimedCollectionBonuses[key]) {
-        return;
-    }
+  const key = `${category}-${level}`;
+  // Проверяем, что бонус еще не был получен
+  if (gameState.claimedCollectionBonuses[key]) {
+    return;
+  }
 
-    // Отмечаем бонус как полученный
-    gameState.claimedCollectionBonuses[key] = true;
+  // Отмечаем бонус как полученный
+  gameState.claimedCollectionBonuses[key] = true;
 
-    // Добавляем монеты
-    const bonusAmount = level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
-    gameState.coins += bonusAmount;
-    haptics.hapticSuccess();
-    playSound(DOMElements.sfxCoin);
-    playerProfile.totalCoinsEarned += bonusAmount;
+  // Добавляем монеты
+  const bonusAmount = level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
+  gameState.coins += bonusAmount;
+  haptics.hapticSuccess();
+  playSound(DOMElements.sfxCoin);
+  playerProfile.totalCoinsEarned += bonusAmount;
 
-    // Анимация полета монетки
-    animateRewardFly(element, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, 1, 'coin');
+  // Анимация полета монетки
+  animateRewardFly(element, DOMElements.coins.container, `<img src="${coinIconUrl}" alt="монета">`, 1, 'coin');
 
-    // Обновляем вид элемента в модалке и запускаем анимации
-    element.classList.remove('bonus-unclaimed');
-    element.classList.add('bonus-claiming'); // Добавляем класс для анимации пульсации
-    element.onclick = null; // Убираем возможность повторного клика
+  // Обновляем вид элемента в модалке и запускаем анимации
+  element.classList.remove('bonus-unclaimed');
+  element.classList.add('bonus-claiming'); // Добавляем класс для анимации пульсации
+  element.onclick = null; // Убираем возможность повторного клика
 
-    const bonusIcon = element.querySelector('.unclaimed-bonus-icon');
-    if (bonusIcon) {
-        bonusIcon.classList.add('exploding'); // Добавляем класс для анимации "взрыва"
-    }
+  const bonusIcon = element.querySelector('.unclaimed-bonus-icon');
+  if (bonusIcon) {
+    bonusIcon.classList.add('exploding'); // Добавляем класс для анимации "взрыва"
+  }
 
-    // Обновляем счетчик монет (можно сделать чуть раньше, чем закончится полет)
-    setTimeout(() => {
-        DOMElements.coins.value.innerText = gameState.coins;
-        updateMenuNotification();
-        saveGame();
-    }, 300);
+  // Обновляем счетчик монет (можно сделать чуть раньше, чем закончится полет)
+  setTimeout(() => {
+    DOMElements.coins.value.innerText = gameState.coins;
+    updateMenuNotification();
+    saveGame();
+  }, 300);
 
-    // Убираем иконку и класс пульсации после завершения их анимаций
-    setTimeout(() => {
-        if (bonusIcon) bonusIcon.remove();
-        element.classList.remove('bonus-claiming');
-    }, 400); // Должно совпадать с длительностью анимаций
+  // Убираем иконку и класс пульсации после завершения их анимаций
+  setTimeout(() => {
+    if (bonusIcon) bonusIcon.remove();
+    element.classList.remove('bonus-claiming');
+  }, 400); // Должно совпадать с длительностью анимаций
 }
 
 export function claimAchievementReward(achievementId, tierIndex, buttonElement) {
@@ -396,12 +405,12 @@ export function claimAchievementReward(achievementId, tierIndex, buttonElement) 
     gameState.claimedAchievements[key] = true;
 
     // Анимация
-    animateRewardFly(buttonElement, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, 5, 'coin');
+    animateRewardFly(buttonElement, DOMElements.coins.container, `<img src="${coinIconUrl}" alt="монета">`, 5, 'coin');
 
     // Обновляем UI
     buttonElement.classList.add('claimed');
     buttonElement.disabled = true;
-    buttonElement.innerHTML = '<img src="assets/icons/checkmark.png" alt="Выполнено">';
+    buttonElement.innerHTML = `<img src="${checkmarkIconUrl}" alt="Выполнено">`;
     buttonElement.onclick = null;
 
     DOMElements.coins.value.innerText = gameState.coins;
@@ -425,7 +434,7 @@ export function deleteItem(index) {
   const sellPrice = (item.level || 1) * 3;
 
   // Запускаем анимацию полета монеток. Она возьмет координаты ячейки, пока предмет еще в ней.
-  animateRewardFly(cellElement, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, 5, 'coin');
+  animateRewardFly(cellElement, DOMElements.coins.container, `<img src="${coinIconUrl}" alt="монета">`, 5, 'coin');
 
   // Теперь обновляем состояние игры
   gameState.coins += sellPrice;
@@ -443,7 +452,7 @@ export function deleteItem(index) {
 
 export function clearBlockedItemWithCoins(index) {
   if (gameState.coins < CONFIG.BLOCKED_CLEAR_COST_COINS) {
-    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет для расчистки (нужно ${CONFIG.BLOCKED_CLEAR_COST_COINS})!`, "error");
+    showToast(`<img src="${coinIconUrl}" class="toast-icon" alt=""> Недостаточно монет для расчистки (нужно ${CONFIG.BLOCKED_CLEAR_COST_COINS})!`, "error");
     closeModal();
     return;
   }
@@ -470,7 +479,7 @@ export function rechargeGeneratorWithCoins(index) {
   }
 
   if (gameState.coins < CONFIG.GENERATOR_RECHARGE_COST) {
-    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.GENERATOR_RECHARGE_COST})!`, "error");
+    showToast(`<img src="${coinIconUrl}" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.GENERATOR_RECHARGE_COST})!`, "error");
     closeModal();
     return;
   }
@@ -487,18 +496,18 @@ export function rechargeGeneratorWithCoins(index) {
   closeModal();
   saveGame();
   updateUI();
-  showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Энергия генератора полностью восстановлена!`, "success");
+  showToast(`<img src="${energyIconUrl}" class="toast-icon" alt=""> Энергия генератора полностью восстановлена!`, "success");
 }
 
 export function rechargePlayerEnergyWithCoins() {
   if (gameState.coins < CONFIG.ENERGY_RECHARGE_COST_COINS) {
-    showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.ENERGY_RECHARGE_COST_COINS})!`, "error");
+    showToast(`<img src="${coinIconUrl}" class="toast-icon" alt=""> Недостаточно монет (нужно ${CONFIG.ENERGY_RECHARGE_COST_COINS})!`, "error");
     closeModal();
     return;
   }
 
   if (gameState.energy >= CONFIG.MAX_ENERGY) {
-    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Ваша энергия уже полная!`, "error");
+    showToast(`<img src="${energyIconUrl}" class="toast-icon" alt=""> Ваша энергия уже полная!`, "error");
     closeModal();
     return;
   }
@@ -511,32 +520,32 @@ export function rechargePlayerEnergyWithCoins() {
   closeModal();
   saveGame();
   updateUI();
-  showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Энергия полностью восстановлена!`, "success");
+  showToast(`<img src="${energyIconUrl}" class="toast-icon" alt=""> Энергия полностью восстановлена!`, "success");
 }
 
 function createUpgradedItem(category, level) {
-    markItemAsDiscovered(category, level);
-    const newItemInfo = CATEGORIES_CONFIG[category]?.items[level - 1];
+  markItemAsDiscovered(category, level);
+  const newItemInfo = CATEGORIES_CONFIG[category]?.items[level - 1];
 
-    if (newItemInfo && newItemInfo.becomesGenerator) {
-        const genInfo = newItemInfo.becomesGenerator;
+  if (newItemInfo && newItemInfo.becomesGenerator) {
+    const genInfo = newItemInfo.becomesGenerator;
 
-        // Разблокируем новую категорию для заказов, если это впервые
-        if (!gameState.unlockedItemGenCategories.includes(genInfo.category)) {
-            gameState.unlockedItemGenCategories.push(genInfo.category);
-            showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
-        }
-
-        return {
-            isItemGenerator: true,
-            category: category,
-            level: level,
-            generatedCategory: genInfo.category,
-            charges: genInfo.charges,
-        };
+    // Разблокируем новую категорию для заказов, если это впервые
+    if (!gameState.unlockedItemGenCategories.includes(genInfo.category)) {
+      gameState.unlockedItemGenCategories.push(genInfo.category);
+      showToast(`Новая категория "${CATEGORIES_CONFIG[genInfo.category].name}" теперь доступна в заказах!`, "success");
     }
 
-    return { category: category, level: level };
+    return {
+      isItemGenerator: true,
+      category: category,
+      level: level,
+      generatedCategory: genInfo.category,
+      charges: genInfo.charges,
+    };
+  }
+
+  return { category: category, level: level };
 }
 
 function handleUnblockMerge(fromIdx, toIdx, source) {
@@ -749,26 +758,26 @@ const MERGE_HANDLERS = [
 ];
 
 export function isActionPossible(fromIdx, toIdx) {
-    const source = gameState.gridData[fromIdx];
-    const target = gameState.gridData[toIdx];
+  const source = gameState.gridData[fromIdx];
+  const target = gameState.gridData[toIdx];
 
-    if (!source) return false; // Нельзя перетаскивать пустую ячейку
+  if (!source) return false; // Нельзя перетаскивать пустую ячейку
 
-    // Проверка на слияние
-    for (const handler of MERGE_HANDLERS) {
-        if (handler.canHandle(source, target)) {
-            return true;
-        }
+  // Проверка на слияние
+  for (const handler of MERGE_HANDLERS) {
+    if (handler.canHandle(source, target)) {
+      return true;
     }
+  }
 
-    // Проверка на обмен
-    // Нельзя меняться местами с заблокированным предметом
-    if (target && target.isBlocked) {
-        return false;
-    }
+  // Проверка на обмен
+  // Нельзя меняться местами с заблокированным предметом
+  if (target && target.isBlocked) {
+    return false;
+  }
 
-    // Можно меняться с пустой ячейкой или другим незаблокированным предметом
-    return true;
+  // Можно меняться с пустой ячейкой или другим незаблокированным предметом
+  return true;
 }
 
 export function executeMergeOrSwap(fromIdx, toIdx) {
@@ -929,7 +938,7 @@ export function triggerItemGenerator(generator, fromIndex) {
     return;
   }
   if (gameState.energy <= 0) {
-    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
+    showToast(`<img src="${energyIconUrl}" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
     return;
   }
   const emptyCells = getAvailableEmptyCells();
@@ -974,11 +983,11 @@ export function triggerRegularGenerator(generator, fromIndex) {
   if (generator.genEnergy === undefined) generator.genEnergy = config.max;
 
   if (generator.genEnergy <= 0) {
-    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Генератор истощен! Подождите, пока накопятся заряды.`, "error");
+    showToast(`<img src="${boxIconUrl}" class="toast-icon" alt=""> Генератор истощен! Подождите, пока накопятся заряды.`, "error");
     return;
   }
   if (gameState.energy <= 0) {
-    showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
+    showToast(`<img src="${energyIconUrl}" class="toast-icon" alt=""> Упс! Недостаточно энергии игрока!`, "error");
     return;
   }
 
@@ -1077,7 +1086,7 @@ export function checkProgressiveUnlocks() {
           newGeneratorIcon: newGeneratorIcon
         });
 
-        animateRewardFly(DOMElements.level.container, DOMElements.coins.container, `<img src="assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinReward / 10)), 'coin');
+        animateRewardFly(DOMElements.level.container, DOMElements.coins.container, `<img src="${coinIconUrl}" alt="монета">`, Math.min(10, Math.ceil(coinReward / 10)), 'coin');
       }
       updateUI(); // Обновляем UI, чтобы показать награду в очереди
     }
@@ -1142,28 +1151,28 @@ export function spawnRandomExistingGenerator() {
       lastRegenTime: Date.now()
     });
     markItemAsDiscovered(randomGenKey, 1);
-    showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Бонус: получен генератор "${generatorData.name}"!`, "story");
+    showToast(`<img src="${boxIconUrl}" class="toast-icon" alt=""> Серия завершена! Бонус: получен генератор "${generatorData.name}"!`, "story");
   } else {
     // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
     spawnUpgradePart();
-    showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
+    showToast(`<img src="${upgradePartIconUrl}" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
   }
 }
 
 function spawnLevelUpBonus(level) {
-    gameState.rewardQueue.push({
-      isGenerator: true,
-      generatorKey: 'bonus_chest',
-      genLevel: 1,
-      genCharges: 1
-    });
-    markItemAsDiscovered('bonus_chest', 1);
+  gameState.rewardQueue.push({
+    isGenerator: true,
+    generatorKey: 'bonus_chest',
+    genLevel: 1,
+    genCharges: 1
+  });
+  markItemAsDiscovered('bonus_chest', 1);
 }
 
 export function spawnUpgradePart() {
   gameState.rewardQueue.push({
     isUpgradePart: true,
-    icon: 'assets/icons/upgrade_part.png',
+    icon: upgradePartIconUrl,
     name: 'Новая деталь'
   });
   markItemAsDiscovered('upgrade_part', 1);
@@ -1172,7 +1181,7 @@ export function spawnUpgradePart() {
 export function spawnMagicTool() {
   gameState.rewardQueue.push({
     isMagicTool: true,
-    icon: 'assets/icons/magic_tool.png',
+    icon: magicToolIconUrl,
     name: 'Магические инструменты'
   });
   markItemAsDiscovered('magic_tool', 1);
@@ -1181,7 +1190,7 @@ export function spawnMagicTool() {
 export function spawnCopyBubble() {
   gameState.rewardQueue.push({
     isCopyBubble: true,
-    icon: 'assets/icons/copy_bubble.png',
+    icon: copyBubbleIconUrl,
     name: 'Копирующий пузырь'
   });
   markItemAsDiscovered('copy_bubble', 1);
@@ -1259,7 +1268,7 @@ export function generateOrder() {
 
   requestedItems.sort((a, b) => a.level - b.level);
 
-  gameState.orders.push({
+  gameState.orders.unshift({
     id: gameState.orderIdCounter++,
     character: char,
     items: requestedItems,
@@ -1296,7 +1305,7 @@ export function generateStoryOrder(step, fixedChar = null) {
 
   requestedItems.sort((a, b) => a.level - b.level);
 
-  gameState.orders.push({
+  gameState.orders.unshift({
     id: gameState.orderIdCounter++,
     character: char,
     items: requestedItems,
@@ -1440,11 +1449,11 @@ export function completeOrder(id) {
     // Воспроизводим звук успешной сдачи заказа
     playSound(DOMElements.sfxOrderComplete);
     playSound(DOMElements.sfxCoin);
-  haptics.hapticSuccess();
+    haptics.hapticSuccess();
 
     // Анимация полета наград
-    animateRewardFly(targetAvatarElement, DOMElements.coins.value, `<img src="assets/icons/coin.png" alt="монета">`, Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
-    if (energyReward > 0) animateRewardFly(targetAvatarElement, DOMElements.energy.value, `<img src="assets/icons/energy.png" alt="энергия">`, energyReward, 'energy');
+    animateRewardFly(targetAvatarElement, DOMElements.coins.value, `<img src="${coinIconUrl}" alt="монета">`, Math.min(10, Math.ceil(coinsEarned / 5)), 'coin');
+    if (energyReward > 0) animateRewardFly(targetAvatarElement, DOMElements.energy.value, `<img src="${energyIconUrl}" alt="энергия">`, energyReward, 'energy');
 
     // Wait for the card fade-out animation to complete
     setTimeout(() => {
@@ -1468,19 +1477,19 @@ export function completeOrder(id) {
               generatorKey: 'bonus_chest',
               genLevel: 1, genCharges: 1
             });
-            showToast(`<img src="assets/icons/box.png" class="toast-icon" alt=""> Серия завершена! Вы получили Подарочную коробку!`, "story");
+            showToast(`<img src="${boxIconUrl}" class="toast-icon" alt=""> Серия завершена! Вы получили Подарочную коробку!`, "story");
           } else if (rand < 0.40) {
             // 20% шанс на деталь для улучшения
             spawnUpgradePart();
-            showToast(`<img src="assets/icons/upgrade_part.png" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
+            showToast(`<img src="${upgradePartIconUrl}" class="toast-icon" alt=""> Серия завершена! Бонус: получена Новая деталь!`, "story");
           } else if (rand < 0.60) {
             // 20% шанс на магические инструменты
             spawnMagicTool();
-            showToast(`<img src="assets/icons/magic_tool.png" class="toast-icon" alt=""> Серия завершена! Бонус: получены Магические инструменты!`, "story");
+            showToast(`<img src="${magicToolIconUrl}" class="toast-icon" alt=""> Серия завершена! Бонус: получены Магические инструменты!`, "story");
           } else if (rand < 0.80) {
             // 20% шанс на копирующий пузырь
             spawnCopyBubble();
-            showToast(`<img src="assets/icons/copy_bubble.png" class="toast-icon" alt=""> Серия завершена! Бонус: получен Копирующий пузырь!`, "story");
+            showToast(`<img src="${copyBubbleIconUrl}" class="toast-icon" alt=""> Серия завершена! Бонус: получен Копирующий пузырь!`, "story");
           } else {
             // 20% шанс на случайный уже открытый генератор
             spawnRandomExistingGenerator();
@@ -1499,50 +1508,50 @@ export function completeOrder(id) {
 }
 
 export function findMergeablePair() {
-    const grid = gameState.gridData;
-    const mergeablePairs = [];
+  const grid = gameState.gridData;
+  const mergeablePairs = [];
 
-    for (let i = 0; i < grid.length; i++) {
-        const source = grid[i];
-        if (!source) continue;
+  for (let i = 0; i < grid.length; i++) {
+    const source = grid[i];
+    if (!source) continue;
 
-        // Start j from i + 1 to avoid duplicate pairs and self-comparison
-        for (let j = i + 1; j < grid.length; j++) {
-            const target = grid[j];
-            if (!target) continue;
+    // Start j from i + 1 to avoid duplicate pairs and self-comparison
+    for (let j = i + 1; j < grid.length; j++) {
+      const target = grid[j];
+      if (!target) continue;
 
-            for (const handler of MERGE_HANDLERS) {
-                // Check both directions as some handlers are not symmetrical
-                if (handler.canHandle(source, target)) {
-                    mergeablePairs.push([i, j]);
-                    break;
-                }
-                if (handler.canHandle(target, source)) {
-                    mergeablePairs.push([j, i]);
-                    break;
-                }
-            }
+      for (const handler of MERGE_HANDLERS) {
+        // Check both directions as some handlers are not symmetrical
+        if (handler.canHandle(source, target)) {
+          mergeablePairs.push([i, j]);
+          break;
         }
+        if (handler.canHandle(target, source)) {
+          mergeablePairs.push([j, i]);
+          break;
+        }
+      }
     }
+  }
 
-    if (mergeablePairs.length > 0) {
-        return mergeablePairs[Math.floor(Math.random() * mergeablePairs.length)];
-    }
+  if (mergeablePairs.length > 0) {
+    return mergeablePairs[Math.floor(Math.random() * mergeablePairs.length)];
+  }
 
-    return null; // No mergeable pair found
+  return null; // No mergeable pair found
 }
 
 // --- DEBUG FUNCTIONS ---
 // This function will be available in the browser console for development purposes.
 function dev_addCoins(amount = 100000) {
-    if (typeof amount !== 'number' || amount <= 0) {
-        console.error("Please provide a positive number of coins to add.");
-        return;
-    }
-    gameState.coins += amount;
-    showToast(`✨ Добавлено ${amount.toLocaleString('ru-RU')} монет!`, 'success');
-    updateUI();
-    saveGame();
+  if (typeof amount !== 'number' || amount <= 0) {
+    console.error("Please provide a positive number of coins to add.");
+    return;
+  }
+  gameState.coins += amount;
+  showToast(`✨ Добавлено ${amount.toLocaleString('ru-RU')} монет!`, 'success');
+  updateUI();
+  saveGame();
 }
 
 // Expose to console for debugging

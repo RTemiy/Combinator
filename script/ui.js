@@ -14,6 +14,16 @@ import {
 import { saveGame } from './gameManager.js';
 import { playSound } from './audio.js';
 import { hapticLight } from './haptics.js';
+import {
+  coinIconUrl,
+  copyBubbleIconUrl,
+  energyIconUrl,
+  magicToolIconUrl,
+  questionIconUrl,
+  starIconUrl,
+  upgradePartIconUrl,
+  checkmarkIconUrl
+} from './data/assetUrls.js';
 
 export function applyTheme() {
   document.body.dataset.theme = gameSettings.theme;
@@ -118,13 +128,13 @@ export function renderRewardQueue() {
         iconHTML = `<img src="${partInfo.icon}" alt="${partInfo.name}" style="width: 90%; height: 90%;">`;
         title = `Забрать: ${partInfo.name}`;
     } else if (reward.isUpgradePart) {
-        iconHTML = `<img src="assets/icons/upgrade_part.png" alt="Новая деталь" style="width: 90%; height: 90%;">`;
+        iconHTML = `<img src="${upgradePartIconUrl}" alt="Новая деталь" style="width: 90%; height: 90%;">`;
         title = 'Забрать: Новая деталь';
     } else if (reward.isMagicTool) {
-        iconHTML = `<img src="assets/icons/magic_tool.png" alt="Магические инструменты" style="width: 90%; height: 90%;">`;
+        iconHTML = `<img src="${magicToolIconUrl}" alt="Магические инструменты" style="width: 90%; height: 90%;">`;
         title = 'Забрать: Магические инструменты';
     } else if (reward.isCopyBubble) {
-        iconHTML = `<img src="assets/icons/copy_bubble.png" alt="Копирующий пузырь" style="width: 90%; height: 90%;">`;
+        iconHTML = `<img src="${copyBubbleIconUrl}" alt="Копирующий пузырь" style="width: 90%; height: 90%;">`;
         title = 'Забрать: Копирующий пузырь';
     } else if (reward.category && reward.level) {
         // Обычный предмет или предмет-генератор
@@ -255,13 +265,13 @@ function renderGeneratorBadges(cell, item) {
   energyBadge.classList.add('gen-energy-badge');
 
   if (item.generatorKey === 'bonus_chest') {
-    energyBadge.innerHTML = `<img src="assets/icons/energy.png" class="badge-icon" alt=""> ${item.genCharges}`;
+    energyBadge.innerHTML = `<img src="${energyIconUrl}" class="badge-icon" alt=""> ${item.genCharges}`;
     energyBadge.classList.add('charges');
     if (item.genCharges === 0) {
       energyBadge.classList.add('gen-energy-badge-no-energy');
     }
   } else {
-    energyBadge.innerHTML = `<img src="assets/icons/energy.png" class="badge-icon" alt="">${item.genEnergy}`;
+    energyBadge.innerHTML = `<img src="${energyIconUrl}" class="badge-icon" alt="">${item.genEnergy}`;
     // Обновляем классы ячейки в зависимости от энергии
     cell.classList.remove('generator-slot-no-energy', 'generator-slot-low-energy');
     energyBadge.classList.remove('gen-energy-badge-no-energy');
@@ -291,7 +301,7 @@ function renderGeneratorBadges(cell, item) {
   if (lvl === CONFIG.MAX_GENERATOR_LEVEL) {
     const starBadge = document.createElement('span');
     starBadge.classList.add('max-level-star');
-    starBadge.innerHTML = `<img src="assets/icons/star.png" alt="max level">`;
+    starBadge.innerHTML = `<img src="${starIconUrl}" alt="max level">`;
     cell.appendChild(starBadge);
   }
 }
@@ -429,7 +439,7 @@ export function renderGrid() {
         // Добавляем значок заряда
         const chargeBadge = document.createElement('span');
         chargeBadge.classList.add('gen-energy-badge', 'charges'); // Переиспользуем существующие стили
-        chargeBadge.innerHTML = `<img src="assets/icons/energy.png" class="badge-icon" alt=""> ${item.charges}`; // Кастомная иконка
+        chargeBadge.innerHTML = `<img src="${energyIconUrl}" class="badge-icon" alt=""> ${item.charges}`; // Кастомная иконка
         if (item.charges === 0) {
           chargeBadge.classList.add('gen-energy-badge-no-energy');
         }
@@ -438,7 +448,7 @@ export function renderGrid() {
         // Добавляем звезду и частицы, так как предмет достиг максимального уровня в своей ветке
         const starBadge = document.createElement('span');
         starBadge.classList.add('max-level-star');
-        starBadge.innerHTML = `<img src="assets/icons/star.png" alt="max level">`;
+        starBadge.innerHTML = `<img src="${starIconUrl}" alt="max level">`;
         cell.appendChild(starBadge);
         // Вставляем частицы перед звездочкой, чтобы звезда была поверх
         starBadge.insertAdjacentHTML('beforebegin', createParticleEffectHTML());
@@ -462,16 +472,16 @@ export function renderGrid() {
         cell.appendChild(levelBadge);
       } else if (item.isUpgradePart || item.isMagicTool || item.isCopyBubble) {
         // Общая логика для деталей и инструментов
-        let iconSrc = 'assets/icons/question.png';
-        if (item.isUpgradePart) iconSrc = 'assets/icons/upgrade_part.png';
-        if (item.isMagicTool) iconSrc = 'assets/icons/magic_tool.png';
-        if (item.isCopyBubble) iconSrc = 'assets/icons/copy_bubble.png';
+        let iconSrc = questionIconUrl;
+        if (item.isUpgradePart) iconSrc = upgradePartIconUrl;
+        if (item.isMagicTool) iconSrc = magicToolIconUrl;
+        if (item.isCopyBubble) iconSrc = copyBubbleIconUrl;
         wrapper.innerHTML = `<img src="${iconSrc}" alt="">`;
 
         // Добавляем звездочку, так как их нельзя улучшить
         const starBadge = document.createElement('span');
         starBadge.classList.add('max-level-star');
-        starBadge.innerHTML = `<img src="assets/icons/star.png" alt="max level">`;
+        starBadge.innerHTML = `<img src="${starIconUrl}" alt="max level">`;
         cell.appendChild(starBadge);
 
         // Добавляем эффект частиц
@@ -485,7 +495,7 @@ export function renderGrid() {
         if (item.level === CONFIG.MAX_ITEM_LEVEL) {
           const starBadge = document.createElement('span');
           starBadge.classList.add('max-level-star');
-          starBadge.innerHTML = `<img src="assets/icons/star.png" alt="max level">`;
+          starBadge.innerHTML = `<img src="${starIconUrl}" alt="max level">`;
           cell.appendChild(starBadge);
           // Вставляем частицы перед звездочкой, чтобы звезда была поверх
           starBadge.insertAdjacentHTML('beforebegin', createParticleEffectHTML());
@@ -522,22 +532,26 @@ export function renderOrders() {
 
   // Создаем временный список доступных на поле предметов для проверки
   const availableItemsOnGrid = gameState.gridData.filter(item =>
-    item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !item.isMagicTool
+    item && !item.isGenerator && !item.isBlocked && !item.isUpgradePart && !item.isGeneratorPart && !item.isMagicTool && !item.isCopyBubble
   );
 
   // Создаем или обновляем карточки на основе отсортированного массива
   gameState.orders.forEach((order, index) => {
     const cardId = `order-card-${order.id}`;
     let card = document.getElementById(cardId);
+    let isNew = false;
     // Создаем копию доступных предметов для этого конкретного заказа, чтобы не влиять на другие
     let tempAvailable = [...availableItemsOnGrid];
 
     if (!card) {
+      isNew = true;
       card = document.createElement('div');
       card.id = cardId;
       card.dataset.orderId = order.id;
       card.classList.add('order-card');
       if (order.isStory) card.classList.add('story-card');
+      // Добавляем начальный класс для анимации
+      card.classList.add('is-entering');
       ordersList.appendChild(card);
     }
 
@@ -580,6 +594,15 @@ export function renderOrders() {
           </div>
       </div>
     `;
+
+    // Если карточка новая, запускаем анимацию
+    if (isNew) {
+      // Небольшая задержка, чтобы браузер успел отрисовать элемент
+      // перед тем, как мы уберем класс и запустим transition.
+      setTimeout(() => {
+        card.classList.remove('is-entering');
+      }, 10);
+    }
   });
 
   // Удаляем карточки, которых больше нет в логике игры
@@ -611,8 +634,8 @@ export function renderProfile() {
   const startDateStr = new Date(profile.startDate).toLocaleDateString('ru-RU');
 
   const profileIconHTML = `<img src="${profile.icon}" alt="${profile.name}">`;
-  const energyIcon = `<img src="assets/icons/energy.png" class="inline-icon" alt="энергия">`;
-  const coinIcon = `<img src="assets/icons/coin.png" class="inline-icon" alt="монета">`;
+  const energyIcon = `<img src="${energyIconUrl}" class="inline-icon" alt="энергия">`;
+  const coinIcon = `<img src="${coinIconUrl}" class="inline-icon" alt="монета">`;
 
   modal.body.innerHTML = `
     <div class="profile-header">
@@ -743,11 +766,11 @@ export function renderAchievementsModal() {
       const isClaimed = !!gameState.claimedAchievements[`${achievement.id}_${index}`];
       const canClaim = progress >= tier.goal && !isClaimed;
       const percentage = Math.min(100, (progress / tier.goal) * 100);
-      const coinIcon = `<img src="assets/icons/coin.png" class="inline-icon" alt="монета">`;
+      const coinIcon = `<img src="${coinIconUrl}" class="inline-icon" alt="монета">`;
 
       let btnHTML;
       if (isClaimed) {
-        btnHTML = `<button class="achievement-claim-btn claimed" disabled><img src="assets/icons/checkmark.png" alt="Выполнено"></button>`;
+        btnHTML = `<button class="achievement-claim-btn claimed" disabled><img src="${checkmarkIconUrl}" alt="Выполнено"></button>`;
       } else {
         btnHTML = `<button class="achievement-claim-btn" ${!canClaim ? 'disabled' : ''} data-action="claim-achievement" data-id="${achievement.id}" data-index="${index}">+${tier.reward}${coinIcon}</button>`;
       }
@@ -809,7 +832,7 @@ export function renderCollectionModal() {
           if (!bonusClaimed) {
             itemClasses += ' bonus-unclaimed';
             const bonusAmount = item.level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
-            const coinIcon = `<img src="assets/icons/coin.png" class="inline-icon" alt="монета">`;
+            const coinIcon = `<img src="${coinIconUrl}" class="inline-icon" alt="монета">`;
             clickHandler = `data-action="claim-bonus" data-category="${key}" data-level="${item.level}"`;
 
             bonusIconHTML = `<div class="unclaimed-bonus-icon" title="Собрать бонус">+${bonusAmount}${coinIcon}</div>`;
@@ -818,7 +841,7 @@ export function renderCollectionModal() {
           itemClasses += ' undiscovered';
         }
 
-        const itemIcon = discovered ? `<img src="${item.icon}" alt="${item.name}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+        const itemIcon = discovered ? `<img src="${item.icon}" alt="${item.name}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
 
         contentHTML += `
           <div class="${itemClasses}" title="${title}" ${clickHandler}>
@@ -857,7 +880,7 @@ export function renderCollectionModal() {
         const discovered = isDiscovered(genKey, level);
         const undiscoveredClass = discovered ? '' : 'undiscovered';
         const title = discovered ? `${genData.name} ${romanLevel}` : 'Не открыто';
-        const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+        const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
 
         contentHTML += `
           <div class="progression-item-square ${undiscoveredClass}" title="${title}">
@@ -893,7 +916,7 @@ export function renderCollectionModal() {
         const discovered = isDiscovered(discoveryKey, level);
         const undiscoveredClass = discovered ? '' : 'undiscovered';
         const title = discovered ? part.name : 'Не открыто';
-        const itemIcon = discovered ? `<img src="${part.icon}" alt="${title}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+        const itemIcon = discovered ? `<img src="${part.icon}" alt="${title}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
 
         contentHTML += `
           <div class="progression-item-square ${undiscoveredClass}" title="${title}">
@@ -910,7 +933,7 @@ export function renderCollectionModal() {
       const finalGenDiscovered = isDiscovered(genKey, 1);
       const finalGenUndiscoveredClass = finalGenDiscovered ? '' : 'undiscovered';
       const finalGenTitle = finalGenDiscovered ? `${genData.name} I` : 'Не открыто';
-      const finalGenIcon = finalGenDiscovered ? `<img src="${genData.icons[0]}" alt="${finalGenTitle}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+      const finalGenIcon = finalGenDiscovered ? `<img src="${genData.icons[0]}" alt="${finalGenTitle}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
 
       contentHTML += `
         <div class="progression-item-square ${finalGenUndiscoveredClass}" title="${finalGenTitle}">
@@ -925,9 +948,9 @@ export function renderCollectionModal() {
 
   // --- Секция 4: Бустеры ---
   const boosters = [
-    { key: 'upgrade_part', name: 'Новая деталь', icon: 'assets/icons/upgrade_part.png' },
-    { key: 'magic_tool', name: 'Магические инструменты', icon: 'assets/icons/magic_tool.png' },
-    { key: 'copy_bubble', name: 'Копирующий пузырь', icon: 'assets/icons/copy_bubble.png' }
+    { key: 'upgrade_part', name: 'Новая деталь', icon: upgradePartIconUrl },
+    { key: 'magic_tool', name: 'Магические инструменты', icon: magicToolIconUrl },
+    { key: 'copy_bubble', name: 'Копирующий пузырь', icon: copyBubbleIconUrl }
   ];
 
   if (hasContent) {
@@ -940,7 +963,7 @@ export function renderCollectionModal() {
     const discovered = isDiscovered(booster.key, 1);
     const undiscoveredClass = discovered ? '' : 'undiscovered';
     const title = discovered ? booster.name : 'Не открыто';
-    const iconSrc = discovered ? booster.icon : 'assets/icons/question.png';
+    const iconSrc = discovered ? booster.icon : questionIconUrl;
 
     contentHTML += `
       <div class="progression-item-square ${undiscoveredClass}" title="${title}">
@@ -963,7 +986,7 @@ export function renderCollectionModal() {
       const discovered = isDiscovered('bonus_chest', level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
       const title = discovered ? `${bonusChestData.name} ${romanLevel}` : 'Не открыто';
-      const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+      const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
 
       contentHTML += `
         <div class="progression-item-square ${undiscoveredClass}" title="${title}">

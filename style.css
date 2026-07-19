@@ -352,7 +352,7 @@ body.is-dragging, body.is-dragging * {
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
   pointer-events: none; /* По умолчанию нельзя нажать */
-  opacity: 0.7;
+  opacity: 0;
 }
 
 .reward-item.claimable {
@@ -390,6 +390,8 @@ body.is-dragging, body.is-dragging * {
   scroll-behavior: smooth;
   flex: 1; /* Занимает оставшееся место */
   position: relative;
+  min-height: 120px;
+  scrollbar-gutter: stable; /* Резервируем место под скроллбар, чтобы избежать скачков */
 }
 
 #orders-list::-webkit-scrollbar { height: 4px; }
@@ -405,12 +407,18 @@ body.is-dragging, body.is-dragging * {
   gap: 4px;
   border: 1px solid var(--border-color);
   width: 180px; /* Делаем карточку шире для большого аватара */
-  min-height: 100px; /* И немного выше */
+  min-height: 90px; /* И немного выше */
   flex-shrink: 0;
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
   transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.order-card.is-entering {
+  opacity: 0;
+  /* Начинаем немного левее и меньше, чтобы "влететь" на свое место */
+  transform: scale(0.8) translateX(-30px);
 }
 
 .order-card.fade-out {
@@ -451,7 +459,7 @@ body.is-dragging, body.is-dragging * {
   justify-content: flex-end;
   height: 16px; /* To align with cancel button */
 }
-.order-items-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.order-items-list { display: flex; flex-wrap: wrap; gap: 4px; padding-top: 15px; }
 
 .order-target {
   background: var(--border-color);
@@ -551,12 +559,12 @@ body.is-dragging, body.is-dragging * {
   cursor: pointer;
   width: 50px; /* Увеличиваем ширину */
   border-radius: 6px; /* Делаем углы немного скругленными */
-  // overflow: hidden; /* Скрываем все, что выходит за пределы */
+  /* overflow: hidden;  Скрываем все, что выходит за пределы */
   position: relative; /* Для позиционирования картинки внутри */
 }
 
 .order-avatar-container img {
-  height: 100%; /* Растягиваем картинку по высоте контейнера */
+  height: 95%; /* Растягиваем картинку по высоте контейнера */
   width: auto; /* Ширина подстроится автоматически для сохранения пропорций */
   position: absolute;
   left: 50%;
@@ -695,7 +703,7 @@ body.is-dragging, body.is-dragging * {
   pointer-events: none;
 }
 .cell.blocked .item-wrapper {
-  // opacity: 0.5;
+  /*opacity: 0.5;*/
   cursor: not-allowed;
 }
 
@@ -735,7 +743,7 @@ body.is-dragging, body.is-dragging * {
   pointer-events: none;
   transform: scale(1.1);
   filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
-// transition: left 0.05s linear, top 0.05s linear;
+  /*transition: left 0.05s linear, top 0.05s linear;*/
 }
 
 .item-wrapper.dragging img {
@@ -776,14 +784,14 @@ body.is-dragging, body.is-dragging * {
   left: 4px;
   width: 20px;
   height: 20px;
-  // background: #28a745;
+  /*background: #28a745;*/
   border-radius: 50%;
   z-index: 12;
   display: flex;
   align-items: center;
   justify-content: center;
-  // border: 1px solid rgba(255, 255, 255, 0.2);
-  // box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  /*border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);*/
 }
 .item-checkmark::before {
   content: '';
@@ -985,7 +993,7 @@ body.is-dragging, body.is-dragging * {
   margin: 0;
   max-height: 150px; /* Увеличиваем высоту для цепочек предметов */
   overflow-y: visible;   /* Добавляем скролл, если текст не помещается */
-  // padding-right: 5px; /* Небольшой отступ для скроллбара, чтобы он не налезал на текст */
+  /*padding-right: 5px; !* Небольшой отступ для скроллбара, чтобы он не налезал на текст *!*/
 }
 
 .modal-desc::-webkit-scrollbar { width: 4px; }
@@ -1631,8 +1639,8 @@ body.is-dragging, body.is-dragging * {
   .order-card {
     min-width: 140px;
     width: 140px;
-    min-height: 90px;
-    height: 90px;
+    min-height: 80px;
+    height: 80px;
   }
   .grid {
     /* Вот ключевое изменение: уменьшаем максимальную ширину и высоту */
@@ -1853,7 +1861,7 @@ body.is-dragging, body.is-dragging * {
 }
 
 .achievement-claim-btn.claimed {
-  // background: #28a745;
+  /*background: #28a745;*/
   color: white;
   cursor: default;
   padding: 8px;

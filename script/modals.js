@@ -2,6 +2,19 @@ import { DOMElements } from './dom.js';
 import { gameState, playerProfile } from './state.js';
 import { CONFIG, CATEGORIES_CONFIG, GENERATORS_DATA, GEN_ENERGY_CONFIG, STORY_DATA } from './config.js';
 import {
+  coinIconUrl,
+  energyIconUrl,
+  magicToolIconUrl,
+  upgradePartIconUrl,
+  copyBubbleIconUrl,
+  boxIconUrl,
+  achievementsIconUrl,
+  chainIconUrl,
+  storyScrollIconUrl,
+  questionIconUrl,
+  lockIconUrl, warningIconUrl, blockIconUrl, bonusChestLvl1IconUrl
+} from './data/assetUrls.js';
+import {
   clearBlockedItemWithCoins,
   rechargeGeneratorWithCoins,
   deleteItem,
@@ -38,7 +51,7 @@ export function openStorySelectionModal() {
             <h4>${story.title}</h4>
             <p>${story.description}</p>
             <div class="story-lock-reason">
-              <img src="assets/icons/lock.png" alt="Замок">
+              <img src="${lockIconUrl}" alt="Замок">
               <span>Доступно с ${story.requiredLevel} уровня</span>
             </div>
           </div>
@@ -114,7 +127,7 @@ export function openStoryModal() {
   if (step.type === 'dialogue') {
     modal.actions.innerHTML = `<button id="story-continue-btn" class="modal-action-btn">Продолжить</button>`;
   } else if (step.type === 'task' && step.task.type === 'spend_coins') {
-    modal.actions.innerHTML = `<button id="story-task-btn" class="modal-action-btn">${step.task.buttonText} (${step.task.amount}<img src="assets/icons/coin.png" class="inline-icon" />)</button>`;
+    modal.actions.innerHTML = `<button id="story-task-btn" class="modal-action-btn">${step.task.buttonText} (${step.task.amount}<img src="${coinIconUrl}" class="inline-icon" />)</button>`;
   } else {
     modal.actions.innerHTML = '';
   }
@@ -131,31 +144,31 @@ export function openTutorialModal() {
 
   modal.body.innerHTML = `
     <div class="tutorial-section">
-        <h4><img src="assets/icons/magic_tool.png" alt="Слияние">1. Объединяйте предметы</h4>
+        <h4><img src="${magicToolIconUrl}" alt="Слияние">1. Объединяйте предметы</h4>
         <p>Перетаскивайте одинаковые предметы друг на друга, чтобы получить предмет более высокого уровня. Это основной способ получения новых вещей!</p>
     </div>
     <div class="tutorial-section">
-        <h4><img src="assets/icons/box.png" alt="Генераторы">2. Используйте генераторы</h4>
-        <p>Нажимайте на генераторы (предметы с оранжевой/синей анимированной обводкой), чтобы создавать предметы. Это тратит энергию генератора и вашу личную энергию <img src="assets/icons/energy.png" class="inline-icon">.</p>
+        <h4><img src="${boxIconUrl}" alt="Генераторы">2. Используйте генераторы</h4>
+        <p>Нажимайте на генераторы (предметы с оранжевой/синей анимированной обводкой), чтобы создавать предметы. Это тратит энергию генератора и вашу личную энергию <img src="${energyIconUrl}" class="inline-icon">.</p>
     </div>
     <div class="tutorial-section">
-        <h4><img src="assets/icons/achievements.png" alt="Заказы">3. Выполняйте заказы</h4>
+        <h4><img src="${achievementsIconUrl}" alt="Заказы">3. Выполняйте заказы</h4>
         <p>В верхней части экрана находятся заказы от клиентов. Собирайте нужные предметы и нажимайте "Сдать заказ", чтобы получить монеты и опыт.</p>
     </div>
     <div class="tutorial-section">
-        <h4><img src="assets/icons/chain.png" alt="Информация">4. Узнайте больше о предметах</h4>
-        <p>Нажмите на любой предмет на поле, чтобы открыть окно с информацией. В этом окне нажмите на иконку цепочки <img src="assets/icons/chain.png" class="inline-icon">, чтобы увидеть всю его линию эволюции.</p>
+        <h4><img src="${chainIconUrl}" alt="Информация">4. Узнайте больше о предметах</h4>
+        <p>Нажмите на любой предмет на поле, чтобы открыть окно с информацией. В этом окне нажмите на иконку цепочки <img src="${chainIconUrl}" class="inline-icon">, чтобы увидеть всю его линию эволюции.</p>
     </div>
     <div class="tutorial-section">
-        <h4><img src="assets/icons/coin.png" alt="Ресурсы">5. Следите за ресурсами</h4>
-        <p><b>Монеты</b> <img src="assets/icons/coin.png" class="inline-icon"> нужны для покупки улучшений и отмены заказов. <b>Энергия</b> <img src="assets/icons/energy.png" class="inline-icon"> нужна для использования генераторов. Оба ресурса восстанавливаются со временем.</p>
+        <h4><img src="${coinIconUrl}" alt="Ресурсы">5. Следите за ресурсами</h4>
+        <p><b>Монеты</b> <img src="${coinIconUrl}" class="inline-icon"> нужны для покупки улучшений и отмены заказов. <b>Энергия</b> <img src="${energyIconUrl}" class="inline-icon"> нужна для использования генераторов. Оба ресурса восстанавливаются со временем.</p>
     </div>
     <div class="tutorial-section">
-        <h4><img src="assets/icons/story_scroll.png" alt="Меню">6. Исследуйте игру</h4>
+        <h4><img src="${storyScrollIconUrl}" alt="Меню">6. Исследуйте игру</h4>
         <p>Нажмите на кнопку меню ☰, чтобы открыть <b>Сюжет</b>, посмотреть свою <b>Коллекцию</b> предметов и отследить <b>Достижения</b>. За их выполнение вы будете получать награды!</p>
     </div>
     <div class="tutorial-section">
-        <h4><img src="assets/icons/question.png" alt="Обучение">7. Возвращайтесь к обучению</h4>
+        <h4><img src="${questionIconUrl}" alt="Обучение">7. Возвращайтесь к обучению</h4>
         <p>Вы всегда можете вернуться к этому руководству, нажав на кнопку меню ☰ в правом верхнем углу и выбрав пункт "Обучение".</p>
     </div>
   `;
@@ -173,7 +186,13 @@ export function showModal(options) {
   const { icon, title, subtitle, desc, actionButton, dangerButtons, infoButton, isBlocking } = options;
   const modal = DOMElements.infoModal;
 
-  modal.icon.innerHTML = icon.startsWith('assets/') ? `<img src="${icon}" alt="">` : icon;
+  if (typeof icon === 'string') {
+    // Assume it's an HTML string
+    modal.icon.innerHTML = icon;
+  } else if (icon instanceof URL) {
+    // It's a URL object from an import or new URL()
+    modal.icon.innerHTML = `<img src="${icon}" alt="">`;
+  }
   modal.title.innerText = title;
   modal.subtitle.innerText = subtitle;
   modal.desc.innerHTML = desc; // Use innerHTML to support icons
@@ -285,7 +304,7 @@ export function openLevelUpModal(fromLevel, toLevel, rewards) {
   if (rewards.coins > 0) {
     rewardsHTML += `
           <div class="level-up-reward-item">
-              <div class="reward-icon-container coin-reward"><img src="assets/icons/coin.png" alt="Монеты"></div>
+              <div class="reward-icon-container coin-reward"><img src="${coinIconUrl}" alt="Монеты"></div>
               <div class="reward-info">
                   <span class="reward-name">Монеты</span>
                   <span class="reward-amount">+${rewards.coins.toLocaleString('ru-RU')}</span>
@@ -296,7 +315,7 @@ export function openLevelUpModal(fromLevel, toLevel, rewards) {
   if (rewards.giftBox) {
     rewardsHTML += `
           <div class="level-up-reward-item">
-              <div class="reward-icon-container"><img src="assets/icons/bonus_chest_lvl1.png" alt="Подарочная коробка"></div>
+              <div class="reward-icon-container"><img src="${bonusChestLvl1IconUrl}" alt="Подарочная коробка"></div>
               <div class="reward-info">
                   <span class="reward-name">Подарочная коробка</span>
                   <span class="reward-amount">+1</span>
@@ -348,7 +367,7 @@ export function closeLevelUpModal() {
 
 export function confirmReset() {
   showModal({
-    icon: `<img src="assets/icons/warning.png" alt="Внимание">`,
+    icon: `<img src="${warningIconUrl}" alt="Внимание">`,
     title: 'Сбросить весь прогресс?',
     subtitle: 'Полное обнуление',
     desc: 'Вы потеряете все свои открытые предметы, генераторы, очки уровня и текущие заказы. Это действие нельзя отменить.',
@@ -373,15 +392,15 @@ export function confirmCancelOrder(id) {
   if (!order || order.isStory) return;
 
   showModal({
-    icon: `<img src="assets/icons/question.png" alt="Вопрос">`,
+    icon: `<img src="${questionIconUrl}" alt="Вопрос">`,
     title: 'Отменить заказ?',
     subtitle: 'Подтверждение действия',
     desc: `Вы уверены, что хотите отменить этот заказ? Это будет стоить ${CONFIG.COINS_PER_ORDER_CANCEL} монет.`,
     dangerButtons: {
-      confirmButtonText: `Да, отменить (-${CONFIG.COINS_PER_ORDER_CANCEL}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      confirmButtonText: `Да, отменить (-${CONFIG.COINS_PER_ORDER_CANCEL}<img src="${coinIconUrl}" class="inline-icon" alt="монета">)`,
       onConfirm: () => {
         if (gameState.coins < CONFIG.COINS_PER_ORDER_CANCEL) {
-          showToast(`<img src="assets/icons/coin.png" class="toast-icon" alt=""> Недостаточно монет для отмены (нужно ${CONFIG.COINS_PER_ORDER_CANCEL})!`, "error");
+          showToast(`<img src="${coinIconUrl}" class="toast-icon" alt=""> Недостаточно монет для отмены (нужно ${CONFIG.COINS_PER_ORDER_CANCEL})!`, "error");
           closeModal();
           return;
         }
@@ -427,12 +446,12 @@ export function showItemInfoModal(item, index = -1) {
 function getBlockedItemModalOptions(item, index) {
   const info = CATEGORIES_CONFIG[item.category].items[item.level - 1];
   return {
-    icon: 'assets/icons/block.png',
+    icon: blockIconUrl,
     title: `Заблокированный: ${info.name}`,
     subtitle: 'Преграда',
     desc: 'Этот предмет за баррикадой. Чтобы его освободить, перетащите на него точно такой же предмет с поля, либо расчистите завал за монеты.',
     actionButton: {
-      text: `Расчистить завал (-${CONFIG.BLOCKED_CLEAR_COST_COINS}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      text: `Расчистить завал (-${CONFIG.BLOCKED_CLEAR_COST_COINS}<img src="${coinIconUrl}" class="inline-icon" alt="монета">)`,
       onClick: () => clearBlockedItemWithCoins(index)
     },
     isBlocking: false
@@ -471,7 +490,7 @@ function getGeneratorModalOptions(item, index) {
 
   if (item.genEnergy < config.max) {
     modalOptions.actionButton = {
-      text: `Восстановить (-${CONFIG.GENERATOR_RECHARGE_COST}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      text: `Восстановить (-${CONFIG.GENERATOR_RECHARGE_COST}<img src="${coinIconUrl}" class="inline-icon" alt="монета">)`,
       onClick: () => rechargeGeneratorWithCoins(index),
     };
   }
@@ -497,7 +516,7 @@ function getItemGeneratorModalOptions(item, index) {
 function getBoosterModalOptions(item) {
   if (item.isUpgradePart) {
     return {
-      icon: 'assets/icons/upgrade_part.png',
+      icon: upgradePartIconUrl,
       title: 'Новая деталь',
       subtitle: 'Универсальный улучшитель',
       desc: 'Редкая деталь, полученная за выполнение особого заказа. Перетащите ее на любой генератор (кроме подарочных коробок), чтобы повысить его уровень.',
@@ -506,7 +525,7 @@ function getBoosterModalOptions(item) {
   }
   if (item.isMagicTool) {
     return {
-      icon: 'assets/icons/magic_tool.png',
+      icon: magicToolIconUrl,
       title: 'Магические инструменты',
       subtitle: 'Универсальный улучшитель',
       desc: 'Волшебные инструменты, способные улучшить любой предмет на один уровень. Перетащите их на предмет, который хотите улучшить.',
@@ -515,7 +534,7 @@ function getBoosterModalOptions(item) {
   }
   if (item.isCopyBubble) {
     return {
-      icon: 'assets/icons/copy_bubble.png',
+      icon: copyBubbleIconUrl,
       title: 'Копирующий пузырь',
       subtitle: 'Бустер-дубликатор',
       desc: 'Перетащите любой предмет (кроме генераторов и других бустеров) на этот пузырь, чтобы создать его точную копию. Пузырь при этом исчезнет.',
@@ -537,7 +556,7 @@ function getGeneratorPartModalOptions(item, index) {
     subtitle: `Деталь для сборки • Уровень ${item.level}`,
     desc: 'Часть для сборки нового генератора.',
     dangerButtons: {
-      confirmButtonText: `Продать (+${sellPrice}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      confirmButtonText: `Продать (+${sellPrice}<img src="${coinIconUrl}" class="inline-icon" alt="монета">)`,
       onConfirm: () => deleteItem(index)
     },
     infoButton: {
@@ -556,7 +575,7 @@ function getRegularItemModalOptions(item, index) {
     subtitle: `${CATEGORIES_CONFIG[item.category].name} • Уровень ${item.level}`,
     desc: 'Предмет для выполнения заказов и слияния.',
     dangerButtons: {
-      confirmButtonText: `Продать (+${sellPrice}<img src="assets/icons/coin.png" class="inline-icon" alt="монета">)`,
+      confirmButtonText: `Продать (+${sellPrice}<img src="${coinIconUrl}" class="inline-icon" alt="монета">)`,
       onConfirm: () => deleteItem(index)
     },
     infoButton: {
@@ -575,7 +594,7 @@ const MODAL_OPTIONS_GETTERS = {
   regular: getRegularItemModalOptions,
 };
 
-export function showCategoryProgressionModal(categoryKeyOrKeys, icon = 'assets/icons/chain.png') {
+export function showCategoryProgressionModal(categoryKeyOrKeys, icon) {
   const categoryKeys = Array.isArray(categoryKeyOrKeys) ? categoryKeyOrKeys : [categoryKeyOrKeys];
   if (categoryKeys.length === 0) return;
   const modal = DOMElements.detailModal; // Используем большой модал
@@ -586,7 +605,7 @@ export function showCategoryProgressionModal(categoryKeyOrKeys, icon = 'assets/i
   let specificItemFound = false;
 
   // Если передан один ключ категории и иконка, пытаемся найти описание конкретного предмета
-  if (categoryKeys.length === 1 && icon && icon !== 'assets/icons/chain.png') {
+  if (categoryKeys.length === 1 && icon) {
     const categoryKey = categoryKeys[0];
     const category = CATEGORIES_CONFIG[categoryKey];
     if (category) {
@@ -603,7 +622,7 @@ export function showCategoryProgressionModal(categoryKeyOrKeys, icon = 'assets/i
 
   // Setup modal shell
   modal.title.innerText = modalTitle;
-  modal.icon.innerHTML = `<img src="${icon}" alt="Иконка цепочки">`;
+  modal.icon.innerHTML = `<img src="${icon || chainIconUrl}" alt="Иконка цепочки">`;
   if (specificItemFound) {
     modal.desc.innerHTML = itemDescription;
     modal.desc.style.display = 'block';
@@ -629,7 +648,7 @@ export function showCategoryProgressionModal(categoryKeyOrKeys, icon = 'assets/i
     category.items.forEach((item, itemIndex) => {
       const discovered = isDiscovered(key, item.level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
-      const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+      const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
       progressionHTML += `
         <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? item.name : 'Не открыто'}">
           <div class="progression-item-icon">${itemIcon}</div>
@@ -692,7 +711,7 @@ export function showGeneratorDetailModal(item) {
     category.items.forEach((item, itemIndex) => {
       const discovered = isDiscovered(key, item.level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
-      const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+      const itemIcon = discovered ? `<img src="${item.icon}" alt="">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
       progressionHTML += `
               <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? item.name : 'Не открыто'}">
                   <div class="progression-item-icon">${itemIcon}</div>
@@ -733,7 +752,7 @@ export function showItemDetailModal(item) {
     cat.items.forEach((progItem, itemIndex) => {
       const discovered = isDiscovered(categoryKey, progItem.level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
-      const itemIcon = discovered ? `<img src="${progItem.icon}" alt="">` : `<img src="assets/icons/question.png" alt="Не открыто">`;
+      const itemIcon = discovered ? `<img src="${progItem.icon}" alt="">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
       chainHTML += `
           <div class="progression-item-square ${undiscoveredClass}" title="${discovered ? progItem.name : 'Не открыто'}">
               <div class="progression-item-icon">${itemIcon}</div>

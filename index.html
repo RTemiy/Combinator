@@ -286,95 +286,64 @@
 <audio id="sfx-fly" src="assets/sfx/fly.mp3"></audio>
 
 <script type="module" src="./script/script.js"></script>
-<script>
-  // Регистрируем Service Worker для работы оффлайн
-    if ('serviceWorker' in navigator) {
-        let refreshing = false;
-        // Этот слушатель будет ловить сообщение от нового SW и перезагружать страницу
-        navigator.serviceWorker.addEventListener('message', event => {
-            // Мы слушаем два типа сообщений: прогресс и активация.
-            // Этот обработчик только для активации.
-            if (event.data && event.data.type === 'SW_ACTIVATED' && !refreshing) {
-                refreshing = true;
-                window.location.reload();
-            }
-        });
-
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(registration => {
-                    console.log('ServiceWorker: регистрация успешна, scope: ', registration.scope);
-
-                    // Если воркер уже ждет активации, просто показываем кнопку
-                    if (registration.waiting) {
-                        showReadyToUpdateUI(registration.waiting);
-                    }
-
-                    // Когда найден новый воркер, начинаем процесс отображения загрузки
-                    registration.onupdatefound = () => {
-                        const installingWorker = registration.installing;
-                        // Показываем UI только если уже есть активный воркер (т.е. это обновление, а не первая установка)
-                        if (navigator.serviceWorker.controller) {
-                            trackInstallation(installingWorker);
-                        }
-                    };
-                })
-                .catch(err => {
-                    console.error('ServiceWorker: ошибка регистрации: ', err);
-                });
-        });
-    }
-
+<script type="module">
+  // Регистрируем Service Worker ТОЛЬКО в продакшен-сборке, чтобы не мешать разработке
+  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+    // Эта функция показывает UI для обновления
     function showReadyToUpdateUI(worker) {
-        const notificationBar = document.createElement('div');
-        notificationBar.id = 'update-notification';
-        notificationBar.innerHTML = `
-            <span>Доступна новая версия игры!</span>
-            <button id="reload-button">Обновить</button>
-        `;
-        document.body.appendChild(notificationBar);
+      // Предотвращаем создание дубликатов уведомления
+      if (document.getElementById('update-notification')) return;
 
-        document.getElementById('reload-button').addEventListener('click', (event) => {
-            const button = event.target;
-            button.textContent = 'Обновление...';
-            button.disabled = true;
-            worker.postMessage({ action: 'skipWaiting' });
+      const notificationBar = document.createElement('div');
+      notificationBar.id = 'update-notification';
+      notificationBar.innerHTML = `
+          <span>Доступна новая версия игры!</span>
+          <button id="reload-button">Обновить</button>
+      `;
+      document.body.appendChild(notificationBar);
+
+      document.getElementById('reload-button').addEventListener('click', (event) => {
+        const button = event.target;
+        button.textContent = 'Обновление...';
+        button.disabled = true;
+        // Отправляем сообщение новому SW, чтобы он активировался
+        worker.postMessage({ type: 'SKIP_WAITING' });
+      });
+    }
+
+    // Этот слушатель перезагружает страницу, когда новый SW полностью активирован
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register(new URL('/sw.js', import.meta.url), { type: 'module' })
+        .then(registration => {
+          console.log('ServiceWorker: регистрация успешна, scope: ', registration.scope);
+
+          // Логика для отслеживания обновлений
+          registration.onupdatefound = () => {
+            const installingWorker = registration.installing;
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // Новый SW установлен и ожидает активации. Показываем UI.
+                showReadyToUpdateUI(installingWorker);
+              }
+            };
+          };
+        })
+        .catch(err => {
+          console.error('ServiceWorker: ошибка регистрации: ', err);
         });
-    }
+    });
 
-    function trackInstallation(worker) {
-        const notificationBar = document.createElement('div');
-        notificationBar.id = 'update-notification';
-        notificationBar.innerHTML = `
-            <div style="width: 100%;">
-                <span>Загрузка обновления... <span class="progress-percentage">(0%)</span></span>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: 0%;"></div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(notificationBar);
-
-        const progressListener = (event) => {
-            if (event.data && event.data.type === 'caching-progress') {
-                const percentage = Math.round(event.data.progress * 100);
-                const progressBar = notificationBar.querySelector('.progress-bar');
-                const percentageText = notificationBar.querySelector('.progress-percentage');
-
-                if (progressBar) progressBar.style.width = `${percentage}%`;
-                if (percentageText) percentageText.textContent = `(${percentage}%)`;
-            }
-        };
-        navigator.serviceWorker.addEventListener('message', progressListener);
-
-        worker.onstatechange = () => {
-            if (worker.state === 'installed') {
-                navigator.serviceWorker.removeEventListener('message', progressListener);
-                notificationBar.remove();
-                showReadyToUpdateUI(worker);
-            }
-        };
-    }
+    // Если при загрузке страницы уже есть ожидающий SW, сразу показываем кнопку
+    navigator.serviceWorker.ready.then(registration => {
+      if (registration.waiting) {
+        showReadyToUpdateUI(registration.waiting);
+      }
+    });
+  }
 </script>
 
 </body>

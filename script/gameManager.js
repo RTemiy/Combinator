@@ -6,6 +6,7 @@ import { addListeners } from './eventHandlers.js';
 import { createGrid, updateUI, applyTheme, showToast, highlightHintItems, removeHintHighlights } from './ui.js';
 import { restoreGeneratorsEnergy, regenerateEnergy, checkOrdersAvailability, shuffleArray, getEmptyGridCells, markItemAsDiscovered, generateOrder, findMergeablePair } from './gameLogic.js';
 import { openTutorialModal, openStoryModal, openStorySelectionModal } from './modals.js';
+import { energyIconUrl, profileIconUrl } from './data/assetUrls.js';
 // --- Game Version Check ---
 (function checkVersion() {
   const storedVersion = localStorage.getItem(CONFIG.VERSION_KEY);
@@ -159,8 +160,7 @@ export function loadGame() {
     gameSettings.theme = loadedSettings.theme || 'light';
 
     const loadedProfile = loaded.profile || {};
-    playerProfile.name = loadedProfile.name || 'Игрок';
-    playerProfile.icon = loadedProfile.icon || 'assets/icons/profile.png';
+    playerProfile.icon = loadedProfile.icon || profileIconUrl.href;
     playerProfile.startDate = loadedProfile.startDate || Date.now();
     playerProfile.timePlayed = loadedProfile.timePlayed || 0;
     playerProfile.totalMerges = loadedProfile.totalMerges || 0;
@@ -178,7 +178,7 @@ export function loadGame() {
     }
     if (energyToRestore > 0) {
       gameState.energy = Math.min(CONFIG.MAX_ENERGY, gameState.energy + energyToRestore);
-      showToast(`<img src="assets/icons/energy.png" class="toast-icon" alt=""> Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100} энергии!`, "success");
+      showToast(`<img src="${energyIconUrl}" class="toast-icon" alt=""> Вы отсутствовали. Восстановлено ${energyToRestore <= 100 ? energyToRestore : 100} энергии!`, "success");
     }
 
     if (loaded.thresholds) {
@@ -220,7 +220,7 @@ export function startNewGame() {
 
   // Сброс профиля
   playerProfile.name = 'Ваше имя';
-  playerProfile.icon = 'assets/icons/profile.png';
+  playerProfile.icon = profileIconUrl.href;
   playerProfile.startDate = Date.now();
   playerProfile.timePlayed = 0;
   playerProfile.totalMerges = 0;

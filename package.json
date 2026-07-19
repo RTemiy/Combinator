@@ -1,0 +1,26 @@
+{
+  "name": "combinations",
+  "version": "1.0.0",
+  "description": "Комбинации: Собирай заказы",
+  "source": "index.html",
+  "homepage": "https://RTemiy.github.io/Combinations",
+  "scripts": {
+    "dev": "parcel",
+    "build": "parcel build --public-url .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@parcel/packager-raw-url": "^2.16.4",
+    "@parcel/transformer-webmanifest": "^2.16.4",
+    "gh-pages": "^6.3.0",
+    "parcel": "^2.16.4",
+    "workbox-core": "^7.4.1",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
+    "workbox-strategies": "^7.4.1"
+  }
+}
