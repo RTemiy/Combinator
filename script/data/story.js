@@ -3,7 +3,7 @@ export const STORY_DATA = {
     id: 'neighbor_arc',
     title: "Соседские сплетни",
     description: "Познакомьтесь с вашей новой соседкой. Кто знает, к чему приведёт это знакомство?",
-    requiredLevel: 1,
+    requiredLevel: 3,
     icon: 'assets/icons/characters/neighbor.png',
     chapters: {
       1: {
