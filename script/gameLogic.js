@@ -232,7 +232,7 @@ export function advanceStoryStep(fromModal = false) {
           gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: rewardLevel, genEnergy: GEN_ENERGY_CONFIG[rewardLevel].max, lastRegenTime: Date.now() });
         }
 
-        markItemAsDiscovered(step.reward.key, rewardLevel);
+        markItemAsDiscovered(`gen_${step.reward.key}`, rewardLevel);
         // Если генератор сюжетный, сразу разблокируем его категории для заказов
         if (generatorData && generatorData.isStoryOnly) {
           generatorData.categories.forEach(cat => {
@@ -575,7 +575,7 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
     genEnergy: GEN_ENERGY_CONFIG[nextLvl].max,
     lastRegenTime: Date.now()
   };
-  markItemAsDiscovered(generator.generatorKey, nextLvl);
+  markItemAsDiscovered(`gen_${generator.generatorKey}`, nextLvl);
   triggerMergeEffects(genIdx, GENERATORS_DATA[generator.generatorKey].categories[0]);
   // showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
   return true;
@@ -586,7 +586,7 @@ function handleGeneratorPartMerge(fromIdx, toIdx, source) {
   playSound(DOMElements.sfxMerge);
 
   // Гарантируем, что исходная деталь, которую мы сливаем, будет добавлена в коллекцию.
-  markItemAsDiscovered(`${source.generatorKey}_part`, source.level);
+  markItemAsDiscovered(`part_${source.generatorKey}`, source.level);
 
   if (source.level >= 3) { // Max level for parts is 3. Merging two L3 parts.
     gameState.gridData[fromIdx] = null;
@@ -598,13 +598,13 @@ function handleGeneratorPartMerge(fromIdx, toIdx, source) {
       genEnergy: GEN_ENERGY_CONFIG[1].max,
       lastRegenTime: Date.now()
     };
-    markItemAsDiscovered(source.generatorKey, 1);
+    markItemAsDiscovered(`gen_${source.generatorKey}`, 1);
     triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
     // showToast(`🛠️ Собран новый генератор!`, "success");
     return true;
   } else { // Levels 1 and 2 merge up
     gameState.gridData[fromIdx] = null;
-    markItemAsDiscovered(`${source.generatorKey}_part`, source.level + 1);
+    markItemAsDiscovered(`part_${source.generatorKey}`, source.level + 1);
     gameState.gridData[toIdx] = { isGeneratorPart: true, generatorKey: source.generatorKey, level: source.level + 1 };
     triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
     return true;
@@ -652,7 +652,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
         genCharges: 3,
       };
       triggerMergeEffects(toIdx, 'stationery');
-      markItemAsDiscovered('bonus_chest', 2);
+      markItemAsDiscovered('gen_bonus_chest', 2);
       return true;
     } else if (currentLevel === 2) { // Слияние L2 -> L3
       gameState.gridData[fromIdx] = null;
@@ -663,7 +663,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
         genCharges: 5,
       };
       triggerMergeEffects(toIdx, 'stationery');
-      markItemAsDiscovered('bonus_chest', 3);
+      markItemAsDiscovered('gen_bonus_chest', 3);
       return true;
     }
     return false; // Нельзя объединять L3 и выше
@@ -680,7 +680,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
     genEnergy: GEN_ENERGY_CONFIG[nextLvl].max,
     lastRegenTime: Date.now()
   };
-  markItemAsDiscovered(source.generatorKey, nextLvl);
+  markItemAsDiscovered(`gen_${source.generatorKey}`, nextLvl);
   triggerMergeEffects(toIdx, GENERATORS_DATA[source.generatorKey].categories[0]);
   // showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
   return true;
@@ -1122,7 +1122,7 @@ function unlockNewGenerator(threshold) {
     genEnergy: GEN_ENERGY_CONFIG[1].max,
     lastRegenTime: Date.now()
   });
-  markItemAsDiscovered(genKey, 1);
+  markItemAsDiscovered(`gen_${genKey}`, 1);
   // showToast - убрали, теперь это в модальном окне
   return {
     name: generatorData.name,
@@ -1150,7 +1150,7 @@ export function spawnRandomExistingGenerator() {
       genEnergy: GEN_ENERGY_CONFIG[1].max,
       lastRegenTime: Date.now()
     });
-    markItemAsDiscovered(randomGenKey, 1);
+    markItemAsDiscovered(`gen_${randomGenKey}`, 1);
     showToast(`<img src="${boxIconUrl}" class="toast-icon" alt=""> Серия завершена! Бонус: получен генератор "${generatorData.name}"!`, "story");
   } else {
     // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
@@ -1166,7 +1166,7 @@ function spawnLevelUpBonus(level) {
     genLevel: 1,
     genCharges: 1
   });
-  markItemAsDiscovered('bonus_chest', 1);
+  markItemAsDiscovered('gen_bonus_chest', 1);
 }
 
 export function spawnUpgradePart() {
@@ -1214,7 +1214,7 @@ export function spawnGeneratorPart() {
       generatorKey: randomGenKey,
       level: 1
     });
-    markItemAsDiscovered(`${randomGenKey}_part`, 1);
+    markItemAsDiscovered(`part_${randomGenKey}`, 1);
     // showToast(`⚙️ Получена деталь для "${generatorData.name}"!`, "success");
   }
 }

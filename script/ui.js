@@ -869,7 +869,7 @@ export function renderCollectionModal() {
     if (genKey === 'bonus_chest') continue;
     const genData = GENERATORS_DATA[genKey];
     // Проверяем, открыт ли хоть один уровень этого генератора
-    const isGeneratorVisible = genData.icons.some((icon, index) => isDiscovered(genKey, index + 1));
+    const isGeneratorVisible = genData.icons.some((icon, index) => isDiscovered(`gen_${genKey}`, index + 1));
 
     if (isGeneratorVisible) {
       contentHTML += `<div class="progression-container" style="margin-top: 5px; margin-bottom: 10px;">`;
@@ -877,7 +877,7 @@ export function renderCollectionModal() {
       genData.icons.forEach((iconPath, index) => {
         const level = index + 1;
         const romanLevel = CONFIG.ROMAN_NUMERALS[level];
-        const discovered = isDiscovered(genKey, level);
+        const discovered = isDiscovered(`gen_${genKey}`, level);
         const undiscoveredClass = discovered ? '' : 'undiscovered';
         const title = discovered ? `${genData.name} ${romanLevel}` : 'Не открыто';
         const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
@@ -905,7 +905,7 @@ export function renderCollectionModal() {
     const genData = GENERATORS_DATA[genKey];
     if (!genData.parts) continue;
 
-    const discoveryKey = `${genKey}_part`;
+    const discoveryKey = `part_${genKey}`;
     const arePartsVisible = genData.parts.some((part, index) => isDiscovered(discoveryKey, index + 1));
 
     if (arePartsVisible) {
@@ -930,7 +930,7 @@ export function renderCollectionModal() {
       });
 
       contentHTML += '<div class="progression-arrow-h">→</div>';
-      const finalGenDiscovered = isDiscovered(genKey, 1);
+      const finalGenDiscovered = isDiscovered(`gen_${genKey}`, 1);
       const finalGenUndiscoveredClass = finalGenDiscovered ? '' : 'undiscovered';
       const finalGenTitle = finalGenDiscovered ? `${genData.name} I` : 'Не открыто';
       const finalGenIcon = finalGenDiscovered ? `<img src="${genData.icons[0]}" alt="${finalGenTitle}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
@@ -975,7 +975,7 @@ export function renderCollectionModal() {
 
   // --- Добавляем цепочку bonus_chest в эту же секцию ---
   const bonusChestData = GENERATORS_DATA['bonus_chest'];
-  const isBonusChestVisible = bonusChestData.icons.some((icon, index) => isDiscovered('bonus_chest', index + 1));
+  const isBonusChestVisible = bonusChestData.icons.some((icon, index) => isDiscovered('gen_bonus_chest', index + 1));
 
   if (isBonusChestVisible) {
     contentHTML += `<div class="progression-container" style="margin-top: 10px;">`;
@@ -983,7 +983,7 @@ export function renderCollectionModal() {
     bonusChestData.icons.forEach((iconPath, index) => {
       const level = index + 1;
       const romanLevel = CONFIG.ROMAN_NUMERALS[level];
-      const discovered = isDiscovered('bonus_chest', level);
+      const discovered = isDiscovered('gen_bonus_chest', level);
       const undiscoveredClass = discovered ? '' : 'undiscovered';
       const title = discovered ? `${bonusChestData.name} ${romanLevel}` : 'Не открыто';
       const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;

@@ -696,6 +696,35 @@ export function showGeneratorDetailModal(item) {
 
   // 2. Progression chain(s)
   let progressionHTML = '';
+  // --- НОВЫЙ БЛОК: Цепочка улучшений самого генератора ---
+  if (genInfo.icons.length > 1) { // Показываем цепочку, только если у генератора больше 1 уровня
+    progressionHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Цепочка улучшений генератора</h4>`;
+    progressionHTML += `<div class="progression-container">`;
+
+    for (let i = 1; i <= CONFIG.MAX_GENERATOR_LEVEL; i++) {
+      // Проверяем, существует ли иконка для этого уровня
+      if (!genInfo.icons[i - 1]) break;
+
+      const discovered = isDiscovered(`gen_${item.generatorKey}`, i);
+      const romanLevel = CONFIG.ROMAN_NUMERALS[i];
+      const title = discovered ? `${genInfo.name} ${romanLevel}` : 'Не открыто';
+      const icon = discovered ? `<img src="${genInfo.icons[i - 1]}" alt="${title}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
+
+      progressionHTML += `
+         <div class="progression-item-square ${discovered ? '' : 'undiscovered'}" title="${title}">
+           <div class="progression-item-icon">${icon}</div>
+           <div class="progression-item-level">${romanLevel}</div>
+         </div>
+       `;
+
+      if (i < CONFIG.MAX_GENERATOR_LEVEL && genInfo.icons[i]) {
+        progressionHTML += '<div class="progression-arrow-h">→</div>';
+      }
+    }
+    progressionHTML += `</div>`;
+
+    progressionHTML += '<hr style="border-color: #444; margin: 20px 0 15px;">';
+  }
   const categoryKeys = genInfo.categories;
   categoryKeys.forEach((key, index) => {
     const category = CATEGORIES_CONFIG[key];
@@ -806,33 +835,45 @@ export function showGeneratorPartDetailModal(item) {
   progressionHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">Цепочка сборки</h4>`;
   progressionHTML += `<div class="progression-container">`;
 
-  const partHTML = (level) => {
+  const partHTML = (level, genKey) => {
     const currentPartInfo = genInfo.parts[level - 1];
+    const partDiscoveryKey = `part_${genKey}`;
+    const discovered = isDiscovered(partDiscoveryKey, level);
+    const undiscoveredClass = discovered ? '' : 'undiscovered';
+    const title = discovered ? `${currentPartInfo.name}, Ур. ${level}` : 'Не открыто';
+    const icon = discovered ? `<img src="${currentPartInfo.icon}" alt="${currentPartInfo.name}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
+
     return `
-        <div class="progression-item-square" title="${currentPartInfo.name}, Ур. ${level}">
+        <div class="progression-item-square ${undiscoveredClass}" title="${title}">
             <div class="progression-item-icon">
-                <img src="${currentPartInfo.icon}" alt="${currentPartInfo.name}">
+                ${icon}
             </div>
             <div class="progression-item-level">${level}</div>
         </div>
     `};
 
-  const generatorHTML = `
-        <div class="progression-item-square" title="${genInfo.name}, Ур. I">
+  const generatorHTML = (genKey) => {
+    const discovered = isDiscovered(`gen_${genKey}`, 1);
+    const undiscoveredClass = discovered ? '' : 'undiscovered';
+    const title = discovered ? `${genInfo.name}, Ур. I` : 'Не открыто';
+    const icon = discovered ? `<img src="${genInfo.icons[0]}" alt="${genInfo.name}">` : `<img src="${questionIconUrl}" alt="Не открыто">`;
+
+    return `
+        <div class="progression-item-square ${undiscoveredClass}" title="${title}">
             <div class="progression-item-icon">
-                <img src="${genInfo.icons[0]}" alt="${genInfo.name}">
+                ${icon}
             </div>
             <div class="progression-item-level">I</div>
         </div>
-    `;
+    `};
 
-  progressionHTML += partHTML(1);
+  progressionHTML += partHTML(1, item.generatorKey);
   progressionHTML += '<div class="progression-arrow-h">→</div>';
-  progressionHTML += partHTML(2);
+  progressionHTML += partHTML(2, item.generatorKey);
   progressionHTML += '<div class="progression-arrow-h">→</div>';
-  progressionHTML += partHTML(3);
+  progressionHTML += partHTML(3, item.generatorKey);
   progressionHTML += '<div class="progression-arrow-h">→</div>';
-  progressionHTML += generatorHTML;
+  progressionHTML += generatorHTML(item.generatorKey);
   progressionHTML += '</div>';
 
   modal.extraContent.innerHTML = progressionHTML;
