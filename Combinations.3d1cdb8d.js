@@ -1026,7 +1026,7 @@ function startNewGame() {
     saveGame();
 }
 
-},{"./config.js":"itWAF","./data/gameConfig.js":"5Gyni","./state.js":"9b3Vp","./dom.js":"iyifM","./eventHandlers.js":"5tF51","./ui.js":"3OQ5l","./gameLogic.js":"6oSsV","./modals.js":"6Bu0H","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./data/assetUrls.js":"4MPQh","./assetPreloader.js":"8s0KB"}],"itWAF":[function(require,module,exports,__globalThis) {
+},{"./config.js":"itWAF","./data/gameConfig.js":"5Gyni","./state.js":"9b3Vp","./dom.js":"iyifM","./eventHandlers.js":"5tF51","./ui.js":"3OQ5l","./gameLogic.js":"6oSsV","./modals.js":"6Bu0H","./data/assetUrls.js":"4MPQh","./assetPreloader.js":"8s0KB","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"itWAF":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _achievementsJs = require("./data/achievements.js");
@@ -1146,37 +1146,7 @@ const ACHIEVEMENTS_DATA = {
     }
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./assetUrls.js":"4MPQh"}],"jnFvT":[function(require,module,exports,__globalThis) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, '__esModule', {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"4MPQh":[function(require,module,exports,__globalThis) {
+},{"./assetUrls.js":"4MPQh","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"4MPQh":[function(require,module,exports,__globalThis) {
 // This file centralizes asset URLs to make them compatible with Parcel's bundling.
 // By using `new URL(...)`, we tell Parcel to include these assets in the build
 // and provide us with the final, correct path.
@@ -1227,16 +1197,7 @@ const orderAchievementIconUrl = new URL(require("d42ef4e4bd806040"));
 const coinsAchievementIconUrl = new URL(require("a45012050e48a3fe"));
 const energyAchievementIconUrl = new URL(require("c88a593a718e6196"));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","8cc4c4eaf5f46193":"94QUL","6ad103636ea20bb5":"21LY5","f9e0a4d5ffcdb3a":"6YoQm","212dbb8d446341a0":"4qhqe","6925787bf5fe2cf":"8Wmv0","efa4998ec850919c":"kpMI4","4f952aa9104fd2a2":"begDh","a24833c87909bad4":"BECs3","b0ef20676c9e41f0":"7gkEz","585fe5255b23fdeb":"a5FXi","a026d5df313ce930":"e2TCP","ba785e0fab8c45fd":"85vnb","77199fd44154371c":"7Qh4L","e9f21387644e413f":"3dqfw","f8f4bf79b5515d24":"hcRwP","dad7f35a8ea52254":"dv2cz","9eeab77a064239ab":"bcXHE","7c807f3b682d469c":"8IdlK","81743507a0165d45":"hog9b","d42ef4e4bd806040":"OczAK","a45012050e48a3fe":"lfEGv","c88a593a718e6196":"bop8R"}],"94QUL":[function(require,module,exports,__globalThis) {
-module.exports = module.bundle.resolve("level.bd276a14.png") + "?" + Date.now();
-
-},{}],"21LY5":[function(require,module,exports,__globalThis) {
-module.exports = module.bundle.resolve("profile.5f50cfab.png") + "?" + Date.now();
-
-},{}],"6YoQm":[function(require,module,exports,__globalThis) {
-module.exports = module.bundle.resolve("star.d5fd55ca.png") + "?" + Date.now();
-
-},{}],"4qhqe":[function(require,module,exports,__globalThis) {
+},{"212dbb8d446341a0":"4qhqe","6925787bf5fe2cf":"8Wmv0","efa4998ec850919c":"kpMI4","4f952aa9104fd2a2":"begDh","a24833c87909bad4":"BECs3","b0ef20676c9e41f0":"7gkEz","585fe5255b23fdeb":"a5FXi","a026d5df313ce930":"e2TCP","ba785e0fab8c45fd":"85vnb","77199fd44154371c":"7Qh4L","e9f21387644e413f":"3dqfw","f8f4bf79b5515d24":"hcRwP","dad7f35a8ea52254":"dv2cz","9eeab77a064239ab":"bcXHE","7c807f3b682d469c":"8IdlK","8cc4c4eaf5f46193":"94QUL","6ad103636ea20bb5":"21LY5","f9e0a4d5ffcdb3a":"6YoQm","81743507a0165d45":"hog9b","d42ef4e4bd806040":"OczAK","a45012050e48a3fe":"lfEGv","c88a593a718e6196":"bop8R","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"4qhqe":[function(require,module,exports,__globalThis) {
 module.exports = module.bundle.resolve("coin.d0546732.png") + "?" + Date.now();
 
 },{}],"8Wmv0":[function(require,module,exports,__globalThis) {
@@ -1281,6 +1242,15 @@ module.exports = module.bundle.resolve("block.1947a7d7.png") + "?" + Date.now();
 },{}],"8IdlK":[function(require,module,exports,__globalThis) {
 module.exports = module.bundle.resolve("bonus_chest_lvl1.47431a07.png") + "?" + Date.now();
 
+},{}],"94QUL":[function(require,module,exports,__globalThis) {
+module.exports = module.bundle.resolve("level.bd276a14.png") + "?" + Date.now();
+
+},{}],"21LY5":[function(require,module,exports,__globalThis) {
+module.exports = module.bundle.resolve("profile.5f50cfab.png") + "?" + Date.now();
+
+},{}],"6YoQm":[function(require,module,exports,__globalThis) {
+module.exports = module.bundle.resolve("star.d5fd55ca.png") + "?" + Date.now();
+
 },{}],"hog9b":[function(require,module,exports,__globalThis) {
 module.exports = module.bundle.resolve("merge_achievement.11ccf8d0.png") + "?" + Date.now();
 
@@ -1292,6 +1262,36 @@ module.exports = module.bundle.resolve("coins_achievement.a079c49b.png") + "?" +
 
 },{}],"bop8R":[function(require,module,exports,__globalThis) {
 module.exports = module.bundle.resolve("energy_achievement.4b4e7ee7.png") + "?" + Date.now();
+
+},{}],"jnFvT":[function(require,module,exports,__globalThis) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, '__esModule', {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
 
 },{}],"j2S6s":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -1373,7 +1373,7 @@ const STORY_CHARACTERS = [
     }
 ];
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","e897767e002011af":"7mlZd","2966f00865d33cc":"hacvG","3eb037fc7845d594":"5CYCI","6c664363ba73338":"bj9vZ","b65b45d8abd44145":"8jtyd","178f097d842b0b3c":"kkyZn","3a23359ea821735a":"fWijE","8b6d13e852ecfa7b":"eGV7u","32765279ef5ea365":"4shyz","889a2d320a66c979":"5E036","32b78bcb34c3b998":"a1uPz","5461015c9c813b21":"kUESP","dac542f301f667f":"ddzyX","6b85868574013f62":"fqU0U"}],"7mlZd":[function(require,module,exports,__globalThis) {
+},{"e897767e002011af":"7mlZd","2966f00865d33cc":"hacvG","3eb037fc7845d594":"5CYCI","6c664363ba73338":"bj9vZ","b65b45d8abd44145":"8jtyd","178f097d842b0b3c":"kkyZn","3a23359ea821735a":"fWijE","8b6d13e852ecfa7b":"eGV7u","32765279ef5ea365":"4shyz","889a2d320a66c979":"5E036","32b78bcb34c3b998":"a1uPz","5461015c9c813b21":"kUESP","dac542f301f667f":"ddzyX","6b85868574013f62":"fqU0U","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"7mlZd":[function(require,module,exports,__globalThis) {
 module.exports = module.bundle.resolve("simple_man_01.2835a589.png") + "?" + Date.now();
 
 },{}],"hacvG":[function(require,module,exports,__globalThis) {
@@ -1971,7 +1971,7 @@ const GENERATORS_DATA = {
     }
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","c401e1ce0719fa75":"jZF6t","16dd353ae0da83f9":"31gwr","a9d47d99a5baf343":"5mbm1","8d272505aa07fe9b":"3xroe","3ae9666c89e9b854":"itnwL","9f2f1b94caeffb37":"356AO","9ef95a947a9b5cc3":"9kQN2","23ad2a881acaf5ce":"c05Uz","e56b2dfef9171e5f":"khCYC","393910bdc1633866":"jzwSR","389c2b0ffea1d519":"5RJ3y","b1b5b8c6eb912bee":"6oOgn","f0f8580593f28745":"1DOXq","d46b649ad1868607":"hN2Jc","5c221b80cbd889e6":"1kYUB","8f43269a8fd16514":"kDh34","d6bae082c0aa09ae":"gURkd","663db21942814ce8":"9hmcn","cd0acebc1151baa2":"8gjRR","827fc4c2204e41c":"k6YZA","b4a556351f5f557":"aXvst","32518da01ba02981":"hXN1Q","c5dc243286bab149":"dbY67","b0ec13162261b5f2":"64hih","2866c481a8faf0ef":"k76yf","f2b0436a0f7dcfa7":"bExiW","c7eb1ea58813ce3e":"eyTXe","a17b743680ae7da4":"5ix8B","c66594bb64712de4":"dNfBK","e4f6599dc096ea28":"aoeac","688f69e1f2dca994":"7K3QN","e22e1ec917c1b2e8":"c2sfX","868989500f57b669":"8IdlK","5d3ffd2336768e4b":"izmkC","e6932d2a9f1862c8":"jTfgJ","2e5589ad72649aa5":"kpMI4","250986d97a31ab38":"begDh","55374b335963f617":"BECs3"}],"jZF6t":[function(require,module,exports,__globalThis) {
+},{"c401e1ce0719fa75":"jZF6t","16dd353ae0da83f9":"31gwr","a9d47d99a5baf343":"5mbm1","8d272505aa07fe9b":"3xroe","3ae9666c89e9b854":"itnwL","9f2f1b94caeffb37":"356AO","9ef95a947a9b5cc3":"9kQN2","23ad2a881acaf5ce":"c05Uz","e56b2dfef9171e5f":"khCYC","393910bdc1633866":"jzwSR","389c2b0ffea1d519":"5RJ3y","b1b5b8c6eb912bee":"6oOgn","f0f8580593f28745":"1DOXq","d46b649ad1868607":"hN2Jc","5c221b80cbd889e6":"1kYUB","8f43269a8fd16514":"kDh34","d6bae082c0aa09ae":"gURkd","663db21942814ce8":"9hmcn","cd0acebc1151baa2":"8gjRR","827fc4c2204e41c":"k6YZA","b4a556351f5f557":"aXvst","32518da01ba02981":"hXN1Q","c5dc243286bab149":"dbY67","b0ec13162261b5f2":"64hih","2866c481a8faf0ef":"k76yf","f2b0436a0f7dcfa7":"bExiW","c7eb1ea58813ce3e":"eyTXe","a17b743680ae7da4":"5ix8B","c66594bb64712de4":"dNfBK","e4f6599dc096ea28":"aoeac","688f69e1f2dca994":"7K3QN","e22e1ec917c1b2e8":"c2sfX","868989500f57b669":"8IdlK","5d3ffd2336768e4b":"izmkC","e6932d2a9f1862c8":"jTfgJ","2e5589ad72649aa5":"kpMI4","250986d97a31ab38":"begDh","55374b335963f617":"BECs3","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"jZF6t":[function(require,module,exports,__globalThis) {
 module.exports = module.bundle.resolve("part_lvl_01.4d0e66b3.png") + "?" + Date.now();
 
 },{}],"31gwr":[function(require,module,exports,__globalThis) {
@@ -2629,7 +2629,7 @@ const CATEGORIES_CONFIG = {
     }
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","ee771f937903888":"evjHh","b7f11f46a287b4da":"joO1t","1d142b723e858f74":"NX2Z8","c0d836f2ab56e991":"1MaDE","ca9ac2ab3dd52bfe":"2ZwWF","eec8da62ec7398a5":"c6rtS","3e23f5dba7c12fdf":"49Q6M","7e42fd6f1a27159b":"kLSMp","697ece373b1a48b4":"d6Lok","17167ab5b2a29f8b":"2zLBj","61c6926da674c83e":"iiBSm","23167359dea38b22":"9rr0f","974b0b61ff4e0992":"jtBnA","36391aa4582adc13":"jH6Ad","648882a0f56c8cea":"flIeF","19b43cddff3e7f54":"9F9SQ","413ef2d00576cffc":"pGUoD","82c7dec63b24f376":"hybpe","c0274ca6ecdf03a2":"bxWwo","80ca1a3053027362":"elAcP","4d792f2856c0b9a3":"cifrC","ebcf5066f1a2efb3":"kIIZg","af672498fa668f2e":"2cWAP","cad2165102e57d06":"d8O8B","961f1727bfb4e625":"dJz7n","236945616bf3136f":"jpxzu","70eab036d245b951":"60ix5","7db0a75dab4d26e4":"hdK98","cc79ef23a99fbd42":"luZpb","40d0927c48e96c87":"dsIOa","86ad1a1815a3b09c":"fHjIB","7ad76dcaf50483c9":"gkDfB","cbf969356fa36c58":"3TbCH","94dba6075e2fb810":"5M473","9cc5abe021657bda":"eGhN9","a0c0cd03fa49e821":"6St31","2acf4218f9e7c4a8":"bz8L5","c2a06e66a1dc8ccd":"juyyM","1809fdeb6fe839b9":"7gpVn","ff1ccb9ccbfa29d1":"ie9JR","6138886a2bd38cb2":"3P8uS","a2da5cd0509f45df":"1pWUb","836d853c5436896d":"25DCl","ba72aeff9e8bd6e2":"guQ8b","dcb8820ef6aafbac":"9Cc5U","8d1998017e881f39":"8n4eX","cdf021522124c666":"fHHHV","45e0b1dbf8cb03fc":"2GQFu","305f2438fda30242":"dtSr0","d42989192fe98c10":"8GDe4","3573fd810ac85c81":"2fS0F","af87c04efd8d26b0":"bEaeo","a927f0eb3e66b0e7":"bNmID","554320863918d7d1":"5jgBv","72d4271329b451af":"l7qS5","73abdf397e1f7daa":"2ztdy","3b5a6ae63c2f90f9":"6w0j2","8ec2aa872ed8b913":"8avOu","3fb5d78ae13e23fe":"3jrGR","2c0bbf92f0385051":"g7e5b","3d46969b15190903":"33UR7","bab104af349e1ef7":"2meEW","73d99351cf48cceb":"kTey6","3f3be7c883c55017":"bo0n6","147b6aeb5c75e8b9":"hXO8s","19a0a28e4bc69d55":"9kkW9","b077813c22bb2ff3":"ae31w","ac7e90f6a9a58fe4":"4HVm0","db4e86fe0e00d30f":"g4YiO","3f500caba53ff052":"9uyTZ","b2ca75e4187316ed":"hRm1b","bffbd9232a3da7d7":"5CYjM","bf86407970bb16ee":"i5PS3","c4b4090e583671a8":"jlcyP","5730eb10d0ce8715":"arLzt","b3ecf46c4eaaa99":"luEC3","fc6a02e8d84a7ba":"ejJo3"}],"evjHh":[function(require,module,exports,__globalThis) {
+},{"ee771f937903888":"evjHh","b7f11f46a287b4da":"joO1t","1d142b723e858f74":"NX2Z8","c0d836f2ab56e991":"1MaDE","ca9ac2ab3dd52bfe":"2ZwWF","eec8da62ec7398a5":"c6rtS","3e23f5dba7c12fdf":"49Q6M","7e42fd6f1a27159b":"kLSMp","697ece373b1a48b4":"d6Lok","17167ab5b2a29f8b":"2zLBj","61c6926da674c83e":"iiBSm","23167359dea38b22":"9rr0f","974b0b61ff4e0992":"jtBnA","36391aa4582adc13":"jH6Ad","648882a0f56c8cea":"flIeF","19b43cddff3e7f54":"9F9SQ","413ef2d00576cffc":"pGUoD","82c7dec63b24f376":"hybpe","c0274ca6ecdf03a2":"bxWwo","80ca1a3053027362":"elAcP","4d792f2856c0b9a3":"cifrC","ebcf5066f1a2efb3":"kIIZg","af672498fa668f2e":"2cWAP","cad2165102e57d06":"d8O8B","961f1727bfb4e625":"dJz7n","236945616bf3136f":"jpxzu","70eab036d245b951":"60ix5","7db0a75dab4d26e4":"hdK98","cc79ef23a99fbd42":"luZpb","40d0927c48e96c87":"dsIOa","86ad1a1815a3b09c":"fHjIB","7ad76dcaf50483c9":"gkDfB","cbf969356fa36c58":"3TbCH","94dba6075e2fb810":"5M473","9cc5abe021657bda":"eGhN9","a0c0cd03fa49e821":"6St31","2acf4218f9e7c4a8":"bz8L5","c2a06e66a1dc8ccd":"juyyM","1809fdeb6fe839b9":"7gpVn","ff1ccb9ccbfa29d1":"ie9JR","6138886a2bd38cb2":"3P8uS","a2da5cd0509f45df":"1pWUb","836d853c5436896d":"25DCl","ba72aeff9e8bd6e2":"guQ8b","dcb8820ef6aafbac":"9Cc5U","8d1998017e881f39":"8n4eX","cdf021522124c666":"fHHHV","45e0b1dbf8cb03fc":"2GQFu","305f2438fda30242":"dtSr0","d42989192fe98c10":"8GDe4","3573fd810ac85c81":"2fS0F","af87c04efd8d26b0":"bEaeo","a927f0eb3e66b0e7":"bNmID","554320863918d7d1":"5jgBv","72d4271329b451af":"l7qS5","73abdf397e1f7daa":"2ztdy","3b5a6ae63c2f90f9":"6w0j2","8ec2aa872ed8b913":"8avOu","3fb5d78ae13e23fe":"3jrGR","2c0bbf92f0385051":"g7e5b","3d46969b15190903":"33UR7","bab104af349e1ef7":"2meEW","73d99351cf48cceb":"kTey6","3f3be7c883c55017":"bo0n6","147b6aeb5c75e8b9":"hXO8s","19a0a28e4bc69d55":"9kkW9","b077813c22bb2ff3":"ae31w","ac7e90f6a9a58fe4":"4HVm0","db4e86fe0e00d30f":"g4YiO","3f500caba53ff052":"9uyTZ","b2ca75e4187316ed":"hRm1b","bffbd9232a3da7d7":"5CYjM","bf86407970bb16ee":"i5PS3","c4b4090e583671a8":"jlcyP","5730eb10d0ce8715":"arLzt","b3ecf46c4eaaa99":"luEC3","fc6a02e8d84a7ba":"ejJo3","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"evjHh":[function(require,module,exports,__globalThis) {
 module.exports = module.bundle.resolve("seeds.be137990.png") + "?" + Date.now();
 
 },{}],"joO1t":[function(require,module,exports,__globalThis) {
@@ -3050,7 +3050,7 @@ const STORY_DATA = {
     }
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","4153d35cb6041b79":"eUYfj","e34f6adb7208c0cd":"8xlQr","c437754356a678c9":"hXh2g"}],"eUYfj":[function(require,module,exports,__globalThis) {
+},{"4153d35cb6041b79":"eUYfj","e34f6adb7208c0cd":"8xlQr","c437754356a678c9":"hXh2g","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"eUYfj":[function(require,module,exports,__globalThis) {
 module.exports = module.bundle.resolve("neighbor.ce8c5ecf.png") + "?" + Date.now();
 
 },{}],"8xlQr":[function(require,module,exports,__globalThis) {
@@ -3589,7 +3589,7 @@ function handleCellClick(index) {
     }
 }
 
-},{"./dom.js":"iyifM","./state.js":"9b3Vp","./config.js":"itWAF","./gameManager.js":"CQNle","./modals.js":"6Bu0H","./gameLogic.js":"6oSsV","./haptics.js":"4SzyB","./audio.js":"bUGZ1","./ui.js":"3OQ5l","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./data/assetUrls.js":"4MPQh"}],"6Bu0H":[function(require,module,exports,__globalThis) {
+},{"./dom.js":"iyifM","./state.js":"9b3Vp","./config.js":"itWAF","./gameManager.js":"CQNle","./data/assetUrls.js":"4MPQh","./modals.js":"6Bu0H","./gameLogic.js":"6oSsV","./haptics.js":"4SzyB","./audio.js":"bUGZ1","./ui.js":"3OQ5l","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6Bu0H":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "openStorySelectionModal", ()=>openStorySelectionModal);
@@ -3613,6 +3613,7 @@ parcelHelpers.export(exports, "closeCollectionModal", ()=>closeCollectionModal);
 parcelHelpers.export(exports, "closeDetailModal", ()=>closeDetailModal);
 parcelHelpers.export(exports, "openLevelUpModal", ()=>openLevelUpModal);
 parcelHelpers.export(exports, "closeLevelUpModal", ()=>closeLevelUpModal);
+parcelHelpers.export(exports, "openStoryTaskCompleteModal", ()=>openStoryTaskCompleteModal);
 parcelHelpers.export(exports, "confirmReset", ()=>confirmReset);
 parcelHelpers.export(exports, "confirmCancelOrder", ()=>confirmCancelOrder);
 parcelHelpers.export(exports, "showCharacterById", ()=>showCharacterById);
@@ -3908,6 +3909,42 @@ function openLevelUpModal(fromLevel, toLevel, rewards) {
 }
 function closeLevelUpModal() {
     (0, _domJs.DOMElements).levelUpModal.overlay.classList.remove('active', 'blocking');
+    // Убираем специальный класс при закрытии, чтобы не влиять на другие модальные окна
+    (0, _domJs.DOMElements).levelUpModal.body.classList.remove('story-task-complete');
+}
+function openStoryTaskCompleteModal(title, rewards) {
+    const modal = (0, _domJs.DOMElements).levelUpModal;
+    const modalContent = modal.body;
+    let rewardsHTML = '';
+    rewards.forEach((reward)=>{
+        rewardsHTML += `
+      <div class="level-up-reward-item">
+          <div class="reward-icon-container"><img src="${reward.icon}" alt="${reward.name}"></div>
+          <div class="reward-info">
+              <span class="reward-name">${reward.name}</span>
+              <span class="reward-amount">+${reward.amount.toLocaleString('ru-RU')}</span>
+          </div>
+      </div>
+    `;
+    });
+    modalContent.innerHTML = `
+    <div class="level-up-header">
+        <h2 class="level-up-title">${title}</h2>
+    </div>
+    <div class="level-up-congrats">
+        <p>\u{412}\u{44B} \u{43F}\u{43E}\u{43B}\u{443}\u{447}\u{438}\u{43B}\u{438} \u{43D}\u{430}\u{433}\u{440}\u{430}\u{434}\u{44B}:</p>
+    </div>
+    <div class="level-up-rewards">
+        ${rewardsHTML}
+    </div>
+    <button id="story-task-complete-close-btn" class="modal-action-btn">\u{41F}\u{440}\u{43E}\u{434}\u{43E}\u{43B}\u{436}\u{438}\u{442}\u{44C}</button>
+  `;
+    modalContent.classList.add('story-task-complete');
+    modal.overlay.classList.add('active', 'blocking');
+    const closeBtn = modalContent.querySelector('#story-task-complete-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', closeLevelUpModal, {
+        once: true
+    });
 }
 function confirmReset() {
     showModal({
@@ -4335,19 +4372,18 @@ function showGeneratorPartDetailModal(item) {
         </div>
     `;
     };
-    progressionHTML += partHTML(1, item.generatorKey);
-    progressionHTML += '<div class="progression-arrow-h">\u2192</div>';
-    progressionHTML += partHTML(2, item.generatorKey);
-    progressionHTML += '<div class="progression-arrow-h">\u2192</div>';
-    progressionHTML += partHTML(3, item.generatorKey);
-    progressionHTML += '<div class="progression-arrow-h">\u2192</div>';
+    // Динамически создаем цепочку на основе данных, а не жестко прописанных 3 уровней
+    genInfo.parts.forEach((part, index)=>{
+        progressionHTML += partHTML(index + 1, item.generatorKey);
+        progressionHTML += '<div class="progression-arrow-h">\u2192</div>';
+    });
     progressionHTML += generatorHTML(item.generatorKey);
     progressionHTML += '</div>';
     modal.extraContent.innerHTML = progressionHTML;
     modal.overlay.classList.add('active', 'blocking');
 }
 
-},{"./dom.js":"iyifM","./state.js":"9b3Vp","./config.js":"itWAF","./gameLogic.js":"6oSsV","./ui.js":"3OQ5l","./gameManager.js":"CQNle","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./data/assetUrls.js":"4MPQh"}],"6oSsV":[function(require,module,exports,__globalThis) {
+},{"./dom.js":"iyifM","./state.js":"9b3Vp","./config.js":"itWAF","./data/assetUrls.js":"4MPQh","./gameLogic.js":"6oSsV","./ui.js":"3OQ5l","./gameManager.js":"CQNle","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6oSsV":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getEmptyGridCells", ()=>getEmptyGridCells);
@@ -4547,6 +4583,7 @@ function advanceStoryStep(fromModal = false) {
             (0, _audioJs.playSound)((0, _domJs.DOMElements).sfxCoin);
             (0, _audioJs.playSound)((0, _domJs.DOMElements).sfxOrderComplete);
         }
+        const rewardsForModal = [];
         // Обработка награды
         if (step.reward) {
             if (step.reward.type === 'generator') {
@@ -4565,14 +4602,26 @@ function advanceStoryStep(fromModal = false) {
                         genLevel: rewardLevel,
                         genCharges: charges
                     });
-                } else // Обычный, перезаряжаемый генератор
-                (0, _stateJs.gameState).rewardQueue.push({
-                    isGenerator: true,
-                    generatorKey: step.reward.key,
-                    genLevel: rewardLevel,
-                    genEnergy: (0, _gameConfigJs.GEN_ENERGY_CONFIG)[rewardLevel].max,
-                    lastRegenTime: Date.now()
-                });
+                    rewardsForModal.push({
+                        name: `${generatorData.name} ${(0, _gameConfigJs.CONFIG).ROMAN_NUMERALS[rewardLevel]}`,
+                        icon: generatorData.icons[rewardLevel - 1],
+                        amount: 1
+                    });
+                } else {
+                    // Обычный, перезаряжаемый генератор
+                    (0, _stateJs.gameState).rewardQueue.push({
+                        isGenerator: true,
+                        generatorKey: step.reward.key,
+                        genLevel: rewardLevel,
+                        genEnergy: (0, _gameConfigJs.GEN_ENERGY_CONFIG)[rewardLevel].max,
+                        lastRegenTime: Date.now()
+                    });
+                    rewardsForModal.push({
+                        name: `${generatorData.name} ${(0, _gameConfigJs.CONFIG).ROMAN_NUMERALS[rewardLevel]}`,
+                        icon: generatorData.icons[rewardLevel - 1],
+                        amount: 1
+                    });
+                }
                 markItemAsDiscovered(`gen_${step.reward.key}`, rewardLevel);
                 // Если генератор сюжетный, сразу разблокируем его категории для заказов
                 if (generatorData && generatorData.isStoryOnly) generatorData.categories.forEach((cat)=>{
@@ -4584,8 +4633,15 @@ function advanceStoryStep(fromModal = false) {
                     level: step.reward.level
                 });
                 markItemAsDiscovered(step.reward.category, step.reward.level);
+                const itemInfo = (0, _configJs.CATEGORIES_CONFIG)[step.reward.category].items[step.reward.level - 1];
+                rewardsForModal.push({
+                    name: itemInfo.name,
+                    icon: itemInfo.icon,
+                    amount: 1
+                });
             }
         }
+        if (rewardsForModal.length > 0) (0, _modalsJs.openStoryTaskCompleteModal)(step.task.completeMessage || "\u0417\u0430\u0434\u0430\u043D\u0438\u0435 \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043E!", rewardsForModal);
     }
     // Переход к следующему шагу
     progress.currentStep++;
@@ -4661,6 +4717,7 @@ function claimReward(rewardIndex, startElement) {
         (0, _gameManagerJs.saveGame)();
         (0, _uiJs.updateUI)(); // Перерисовывает и очередь, и поле
         (0, _uiJs.animateCellPop)(targetCellIndex);
+        (0, _uiJs.animateItemShimmer)(targetCellIndex);
         (0, _audioJs.playSound)((0, _domJs.DOMElements).sfxSpawn);
     });
 }
@@ -5148,6 +5205,7 @@ function triggerSpecialGenerator(generator, fromIndex) {
         (0, _gameManagerJs.saveGame)();
         (0, _uiJs.updateUI)();
         (0, _uiJs.animateCellPop)(targetCellIndex);
+        (0, _uiJs.animateItemShimmer)(targetCellIndex);
         (0, _audioJs.playSound)((0, _domJs.DOMElements).sfxSpawn);
     });
 }
@@ -5189,6 +5247,7 @@ function triggerItemGenerator(generator, fromIndex) {
         (0, _gameManagerJs.saveGame)();
         (0, _uiJs.updateUI)();
         (0, _uiJs.animateCellPop)(targetCellIndex);
+        (0, _uiJs.animateItemShimmer)(targetCellIndex);
         (0, _audioJs.playSound)((0, _domJs.DOMElements).sfxSpawn);
     });
 }
@@ -5240,6 +5299,7 @@ function triggerRegularGenerator(generator, fromIndex) {
         (0, _gameManagerJs.saveGame)();
         (0, _uiJs.updateUI)();
         (0, _uiJs.animateCellPop)(targetCellIndex);
+        (0, _uiJs.animateItemShimmer)(targetCellIndex);
         (0, _audioJs.playSound)((0, _domJs.DOMElements).sfxSpawn);
     });
 }
@@ -5706,7 +5766,7 @@ if (levelContainerForCheat) levelContainerForCheat.addEventListener('click', ()=
     dev_addCoins(100000);
 });
 
-},{"./state.js":"9b3Vp","./dom.js":"iyifM","./config.js":"itWAF","./data/gameConfig.js":"5Gyni","./audio.js":"bUGZ1","./ui.js":"3OQ5l","./gameManager.js":"CQNle","./modals.js":"6Bu0H","./haptics.js":"4SzyB","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./data/assetUrls.js":"4MPQh"}],"bUGZ1":[function(require,module,exports,__globalThis) {
+},{"./state.js":"9b3Vp","./dom.js":"iyifM","./config.js":"itWAF","./data/assetUrls.js":"4MPQh","./data/gameConfig.js":"5Gyni","./audio.js":"bUGZ1","./ui.js":"3OQ5l","./gameManager.js":"CQNle","./modals.js":"6Bu0H","./haptics.js":"4SzyB","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"bUGZ1":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "playSound", ()=>playSound);
@@ -5739,6 +5799,7 @@ parcelHelpers.export(exports, "updateMenuNotification", ()=>updateMenuNotificati
 parcelHelpers.export(exports, "renderRewardQueue", ()=>renderRewardQueue);
 parcelHelpers.export(exports, "updateEnergyUI", ()=>updateEnergyUI);
 parcelHelpers.export(exports, "showToast", ()=>showToast);
+parcelHelpers.export(exports, "animateItemShimmer", ()=>animateItemShimmer);
 parcelHelpers.export(exports, "animateCellPop", ()=>animateCellPop);
 parcelHelpers.export(exports, "triggerMergeEffects", ()=>triggerMergeEffects);
 parcelHelpers.export(exports, "moveItem3D", ()=>moveItem3D);
@@ -5888,6 +5949,18 @@ function showToast(text, type = "success") {
         setTimeout(()=>toast.remove(), 300);
     }, 2800);
 }
+function animateItemShimmer(index) {
+    const cells = document.querySelectorAll('.cell');
+    const wrapper = cells[index]?.querySelector('.item-wrapper');
+    if (wrapper) {
+        // Prevent adding multiple shimmers
+        if (wrapper.querySelector('.item-shimmer-effect')) return;
+        const shimmer = document.createElement('div');
+        shimmer.classList.add('item-shimmer-effect');
+        wrapper.appendChild(shimmer);
+        setTimeout(()=>shimmer.remove(), 1000); // Duration of shimmer animation
+    }
+}
 function animateCellPop(index) {
     const cells = document.querySelectorAll('.cell');
     const wrapper = cells[index]?.querySelector('.item-wrapper');
@@ -5900,6 +5973,7 @@ function animateCellPop(index) {
 function triggerMergeEffects(idx, category) {
     setTimeout(()=>{
         animateCellPop(idx);
+        animateItemShimmer(idx);
         const targetCell = (0, _domJs.DOMElements).grid.children[idx];
         if (targetCell) {
             const themeColor = (0, _configJs.CATEGORIES_CONFIG)[category] ? (0, _configJs.CATEGORIES_CONFIG)[category].color : '#ff477e';
@@ -6581,7 +6655,7 @@ function renderCollectionModal() {
     modal.footer.innerHTML = ''; // Очищаем футер, кнопка больше не нужна
 }
 
-},{"./dom.js":"iyifM","./state.js":"9b3Vp","./config.js":"itWAF","./data/gameConfig.js":"5Gyni","./gameLogic.js":"6oSsV","./gameManager.js":"CQNle","./audio.js":"bUGZ1","./haptics.js":"4SzyB","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./data/assetUrls.js":"4MPQh"}],"4SzyB":[function(require,module,exports,__globalThis) {
+},{"./dom.js":"iyifM","./state.js":"9b3Vp","./config.js":"itWAF","./data/gameConfig.js":"5Gyni","./gameLogic.js":"6oSsV","./gameManager.js":"CQNle","./audio.js":"bUGZ1","./haptics.js":"4SzyB","./data/assetUrls.js":"4MPQh","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"4SzyB":[function(require,module,exports,__globalThis) {
 // script/haptics.js
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -6643,7 +6717,7 @@ const allAssetUrls = new Set();
 function addUrl(url) {
     // Убеждаемся, что работаем со строковым представлением URL
     if (url instanceof URL) allAssetUrls.add(url.href);
-    else if (typeof url === 'string' && url.startsWith('http')) allAssetUrls.add(url);
+    else if (typeof url === 'string' && url) allAssetUrls.add(url);
 }
 // 1. Собираем URL из центрального файла ассетов
 Object.values(_assetUrlsJs).forEach(addUrl);
@@ -6668,6 +6742,11 @@ Object.values((0, _configJs.STORY_DATA)).forEach((story)=>{
             if (step.character) addUrl(step.character);
         });
     });
+});
+// 6. Собираем URL аудиофайлов прямо из DOM
+// Это позволяет не дублировать пути в JS-конфигах
+document.querySelectorAll('audio[src]').forEach((audioEl)=>{
+    addUrl(audioEl.src);
 });
 function precacheGameAssets() {
     // Проверяем, что Service Worker активен
