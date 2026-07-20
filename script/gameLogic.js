@@ -25,11 +25,11 @@ import {
   triggerMergeEffects,
   moveItem3D,
   updateUI,
-  animateRewardFly,
+  animateRewardFly, animateItemShimmer,
   renderGrid, updateMenuNotification
 } from './ui.js';
 import { saveGame } from './gameManager.js';
-import { closeModal, openLevelUpModal, openStoryModal } from './modals.js';
+import { closeModal, openLevelUpModal, openStoryModal, openStoryTaskCompleteModal } from './modals.js';
 import * as haptics from './haptics.js';
 
 export function getEmptyGridCells() {
@@ -204,6 +204,8 @@ export function advanceStoryStep(fromModal = false) {
       playSound(DOMElements.sfxCoin);
       playSound(DOMElements.sfxOrderComplete);
     }
+
+    const rewardsForModal = [];
     // Обработка награды
     if (step.reward) {
       if (step.reward.type === 'generator') {
@@ -227,11 +229,21 @@ export function advanceStoryStep(fromModal = false) {
             genLevel: rewardLevel,
             genCharges: charges
           });
+          rewardsForModal.push({
+            name: `${generatorData.name} ${CONFIG.ROMAN_NUMERALS[rewardLevel]}`,
+            icon: generatorData.icons[rewardLevel - 1],
+            amount: 1
+          });
         } else {
           // Обычный, перезаряжаемый генератор
           gameState.rewardQueue.push({ isGenerator: true, generatorKey: step.reward.key, genLevel: rewardLevel, genEnergy: GEN_ENERGY_CONFIG[rewardLevel].max, lastRegenTime: Date.now() });
+          rewardsForModal.push({
+            name: `${generatorData.name} ${CONFIG.ROMAN_NUMERALS[rewardLevel]}`,
+            icon: generatorData.icons[rewardLevel - 1],
+            amount: 1
+          });
         }
-
+        
         markItemAsDiscovered(`gen_${step.reward.key}`, rewardLevel);
         // Если генератор сюжетный, сразу разблокируем его категории для заказов
         if (generatorData && generatorData.isStoryOnly) {
@@ -244,7 +256,17 @@ export function advanceStoryStep(fromModal = false) {
       } else if (step.reward.type === 'item') {
         gameState.rewardQueue.push({ category: step.reward.category, level: step.reward.level });
         markItemAsDiscovered(step.reward.category, step.reward.level);
+        const itemInfo = CATEGORIES_CONFIG[step.reward.category].items[step.reward.level - 1];
+        rewardsForModal.push({
+          name: itemInfo.name,
+          icon: itemInfo.icon,
+          amount: 1
+        });
       }
+    }
+
+    if (rewardsForModal.length > 0) {
+      openStoryTaskCompleteModal(step.task.completeMessage || 'Задание выполнено!', rewardsForModal);
     }
   }
 
@@ -340,6 +362,7 @@ export function claimReward(rewardIndex, startElement) {
     saveGame();
     updateUI(); // Перерисовывает и очередь, и поле
     animateCellPop(targetCellIndex);
+    animateItemShimmer(targetCellIndex);
     playSound(DOMElements.sfxSpawn);
   });
 }
@@ -928,6 +951,7 @@ export function triggerSpecialGenerator(generator, fromIndex) {
     saveGame();
     updateUI();
     animateCellPop(targetCellIndex);
+    animateItemShimmer(targetCellIndex);
     playSound(DOMElements.sfxSpawn);
   });
 }
@@ -971,6 +995,7 @@ export function triggerItemGenerator(generator, fromIndex) {
     saveGame();
     updateUI();
     animateCellPop(targetCellIndex);
+    animateItemShimmer(targetCellIndex);
     playSound(DOMElements.sfxSpawn);
   });
 }
@@ -1031,6 +1056,7 @@ export function triggerRegularGenerator(generator, fromIndex) {
     saveGame();
     updateUI();
     animateCellPop(targetCellIndex);
+    animateItemShimmer(targetCellIndex);
     playSound(DOMElements.sfxSpawn);
   });
 }

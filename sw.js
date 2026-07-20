@@ -59,7 +59,35 @@ registerRoute(
   })
 );
 
-// 4. Логика для обновления Service Worker по команде от пользователя.
+// 4. Стратегия для кэширования аудиофайлов во время выполнения.
+registerRoute(
+  // Функция, которая проверяет, является ли запрос запросом на аудио.
+  // Мы проверяем и destination, и расширение файла, т.к. при вызове fetch()
+  // из скрипта-предзагрузчика destination может быть пустым.
+  ({ request, url }) => {
+    if (request.destination === 'audio') {
+      return true;
+    }
+    return /\.(?:mp3|ogg|wav)$/.test(url.pathname);
+  },
+  // Используем стратегию "Cache First".
+  new CacheFirst({
+    cacheName: 'audio', // Отдельный кэш для аудио
+    plugins: [
+      // Кэшируем только успешные ответы.
+      new CacheableResponsePlugin({
+        statuses: [200],
+      }),
+      // Ограничиваем время жизни и количество файлов.
+      new ExpirationPlugin({
+        maxEntries: 50, // Хранить до 50 аудиофайлов
+        maxAgeSeconds: 30 * 24 * 60 * 60, // Хранить 30 дней
+      }),
+    ],
+  })
+);
+
+// 5. Логика для обновления Service Worker по команде от пользователя.
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

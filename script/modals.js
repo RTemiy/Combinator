@@ -363,6 +363,47 @@ export function openLevelUpModal(fromLevel, toLevel, rewards) {
 
 export function closeLevelUpModal() {
   DOMElements.levelUpModal.overlay.classList.remove('active', 'blocking');
+  // Убираем специальный класс при закрытии, чтобы не влиять на другие модальные окна
+  DOMElements.levelUpModal.body.classList.remove('story-task-complete');
+}
+
+export function openStoryTaskCompleteModal(title, rewards) {
+  const modal = DOMElements.levelUpModal;
+  const modalContent = modal.body;
+
+  let rewardsHTML = '';
+  rewards.forEach(reward => {
+    rewardsHTML += `
+      <div class="level-up-reward-item">
+          <div class="reward-icon-container"><img src="${reward.icon}" alt="${reward.name}"></div>
+          <div class="reward-info">
+              <span class="reward-name">${reward.name}</span>
+              <span class="reward-amount">+${reward.amount.toLocaleString('ru-RU')}</span>
+          </div>
+      </div>
+    `;
+  });
+
+  modalContent.innerHTML = `
+    <div class="level-up-header">
+        <h2 class="level-up-title">${title}</h2>
+    </div>
+    <div class="level-up-congrats">
+        <p>Вы получили награды:</p>
+    </div>
+    <div class="level-up-rewards">
+        ${rewardsHTML}
+    </div>
+    <button id="story-task-complete-close-btn" class="modal-action-btn">Продолжить</button>
+  `;
+
+  modalContent.classList.add('story-task-complete');
+  modal.overlay.classList.add('active', 'blocking');
+
+  const closeBtn = modalContent.querySelector('#story-task-complete-close-btn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeLevelUpModal, { once: true });
+  }
 }
 
 export function confirmReset() {
@@ -867,12 +908,12 @@ export function showGeneratorPartDetailModal(item) {
         </div>
     `};
 
-  progressionHTML += partHTML(1, item.generatorKey);
-  progressionHTML += '<div class="progression-arrow-h">→</div>';
-  progressionHTML += partHTML(2, item.generatorKey);
-  progressionHTML += '<div class="progression-arrow-h">→</div>';
-  progressionHTML += partHTML(3, item.generatorKey);
-  progressionHTML += '<div class="progression-arrow-h">→</div>';
+  // Динамически создаем цепочку на основе данных, а не жестко прописанных 3 уровней
+  genInfo.parts.forEach((part, index) => {
+    progressionHTML += partHTML(index + 1, item.generatorKey);
+    progressionHTML += '<div class="progression-arrow-h">→</div>';
+  });
+
   progressionHTML += generatorHTML(item.generatorKey);
   progressionHTML += '</div>';
 

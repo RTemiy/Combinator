@@ -8,7 +8,7 @@ function addUrl(url) {
     // Убеждаемся, что работаем со строковым представлением URL
     if (url instanceof URL) {
         allAssetUrls.add(url.href);
-    } else if (typeof url === 'string' && url.startsWith('http')) {
+    } else if (typeof url === 'string' && url) { // Убрана проверка на 'http', чтобы локальные ассеты тоже добавлялись
         allAssetUrls.add(url);
     }
 }
@@ -48,6 +48,12 @@ Object.values(STORY_DATA).forEach(story => {
             }
         });
     });
+});
+
+// 6. Собираем URL аудиофайлов прямо из DOM
+// Это позволяет не дублировать пути в JS-конфигах
+document.querySelectorAll('audio[src]').forEach(audioEl => {
+    addUrl(audioEl.src);
 });
 
 /**

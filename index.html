@@ -288,7 +288,7 @@
 <script type="module" src="./script/script.js"></script>
 <script type="module">
   // Регистрируем Service Worker ТОЛЬКО в продакшен-сборке, чтобы не мешать разработке
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     // Эта функция показывает UI для обновления
     function showReadyToUpdateUI(worker) {
       // Предотвращаем создание дубликатов уведомления

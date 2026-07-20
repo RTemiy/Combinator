@@ -175,6 +175,20 @@ export function showToast(text, type = "success") {
   }, 2800);
 }
 
+export function animateItemShimmer(index) {
+  const cells = document.querySelectorAll('.cell');
+  const wrapper = cells[index]?.querySelector('.item-wrapper');
+  if (wrapper) {
+    // Prevent adding multiple shimmers
+    if (wrapper.querySelector('.item-shimmer-effect')) return;
+
+    const shimmer = document.createElement('div');
+    shimmer.classList.add('item-shimmer-effect');
+    wrapper.appendChild(shimmer);
+    setTimeout(() => shimmer.remove(), 1000); // Duration of shimmer animation
+  }
+}
+
 export function animateCellPop(index) {
   const cells = document.querySelectorAll('.cell');
   const wrapper = cells[index]?.querySelector('.item-wrapper');
@@ -188,6 +202,7 @@ export function animateCellPop(index) {
 export function triggerMergeEffects(idx, category) {
   setTimeout(() => {
     animateCellPop(idx);
+    animateItemShimmer(idx);
     const targetCell = DOMElements.grid.children[idx];
     if (targetCell) {
       const themeColor = CATEGORIES_CONFIG[category] ? CATEGORIES_CONFIG[category].color : '#ff477e';
