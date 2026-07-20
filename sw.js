@@ -1,6 +1,8 @@
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute, NavigationRoute } from 'workbox-routing';
-import { NetworkFirst } from 'workbox-strategies';
+import { NetworkFirst, CacheFirst } from 'workbox-strategies';
+import { CacheableResponsePlugin } from 'workbox-cacheable-response';
+import { ExpirationPlugin } from 'workbox-expiration';
 import { clientsClaim } from 'workbox-core';
 
 // Эта команда заставляет SW немедленно брать под контроль страницу после активации.
@@ -17,7 +19,10 @@ precacheAndRoute(self.__WB_MANIFEST || []);
 const navigationStrategy = new NetworkFirst({
   cacheName: 'pages', // Кэш для хранения HTML-страниц
   plugins: [
-    // Сюда можно добавить плагины, например, для кэширования только успешных ответов (статус 200)
+    // Кэшируем только успешные ответы (статус 200)
+    new CacheableResponsePlugin({
+      statuses: [200],
+    }),
   ],
 });
 
@@ -30,7 +35,31 @@ const navigationRoute = new NavigationRoute(navigationStrategy, {
 // Регистрируем маршрут в Workbox.
 registerRoute(navigationRoute);
 
-// 3. Логика для обновления Service Worker по команде от пользователя.
+// 3. Новая стратегия для кэширования изображений во время выполнения (runtime caching).
+// Эта стратегия будет "ловить" запросы к изображениям по мере их появления.
+registerRoute(
+  // Функция, которая проверяет, является ли запрос запросом на изображение.
+  ({ request }) => request.destination === 'image',
+  // Используем стратегию "Cache First":
+  // - Сначала ищем ответ в кэше.
+  // - Если в кэше нет, идем в сеть, получаем ответ, кладем его в кэш и отдаем приложению.
+  new CacheFirst({
+    cacheName: 'images', // Отдельный кэш для всех изображений
+    plugins: [
+      // Кэшируем только успешные ответы (статус 200 OK).
+      new CacheableResponsePlugin({
+        statuses: [200],
+      }),
+      // Ограничиваем время жизни и количество кэшированных изображений.
+      new ExpirationPlugin({
+        maxEntries: 300, // Хранить до 300 изображений (с запасом)
+        maxAgeSeconds: 30 * 24 * 60 * 60, // Хранить 30 дней
+      }),
+    ],
+  })
+);
+
+// 4. Логика для обновления Service Worker по команде от пользователя.
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

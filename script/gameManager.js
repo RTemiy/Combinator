@@ -7,6 +7,8 @@ import { createGrid, updateUI, applyTheme, showToast, highlightHintItems, remove
 import { restoreGeneratorsEnergy, regenerateEnergy, checkOrdersAvailability, shuffleArray, getEmptyGridCells, markItemAsDiscovered, generateOrder, findMergeablePair } from './gameLogic.js';
 import { openTutorialModal, openStoryModal, openStorySelectionModal } from './modals.js';
 import { energyIconUrl, profileIconUrl } from './data/assetUrls.js';
+import { precacheGameAssets } from './assetPreloader.js';
+
 // --- Game Version Check ---
 (function checkVersion() {
   const storedVersion = localStorage.getItem(CONFIG.VERSION_KEY);
@@ -44,6 +46,9 @@ export function startGameAndAudio() {
   }
   DOMElements.startScreen.style.opacity = '0';
   setTimeout(() => { DOMElements.startScreen.style.display = 'none'; }, 500);
+
+  // Запускаем постепенное кэширование всех игровых картинок в фоне
+  precacheGameAssets();
 }
 
 export function initGame() {

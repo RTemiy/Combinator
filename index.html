@@ -317,7 +317,7 @@
     });
 
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register(new URL('/sw.js', import.meta.url), { type: 'module' })
+      navigator.serviceWorker.register(new URL('sw.js', import.meta.url), { type: 'module' })
         .then(registration => {
           console.log('ServiceWorker: регистрация успешна, scope: ', registration.scope);
 
