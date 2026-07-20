@@ -715,7 +715,15 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 
 },{}],"doGT4":[function(require,module,exports,__globalThis) {
 var _gameManagerJs = require("./gameManager.js");
-window.onload = (0, _gameManagerJs.initGame);
+// 1. Инициализируем игру, как только загрузится структура страницы
+document.addEventListener('DOMContentLoaded', ()=>{
+    (0, _gameManagerJs.initGame)();
+});
+// 2. Ждем первого клика/касания от пользователя, чтобы запустить музыку и саму игру.
+// Это необходимо для обхода ограничений автозапуска аудио в браузерах.
+document.body.addEventListener('pointerdown', (0, _gameManagerJs.startGameAndAudio), {
+    once: true
+});
 
 },{"./gameManager.js":"CQNle"}],"CQNle":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -734,6 +742,7 @@ var _uiJs = require("./ui.js");
 var _gameLogicJs = require("./gameLogic.js");
 var _modalsJs = require("./modals.js");
 var _assetUrlsJs = require("./data/assetUrls.js");
+var _assetPreloaderJs = require("./assetPreloader.js");
 // --- Game Version Check ---
 (function checkVersion() {
     const storedVersion = localStorage.getItem((0, _gameConfigJs.CONFIG).VERSION_KEY);
@@ -765,6 +774,8 @@ function startGameAndAudio() {
     setTimeout(()=>{
         (0, _domJs.DOMElements).startScreen.style.display = 'none';
     }, 500);
+    // Запускаем постепенное кэширование всех игровых картинок в фоне
+    (0, _assetPreloaderJs.precacheGameAssets)();
 }
 function initGame() {
     (0, _uiJs.createGrid)();
@@ -1015,7 +1026,7 @@ function startNewGame() {
     saveGame();
 }
 
-},{"./config.js":"itWAF","./data/gameConfig.js":"5Gyni","./state.js":"9b3Vp","./dom.js":"iyifM","./eventHandlers.js":"5tF51","./ui.js":"3OQ5l","./gameLogic.js":"6oSsV","./modals.js":"6Bu0H","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./data/assetUrls.js":"4MPQh"}],"itWAF":[function(require,module,exports,__globalThis) {
+},{"./config.js":"itWAF","./data/gameConfig.js":"5Gyni","./state.js":"9b3Vp","./dom.js":"iyifM","./eventHandlers.js":"5tF51","./ui.js":"3OQ5l","./gameLogic.js":"6oSsV","./modals.js":"6Bu0H","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./data/assetUrls.js":"4MPQh","./assetPreloader.js":"8s0KB"}],"itWAF":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _achievementsJs = require("./data/achievements.js");
@@ -4186,6 +4197,28 @@ function showGeneratorDetailModal(item) {
     modal.desc.innerHTML = desc;
     // 2. Progression chain(s)
     let progressionHTML = '';
+    // --- НОВЫЙ БЛОК: Цепочка улучшений самого генератора ---
+    if (genInfo.icons.length > 1) {
+        progressionHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">\u{426}\u{435}\u{43F}\u{43E}\u{447}\u{43A}\u{430} \u{443}\u{43B}\u{443}\u{447}\u{448}\u{435}\u{43D}\u{438}\u{439} \u{433}\u{435}\u{43D}\u{435}\u{440}\u{430}\u{442}\u{43E}\u{440}\u{430}</h4>`;
+        progressionHTML += `<div class="progression-container">`;
+        for(let i = 1; i <= (0, _configJs.CONFIG).MAX_GENERATOR_LEVEL; i++){
+            // Проверяем, существует ли иконка для этого уровня
+            if (!genInfo.icons[i - 1]) break;
+            const discovered = (0, _gameLogicJs.isDiscovered)(`gen_${item.generatorKey}`, i);
+            const romanLevel = (0, _configJs.CONFIG).ROMAN_NUMERALS[i];
+            const title = discovered ? `${genInfo.name} ${romanLevel}` : "\u041D\u0435 \u043E\u0442\u043A\u0440\u044B\u0442\u043E";
+            const icon = discovered ? `<img src="${genInfo.icons[i - 1]}" alt="${title}">` : `<img src="${0, _assetUrlsJs.questionIconUrl}" alt="\u{41D}\u{435} \u{43E}\u{442}\u{43A}\u{440}\u{44B}\u{442}\u{43E}">`;
+            progressionHTML += `
+         <div class="progression-item-square ${discovered ? '' : 'undiscovered'}" title="${title}">
+           <div class="progression-item-icon">${icon}</div>
+           <div class="progression-item-level">${romanLevel}</div>
+         </div>
+       `;
+            if (i < (0, _configJs.CONFIG).MAX_GENERATOR_LEVEL && genInfo.icons[i]) progressionHTML += '<div class="progression-arrow-h">\u2192</div>';
+        }
+        progressionHTML += `</div>`;
+        progressionHTML += '<hr style="border-color: #444; margin: 20px 0 15px;">';
+    }
     const categoryKeys = genInfo.categories;
     categoryKeys.forEach((key, index)=>{
         const category = (0, _configJs.CATEGORIES_CONFIG)[key];
@@ -4272,32 +4305,43 @@ function showGeneratorPartDetailModal(item) {
     let progressionHTML = '';
     progressionHTML += `<h4 style="margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color);">\u{426}\u{435}\u{43F}\u{43E}\u{447}\u{43A}\u{430} \u{441}\u{431}\u{43E}\u{440}\u{43A}\u{438}</h4>`;
     progressionHTML += `<div class="progression-container">`;
-    const partHTML = (level)=>{
+    const partHTML = (level, genKey)=>{
         const currentPartInfo = genInfo.parts[level - 1];
+        const partDiscoveryKey = `part_${genKey}`;
+        const discovered = (0, _gameLogicJs.isDiscovered)(partDiscoveryKey, level);
+        const undiscoveredClass = discovered ? '' : 'undiscovered';
+        const title = discovered ? `${currentPartInfo.name}, \u{423}\u{440}. ${level}` : "\u041D\u0435 \u043E\u0442\u043A\u0440\u044B\u0442\u043E";
+        const icon = discovered ? `<img src="${currentPartInfo.icon}" alt="${currentPartInfo.name}">` : `<img src="${0, _assetUrlsJs.questionIconUrl}" alt="\u{41D}\u{435} \u{43E}\u{442}\u{43A}\u{440}\u{44B}\u{442}\u{43E}">`;
         return `
-        <div class="progression-item-square" title="${currentPartInfo.name}, \u{423}\u{440}. ${level}">
+        <div class="progression-item-square ${undiscoveredClass}" title="${title}">
             <div class="progression-item-icon">
-                <img src="${currentPartInfo.icon}" alt="${currentPartInfo.name}">
+                ${icon}
             </div>
             <div class="progression-item-level">${level}</div>
         </div>
     `;
     };
-    const generatorHTML = `
-        <div class="progression-item-square" title="${genInfo.name}, \u{423}\u{440}. I">
+    const generatorHTML = (genKey)=>{
+        const discovered = (0, _gameLogicJs.isDiscovered)(`gen_${genKey}`, 1);
+        const undiscoveredClass = discovered ? '' : 'undiscovered';
+        const title = discovered ? `${genInfo.name}, \u{423}\u{440}. I` : "\u041D\u0435 \u043E\u0442\u043A\u0440\u044B\u0442\u043E";
+        const icon = discovered ? `<img src="${genInfo.icons[0]}" alt="${genInfo.name}">` : `<img src="${0, _assetUrlsJs.questionIconUrl}" alt="\u{41D}\u{435} \u{43E}\u{442}\u{43A}\u{440}\u{44B}\u{442}\u{43E}">`;
+        return `
+        <div class="progression-item-square ${undiscoveredClass}" title="${title}">
             <div class="progression-item-icon">
-                <img src="${genInfo.icons[0]}" alt="${genInfo.name}">
+                ${icon}
             </div>
             <div class="progression-item-level">I</div>
         </div>
     `;
-    progressionHTML += partHTML(1);
+    };
+    progressionHTML += partHTML(1, item.generatorKey);
     progressionHTML += '<div class="progression-arrow-h">\u2192</div>';
-    progressionHTML += partHTML(2);
+    progressionHTML += partHTML(2, item.generatorKey);
     progressionHTML += '<div class="progression-arrow-h">\u2192</div>';
-    progressionHTML += partHTML(3);
+    progressionHTML += partHTML(3, item.generatorKey);
     progressionHTML += '<div class="progression-arrow-h">\u2192</div>';
-    progressionHTML += generatorHTML;
+    progressionHTML += generatorHTML(item.generatorKey);
     progressionHTML += '</div>';
     modal.extraContent.innerHTML = progressionHTML;
     modal.overlay.classList.add('active', 'blocking');
@@ -4529,7 +4573,7 @@ function advanceStoryStep(fromModal = false) {
                     genEnergy: (0, _gameConfigJs.GEN_ENERGY_CONFIG)[rewardLevel].max,
                     lastRegenTime: Date.now()
                 });
-                markItemAsDiscovered(step.reward.key, rewardLevel);
+                markItemAsDiscovered(`gen_${step.reward.key}`, rewardLevel);
                 // Если генератор сюжетный, сразу разблокируем его категории для заказов
                 if (generatorData && generatorData.isStoryOnly) generatorData.categories.forEach((cat)=>{
                     if (!(0, _stateJs.gameState).activeCategories.includes(cat)) (0, _stateJs.gameState).activeCategories.push(cat);
@@ -4814,7 +4858,7 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
         genEnergy: (0, _gameConfigJs.GEN_ENERGY_CONFIG)[nextLvl].max,
         lastRegenTime: Date.now()
     };
-    markItemAsDiscovered(generator.generatorKey, nextLvl);
+    markItemAsDiscovered(`gen_${generator.generatorKey}`, nextLvl);
     (0, _uiJs.triggerMergeEffects)(genIdx, (0, _configJs.GENERATORS_DATA)[generator.generatorKey].categories[0]);
     // showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
     return true;
@@ -4823,7 +4867,7 @@ function handleGeneratorPartMerge(fromIdx, toIdx, source) {
     _hapticsJs.hapticSuccess();
     (0, _audioJs.playSound)((0, _domJs.DOMElements).sfxMerge);
     // Гарантируем, что исходная деталь, которую мы сливаем, будет добавлена в коллекцию.
-    markItemAsDiscovered(`${source.generatorKey}_part`, source.level);
+    markItemAsDiscovered(`part_${source.generatorKey}`, source.level);
     if (source.level >= 3) {
         (0, _stateJs.gameState).gridData[fromIdx] = null;
         // Create a new L1 generator
@@ -4834,13 +4878,13 @@ function handleGeneratorPartMerge(fromIdx, toIdx, source) {
             genEnergy: (0, _gameConfigJs.GEN_ENERGY_CONFIG)[1].max,
             lastRegenTime: Date.now()
         };
-        markItemAsDiscovered(source.generatorKey, 1);
+        markItemAsDiscovered(`gen_${source.generatorKey}`, 1);
         (0, _uiJs.triggerMergeEffects)(toIdx, (0, _configJs.GENERATORS_DATA)[source.generatorKey].categories[0]);
         // showToast(`🛠️ Собран новый генератор!`, "success");
         return true;
     } else {
         (0, _stateJs.gameState).gridData[fromIdx] = null;
-        markItemAsDiscovered(`${source.generatorKey}_part`, source.level + 1);
+        markItemAsDiscovered(`part_${source.generatorKey}`, source.level + 1);
         (0, _stateJs.gameState).gridData[toIdx] = {
             isGeneratorPart: true,
             generatorKey: source.generatorKey,
@@ -4886,7 +4930,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
                 genCharges: 3
             };
             (0, _uiJs.triggerMergeEffects)(toIdx, 'stationery');
-            markItemAsDiscovered('bonus_chest', 2);
+            markItemAsDiscovered('gen_bonus_chest', 2);
             return true;
         } else if (currentLevel === 2) {
             (0, _stateJs.gameState).gridData[fromIdx] = null;
@@ -4897,7 +4941,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
                 genCharges: 5
             };
             (0, _uiJs.triggerMergeEffects)(toIdx, 'stationery');
-            markItemAsDiscovered('bonus_chest', 3);
+            markItemAsDiscovered('gen_bonus_chest', 3);
             return true;
         }
         return false; // Нельзя объединять L3 и выше
@@ -4913,7 +4957,7 @@ function handleGeneratorMerge(fromIdx, toIdx, source) {
         genEnergy: (0, _gameConfigJs.GEN_ENERGY_CONFIG)[nextLvl].max,
         lastRegenTime: Date.now()
     };
-    markItemAsDiscovered(source.generatorKey, nextLvl);
+    markItemAsDiscovered(`gen_${source.generatorKey}`, nextLvl);
     (0, _uiJs.triggerMergeEffects)(toIdx, (0, _configJs.GENERATORS_DATA)[source.generatorKey].categories[0]);
     // showToast(`🎉 Генератор улучшен до уровня ${CONFIG.ROMAN_NUMERALS[nextLvl]}!`, "success");
     return true;
@@ -5271,7 +5315,7 @@ function unlockNewGenerator(threshold) {
         genEnergy: (0, _gameConfigJs.GEN_ENERGY_CONFIG)[1].max,
         lastRegenTime: Date.now()
     });
-    markItemAsDiscovered(genKey, 1);
+    markItemAsDiscovered(`gen_${genKey}`, 1);
     // showToast - убрали, теперь это в модальном окне
     return {
         name: generatorData.name,
@@ -5297,7 +5341,7 @@ function spawnRandomExistingGenerator() {
             genEnergy: (0, _gameConfigJs.GEN_ENERGY_CONFIG)[1].max,
             lastRegenTime: Date.now()
         });
-        markItemAsDiscovered(randomGenKey, 1);
+        markItemAsDiscovered(`gen_${randomGenKey}`, 1);
         (0, _uiJs.showToast)(`<img src="${(0, _assetUrlsJs.boxIconUrl)}" class="toast-icon" alt=""> \u{421}\u{435}\u{440}\u{438}\u{44F} \u{437}\u{430}\u{432}\u{435}\u{440}\u{448}\u{435}\u{43D}\u{430}! \u{411}\u{43E}\u{43D}\u{443}\u{441}: \u{43F}\u{43E}\u{43B}\u{443}\u{447}\u{435}\u{43D} \u{433}\u{435}\u{43D}\u{435}\u{440}\u{430}\u{442}\u{43E}\u{440} "${generatorData.name}"!`, "story");
     } else {
         // Запасной вариант, если по какой-то причине нет активных обычных генераторов (маловероятно).
@@ -5312,7 +5356,7 @@ function spawnLevelUpBonus(level) {
         genLevel: 1,
         genCharges: 1
     });
-    markItemAsDiscovered('bonus_chest', 1);
+    markItemAsDiscovered('gen_bonus_chest', 1);
 }
 function spawnUpgradePart() {
     (0, _stateJs.gameState).rewardQueue.push({
@@ -5355,7 +5399,7 @@ function spawnGeneratorPart() {
             generatorKey: randomGenKey,
             level: 1
         });
-        markItemAsDiscovered(`${randomGenKey}_part`, 1);
+        markItemAsDiscovered(`part_${randomGenKey}`, 1);
     // showToast(`⚙️ Получена деталь для "${generatorData.name}"!`, "success");
     }
 }
@@ -6418,13 +6462,13 @@ function renderCollectionModal() {
         if (genKey === 'bonus_chest') continue;
         const genData = (0, _configJs.GENERATORS_DATA)[genKey];
         // Проверяем, открыт ли хоть один уровень этого генератора
-        const isGeneratorVisible = genData.icons.some((icon, index)=>(0, _gameLogicJs.isDiscovered)(genKey, index + 1));
+        const isGeneratorVisible = genData.icons.some((icon, index)=>(0, _gameLogicJs.isDiscovered)(`gen_${genKey}`, index + 1));
         if (isGeneratorVisible) {
             contentHTML += `<div class="progression-container" style="margin-top: 5px; margin-bottom: 10px;">`;
             genData.icons.forEach((iconPath, index)=>{
                 const level = index + 1;
                 const romanLevel = (0, _gameConfigJs.CONFIG).ROMAN_NUMERALS[level];
-                const discovered = (0, _gameLogicJs.isDiscovered)(genKey, level);
+                const discovered = (0, _gameLogicJs.isDiscovered)(`gen_${genKey}`, level);
                 const undiscoveredClass = discovered ? '' : 'undiscovered';
                 const title = discovered ? `${genData.name} ${romanLevel}` : "\u041D\u0435 \u043E\u0442\u043A\u0440\u044B\u0442\u043E";
                 const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="${0, _assetUrlsJs.questionIconUrl}" alt="\u{41D}\u{435} \u{43E}\u{442}\u{43A}\u{440}\u{44B}\u{442}\u{43E}">`;
@@ -6446,7 +6490,7 @@ function renderCollectionModal() {
     for(const genKey in 0, _configJs.GENERATORS_DATA){
         const genData = (0, _configJs.GENERATORS_DATA)[genKey];
         if (!genData.parts) continue;
-        const discoveryKey = `${genKey}_part`;
+        const discoveryKey = `part_${genKey}`;
         const arePartsVisible = genData.parts.some((part, index)=>(0, _gameLogicJs.isDiscovered)(discoveryKey, index + 1));
         if (arePartsVisible) {
             contentHTML += `<div class="progression-container" style="margin-top: 5px; margin-bottom: 10px;">`;
@@ -6465,7 +6509,7 @@ function renderCollectionModal() {
                 if (index < genData.parts.length - 1) contentHTML += '<div class="progression-arrow-h">\u2192</div>';
             });
             contentHTML += '<div class="progression-arrow-h">\u2192</div>';
-            const finalGenDiscovered = (0, _gameLogicJs.isDiscovered)(genKey, 1);
+            const finalGenDiscovered = (0, _gameLogicJs.isDiscovered)(`gen_${genKey}`, 1);
             const finalGenUndiscoveredClass = finalGenDiscovered ? '' : 'undiscovered';
             const finalGenTitle = finalGenDiscovered ? `${genData.name} I` : "\u041D\u0435 \u043E\u0442\u043A\u0440\u044B\u0442\u043E";
             const finalGenIcon = finalGenDiscovered ? `<img src="${genData.icons[0]}" alt="${finalGenTitle}">` : `<img src="${0, _assetUrlsJs.questionIconUrl}" alt="\u{41D}\u{435} \u{43E}\u{442}\u{43A}\u{440}\u{44B}\u{442}\u{43E}">`;
@@ -6513,13 +6557,13 @@ function renderCollectionModal() {
     contentHTML += `</div>`;
     // --- Добавляем цепочку bonus_chest в эту же секцию ---
     const bonusChestData = (0, _configJs.GENERATORS_DATA)['bonus_chest'];
-    const isBonusChestVisible = bonusChestData.icons.some((icon, index)=>(0, _gameLogicJs.isDiscovered)('bonus_chest', index + 1));
+    const isBonusChestVisible = bonusChestData.icons.some((icon, index)=>(0, _gameLogicJs.isDiscovered)('gen_bonus_chest', index + 1));
     if (isBonusChestVisible) {
         contentHTML += `<div class="progression-container" style="margin-top: 10px;">`;
         bonusChestData.icons.forEach((iconPath, index)=>{
             const level = index + 1;
             const romanLevel = (0, _gameConfigJs.CONFIG).ROMAN_NUMERALS[level];
-            const discovered = (0, _gameLogicJs.isDiscovered)('bonus_chest', level);
+            const discovered = (0, _gameLogicJs.isDiscovered)('gen_bonus_chest', level);
             const undiscoveredClass = discovered ? '' : 'undiscovered';
             const title = discovered ? `${bonusChestData.name} ${romanLevel}` : "\u041D\u0435 \u043E\u0442\u043A\u0440\u044B\u0442\u043E";
             const itemIcon = discovered ? `<img src="${iconPath}" alt="${title}">` : `<img src="${0, _assetUrlsJs.questionIconUrl}" alt="\u{41D}\u{435} \u{43E}\u{442}\u{43A}\u{440}\u{44B}\u{442}\u{43E}">`;
@@ -6585,6 +6629,75 @@ function hapticError() {
     ]); // "Дребезжание"
 }
 
-},{"./state.js":"9b3Vp","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["7BLl3","doGT4"], "doGT4", "parcelRequire7fd4", {}, "./", "/")
+},{"./state.js":"9b3Vp","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"8s0KB":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+/**
+ * Запускает постепенную фоновую загрузку всех игровых ассетов для кэширования.
+ * Использует requestIdleCallback, чтобы не мешать основному потоку выполнения.
+ */ parcelHelpers.export(exports, "precacheGameAssets", ()=>precacheGameAssets);
+var _configJs = require("./config.js");
+var _assetUrlsJs = require("./data/assetUrls.js");
+// Используем Set, чтобы хранить только уникальные URL и избежать дубликатов
+const allAssetUrls = new Set();
+function addUrl(url) {
+    // Убеждаемся, что работаем со строковым представлением URL
+    if (url instanceof URL) allAssetUrls.add(url.href);
+    else if (typeof url === 'string' && url.startsWith('http')) allAssetUrls.add(url);
+}
+// 1. Собираем URL из центрального файла ассетов
+Object.values(_assetUrlsJs).forEach(addUrl);
+// 2. Собираем иконки предметов
+Object.values((0, _configJs.CATEGORIES_CONFIG)).forEach((category)=>{
+    category.items.forEach((item)=>addUrl(item.icon));
+});
+// 3. Собираем иконки генераторов, их частей и дропов
+Object.values((0, _configJs.GENERATORS_DATA)).forEach((generator)=>{
+    if (generator.parts) generator.parts.forEach((part)=>addUrl(part.icon));
+    if (generator.icons) generator.icons.forEach((icon)=>addUrl(icon));
+    if (generator.drops) generator.drops.forEach((drop)=>addUrl(drop.item.icon));
+});
+// 4. Собираем иконки персонажей
+(0, _configJs.CHARACTERS).forEach((char)=>addUrl(char.icon));
+(0, _configJs.STORY_CHARACTERS).forEach((char)=>addUrl(char.icon));
+// 5. Собираем иконки из сюжетов
+Object.values((0, _configJs.STORY_DATA)).forEach((story)=>{
+    addUrl(story.icon);
+    Object.values(story.chapters).forEach((chapter)=>{
+        chapter.steps.forEach((step)=>{
+            if (step.character) addUrl(step.character);
+        });
+    });
+});
+function precacheGameAssets() {
+    // Проверяем, что Service Worker активен
+    if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+        console.log("Service Worker \u043D\u0435 \u0430\u043A\u0442\u0438\u0432\u0435\u043D, \u0444\u043E\u043D\u043E\u0432\u043E\u0435 \u043A\u044D\u0448\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u043E\u043F\u0443\u0449\u0435\u043D\u043E.");
+        return;
+    }
+    console.log(`[Asset Preloader] \u{417}\u{430}\u{43F}\u{443}\u{441}\u{43A} \u{444}\u{43E}\u{43D}\u{43E}\u{432}\u{43E}\u{433}\u{43E} \u{43A}\u{44D}\u{448}\u{438}\u{440}\u{43E}\u{432}\u{430}\u{43D}\u{438}\u{44F} ${allAssetUrls.size} \u{430}\u{441}\u{441}\u{435}\u{442}\u{43E}\u{432}.`);
+    const urlsToCache = Array.from(allAssetUrls);
+    let i = 0;
+    function fetchNext() {
+        if (i >= urlsToCache.length) {
+            console.log("[Asset Preloader] \u0412\u0441\u0435 \u0438\u0433\u0440\u043E\u0432\u044B\u0435 \u0430\u0441\u0441\u0435\u0442\u044B \u0431\u044B\u043B\u0438 \u0437\u0430\u043F\u0440\u043E\u0448\u0435\u043D\u044B \u0434\u043B\u044F \u043A\u044D\u0448\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.");
+            return;
+        }
+        // Этот запрос будет перехвачен Service Worker'ом,
+        // который положит ответ в кэш согласно стратегии CacheFirst.
+        fetch(urlsToCache[i]);
+        i++;
+        // Планируем следующий запрос, когда браузер будет свободен
+        if ('requestIdleCallback' in window) requestIdleCallback(fetchNext);
+        else setTimeout(fetchNext, 100); // Fallback для старых браузеров
+    }
+    // Даем игре "продышаться" и запускаем процесс с небольшой задержкой
+    setTimeout(()=>{
+        if ('requestIdleCallback' in window) requestIdleCallback(fetchNext);
+        else setTimeout(fetchNext, 1000);
+    }, 2000); // Запускаем через 2 секунды после старта игры
+}
+
+},{"./config.js":"itWAF","./data/assetUrls.js":"4MPQh","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["7BLl3","doGT4"], "doGT4", "parcelRequire7fd4", {}, "./", "/")
 
 //# sourceMappingURL=Combinations.3d1cdb8d.js.map
