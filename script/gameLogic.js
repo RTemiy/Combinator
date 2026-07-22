@@ -18,7 +18,7 @@ import {
   checkmarkIconUrl
 } from './data/assetUrls.js';
 import { CONFIG, GEN_ENERGY_CONFIG, SPAWN_CHANCES, UNLOCK_THRESHOLDS, STORY_ORDER_CONFIG } from './data/gameConfig.js';
-import { playSound, playMergeSound } from './audio.js';
+import { playSound, playMergeSound } from './audioManager.js';
 import {
   showToast,
   animateCellPop,
@@ -201,8 +201,8 @@ export function advanceStoryStep(fromModal = false) {
       gameState.coins -= step.task.amount;
       // В идеале, здесь должна быть отдельная статистика потраченных монет
       haptics.hapticSuccess();
-      playSound(DOMElements.sfxCoin);
-      playSound(DOMElements.sfxOrderComplete);
+      playSound('coin');
+      playSound('order-complete');
     }
 
     const rewardsForModal = [];
@@ -300,7 +300,7 @@ export function claimReward(rewardIndex, startElement) {
   startElement.style.pointerEvents = 'none';
   startElement.style.opacity = '0.5';
 
-  playSound(DOMElements.sfxClaimReward);
+  playSound('claim-reward');
 
   const reward = gameState.rewardQueue[rewardIndex];
   const targetCellIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
@@ -363,7 +363,7 @@ export function claimReward(rewardIndex, startElement) {
     updateUI(); // Перерисовывает и очередь, и поле
     animateCellPop(targetCellIndex);
     animateItemShimmer(targetCellIndex);
-    playSound(DOMElements.sfxSpawn);
+    playSound('spawn');
   });
 }
 
@@ -381,7 +381,7 @@ export function claimItemBonus(category, level, element) {
   const bonusAmount = level * CONFIG.COLLECTION_BONUS_BASE_VALUE;
   gameState.coins += bonusAmount;
   haptics.hapticSuccess();
-  playSound(DOMElements.sfxCoin);
+  playSound('coin');
   playerProfile.totalCoinsEarned += bonusAmount;
 
   // Анимация полета монетки
@@ -423,7 +423,7 @@ export function claimAchievementReward(achievementId, tierIndex, buttonElement) 
     // Добавляем награду
     gameState.coins += tier.reward;
     haptics.hapticSuccess();
-    playSound(DOMElements.sfxCoin);
+    playSound('coin');
     // Отмечаем как полученную
     gameState.claimedAchievements[key] = true;
 
@@ -462,7 +462,7 @@ export function deleteItem(index) {
   // Теперь обновляем состояние игры
   gameState.coins += sellPrice;
   haptics.hapticSuccess();
-  playSound(DOMElements.sfxCoin);
+  playSound('coin');
   playerProfile.totalCoinsEarned += sellPrice;
   gameState.gridData[index] = null;
 
@@ -491,7 +491,7 @@ export function clearBlockedItemWithCoins(index) {
   // showToast("Завал успешно расчищен!", "success");
   setTimeout(() => {
     animateCellPop(index);
-    playSound(DOMElements.sfxSpawn);
+    playSound('spawn');
   }, 50);
 }
 export function rechargeGeneratorWithCoins(index) {
@@ -514,7 +514,7 @@ export function rechargeGeneratorWithCoins(index) {
   item.genEnergy = config.max;
   item.lastRegenTime = Date.now();
   haptics.hapticSuccess();
-  playSound(DOMElements.sfxClaimReward);
+  playSound('claim-reward');
 
   closeModal();
   saveGame();
@@ -538,7 +538,7 @@ export function rechargePlayerEnergyWithCoins() {
   gameState.coins -= CONFIG.ENERGY_RECHARGE_COST_COINS;
   gameState.energy = CONFIG.MAX_ENERGY;
   haptics.hapticSuccess();
-  playSound(DOMElements.sfxClaimReward);
+  playSound('claim-reward');
 
   closeModal();
   saveGame();
@@ -589,7 +589,7 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
   const lvl = generator.genLevel || 1;
   if (lvl >= CONFIG.MAX_GENERATOR_LEVEL) return false;
   haptics.hapticSuccess();
-  playSound(DOMElements.sfxMerge);
+  playSound('merge');
   const nextLvl = lvl + 1;
   gameState.gridData[partIdx] = null;
   gameState.gridData[genIdx] = {
@@ -606,7 +606,7 @@ function handleGeneratorUpgrade(partIdx, genIdx, generator) {
 
 function handleGeneratorPartMerge(fromIdx, toIdx, source) {
   haptics.hapticSuccess();
-  playSound(DOMElements.sfxMerge);
+  playSound('merge');
 
   // Гарантируем, что исходная деталь, которую мы сливаем, будет добавлена в коллекцию.
   markItemAsDiscovered(`part_${source.generatorKey}`, source.level);
@@ -663,7 +663,7 @@ function handleItemMerge(fromIdx, toIdx, source) {
 
 function handleGeneratorMerge(fromIdx, toIdx, source) {
   haptics.hapticSuccess();
-  playSound(DOMElements.sfxMerge);
+  playSound('merge');
   if (source.generatorKey === 'bonus_chest') {
     const currentLevel = source.genLevel || 1;
     if (currentLevel === 1) { // Слияние L1 -> L2
@@ -765,7 +765,7 @@ const MERGE_HANDLERS = [
     canHandle: (s, t) => t?.isCopyBubble && s && !s.isGenerator && !s.isBlocked && !s.isGeneratorPart && !s.isUpgradePart && !s.isMagicTool && !s.isCopyBubble && (s.isItemGenerator || s.level < CONFIG.MAX_ITEM_LEVEL),
     execute: (from, to, src, trg) => {
       haptics.hapticSuccess();
-      playSound(DOMElements.sfxMerge);
+      playSound('merge');
       // Пузырь в ячейке 'to' заменяется копией предмета из ячейки 'from'.
       // Предмет в 'from' НЕ удаляется, что приводит к дублированию.
       gameState.gridData[to] = {...src};
@@ -849,7 +849,7 @@ export function executeMergeOrSwap(fromIdx, toIdx) {
   // Если ни один обработчик слияния не сработал, выполняем перемещение
   const wasSwapped = handleSwap(fromIdx, toIdx, source, target);
   if (wasSwapped) {
-    playSound(DOMElements.sfxSwap);
+    playSound('swap');
   }
   saveGame();
   updateUI();
@@ -913,7 +913,7 @@ export function triggerSpecialGenerator(generator, fromIndex) {
   }
 
   haptics.hapticMedium();
-  playSound(DOMElements.sfxGeneratorSpawn);
+  playSound('generator-spawn');
   generator.genCharges--;
 
   const targetCellIndex = findClosestEmptyCell(fromIndex, emptyCells);
@@ -952,7 +952,7 @@ export function triggerSpecialGenerator(generator, fromIndex) {
     updateUI();
     animateCellPop(targetCellIndex);
     animateItemShimmer(targetCellIndex);
-    playSound(DOMElements.sfxSpawn);
+    playSound('spawn');
   });
 }
 
@@ -972,7 +972,7 @@ export function triggerItemGenerator(generator, fromIndex) {
   }
 
   haptics.hapticMedium();
-  playSound(DOMElements.sfxGeneratorSpawn);
+  playSound('generator-spawn');
   gameState.energy--;
   playerProfile.totalEnergySpent++;
   generator.charges--;
@@ -996,7 +996,7 @@ export function triggerItemGenerator(generator, fromIndex) {
     updateUI();
     animateCellPop(targetCellIndex);
     animateItemShimmer(targetCellIndex);
-    playSound(DOMElements.sfxSpawn);
+    playSound('spawn');
   });
 }
 
@@ -1023,7 +1023,7 @@ export function triggerRegularGenerator(generator, fromIndex) {
   }
 
   haptics.hapticMedium();
-  playSound(DOMElements.sfxGeneratorSpawn);
+  playSound('generator-spawn');
   if (generator.genEnergy === config.max) {
     generator.lastRegenTime = Date.now();
   }
@@ -1057,7 +1057,7 @@ export function triggerRegularGenerator(generator, fromIndex) {
     updateUI();
     animateCellPop(targetCellIndex);
     animateItemShimmer(targetCellIndex);
-    playSound(DOMElements.sfxSpawn);
+    playSound('spawn');
   });
 }
 
@@ -1079,7 +1079,7 @@ export function checkProgressiveUnlocks() {
 
       // Воспроизводим звук, даем монеты и показываем тост при повышении уровня (кроме 1-го)
       if (threshold.level > 1) {
-        playSound(DOMElements.sfxLevelUp); // Звук повышения уровня
+        playSound('level-up'); // Звук повышения уровня
         const coinReward = threshold.level * CONFIG.LEVEL_UP_COIN_MULTIPLIER;
         gameState.coins += coinReward;
         playerProfile.totalCoinsEarned += coinReward;
@@ -1410,7 +1410,7 @@ export function checkOrdersAvailability() {
 
   // Если появился новый выполненный заказ, плавно прокручиваем панель влево
   if (hasNewlyCompletedOrder) {
-    playSound(DOMElements.sfxOrderReady);
+    playSound('order-ready');
     setTimeout(() => {
       DOMElements.ordersList.scrollTo({ left: 0, behavior: 'smooth' });
     }, 50); // Небольшая задержка, чтобы DOM успел обновиться перед прокруткой
@@ -1450,7 +1450,7 @@ export function completeOrder(id) {
   });
   renderGrid();
 
-  playSound(DOMElements.sfxFly);
+  playSound('fly');
 
   const animationPromises = elementsToAnimate.map(el => {
     gameState.score += el.level * CONFIG.ITEM_SCORE_MULTIPLIER;
@@ -1473,8 +1473,8 @@ export function completeOrder(id) {
     const energyReward = order.isStory ? CONFIG.STORY_ORDER_ENERGY_REWARD : CONFIG.ORDER_ENERGY_REWARD;
 
     // Воспроизводим звук успешной сдачи заказа
-    playSound(DOMElements.sfxOrderComplete);
-    playSound(DOMElements.sfxCoin);
+    playSound('order-complete');
+    playSound('coin');
     haptics.hapticSuccess();
 
     // Анимация полета наград

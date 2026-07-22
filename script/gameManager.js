@@ -6,8 +6,8 @@ import { addListeners } from './eventHandlers.js';
 import { createGrid, updateUI, applyTheme, showToast, highlightHintItems, removeHintHighlights } from './ui.js';
 import { restoreGeneratorsEnergy, regenerateEnergy, checkOrdersAvailability, shuffleArray, getEmptyGridCells, markItemAsDiscovered, generateOrder, findMergeablePair } from './gameLogic.js';
 import { openTutorialModal, openStoryModal, openStorySelectionModal } from './modals.js';
+import { initAudio, playBackgroundMusic, pauseBackgroundMusic } from './audioManager.js';
 import { energyIconUrl, profileIconUrl } from './data/assetUrls.js';
-import { precacheGameAssets } from './assetPreloader.js';
 
 // --- Game Version Check ---
 (function checkVersion() {
@@ -39,16 +39,20 @@ function resetInactivityTimer() {
 }
 
 export function startGameAndAudio() {
-  if (gameSettings.musicVolume > 0 && DOMElements.bgMusic.paused) {
-    DOMElements.bgMusic.play().catch(e => {
-      console.warn("Background music playback failed even after initial user interaction.", e);
-    });
+  // Инициализируем Web Audio API. Это нужно сделать после первого действия пользователя.
+  initAudio(gameSettings.musicVolume, gameSettings.sfxVolume);
+
+  // Если громкость музыки > 0, пытаемся запустить.
+  // playBackgroundMusic() уже содержит логику resume AudioContext и обработки ошибок.
+  if (gameSettings.musicVolume > 0) {
+    playBackgroundMusic();
+  } else {
+    // Если музыка выключена, убедимся, что она не играет
+    pauseBackgroundMusic();
   }
+
   DOMElements.startScreen.style.opacity = '0';
   setTimeout(() => { DOMElements.startScreen.style.display = 'none'; }, 500);
-
-  // Запускаем постепенное кэширование всех игровых картинок в фоне
-  precacheGameAssets();
 }
 
 export function initGame() {
@@ -60,7 +64,7 @@ export function initGame() {
   } else {
     loadGame();
   }
-  DOMElements.bgMusic.volume = gameSettings.musicVolume;
+
   applyTheme();
 
   restoreGeneratorsEnergy();
@@ -221,7 +225,6 @@ export function startNewGame() {
   gameSettings.musicVolume = 0.2;
   gameSettings.sfxVolume = 0.5;
   gameSettings.theme = 'light';
-  DOMElements.bgMusic.volume = gameSettings.musicVolume;
 
   // Сброс профиля
   playerProfile.name = 'Ваше имя';

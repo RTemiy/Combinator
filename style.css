@@ -694,7 +694,7 @@ body.is-dragging, body.is-dragging * {
   position: absolute;
   width: 110%;
   height: 110%;
-  background-image: url('assets/icons/block.png');
+  background-image: url('./icons/block.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -797,7 +797,7 @@ body.is-dragging, body.is-dragging * {
   content: '';
   width: 20px;
   height: 20px;
-  background-image: url('assets/icons/checkmark.png');
+  background-image: url('./icons/checkmark.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

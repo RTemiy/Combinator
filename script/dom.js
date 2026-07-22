@@ -83,27 +83,6 @@ export const DOMElements = {
   menuNotificationDot: document.getElementById('menu-notification-dot'),
   ordersList: document.getElementById('orders-list'),
   rewardQueuePanel: document.getElementById('reward-queue-panel'),
-  bgMusic: document.getElementById('bg-music'),
-  sfxMerge: document.getElementById('sfx-merge'),
-  sfxMergeLevels: {
-    2: document.getElementById('sfx-merge-lvl2'),
-    3: document.getElementById('sfx-merge-lvl3'),
-    4: document.getElementById('sfx-merge-lvl4'),
-    5: document.getElementById('sfx-merge-lvl5'),
-    6: document.getElementById('sfx-merge-lvl6'),
-    7: document.getElementById('sfx-merge-lvl7'),
-  },
-  sfxSwap: document.getElementById('sfx-swap'),
-  sfxSpawn: document.getElementById('sfx-spawn'),
-  sfxClaimReward: document.getElementById('sfx-claim-reward'),
-  sfxLevelUp: document.getElementById('sfx-level-up'),
-  sfxGeneratorSpawn: document.getElementById('sfx-generator-spawn'),
-  sfxOrderComplete: document.getElementById('sfx-order-complete'),
-  sfxCoin: document.getElementById('sfx-coin'),
-  sfxDragStart: document.getElementById('sfx-drag-start'),
-  sfxOrderReady: document.getElementById('sfx-order-ready'),
-  sfxFly: document.getElementById('sfx-fly'),
-  // Добавьте новый объект для модального окна сюжета
   storyModal: {
     overlay: document.getElementById('story-modal'),
     closeBtn: document.getElementById('st-m-close'),
@@ -122,5 +101,5 @@ export const DOMElements = {
     closeBtn: document.getElementById('story-selection-close'),
     body: document.getElementById('story-selection-body'),
   },
-
+  bgMusic: document.getElementById('bg-music'),
 };

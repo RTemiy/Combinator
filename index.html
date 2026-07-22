@@ -8,6 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="stylesheet" href="style.css">
+    <script async src="/sdk.js"></script>
 </head>
 <body>
 
@@ -264,87 +265,9 @@
     </div>
 </div>
 
-
-
 <audio id="bg-music" loop preload="auto" src="assets/music/bg.mp3"></audio>
-<audio id="sfx-merge" src="assets/sfx/merge.mp3"></audio>
-<audio id="sfx-merge-lvl2" src="assets/sfx/merge_lvl2.mp3"></audio>
-<audio id="sfx-merge-lvl3" src="assets/sfx/merge_lvl3.mp3"></audio>
-<audio id="sfx-merge-lvl4" src="assets/sfx/merge_lvl4.mp3"></audio>
-<audio id="sfx-merge-lvl5" src="assets/sfx/merge_lvl5.mp3"></audio>
-<audio id="sfx-merge-lvl6" src="assets/sfx/merge_lvl6.mp3"></audio>
-<audio id="sfx-merge-lvl7" src="assets/sfx/merge_lvl7.mp3"></audio>
-<audio id="sfx-swap" src="assets/sfx/swap.mp3"></audio>
-<audio id="sfx-level-up" src="assets/sfx/level-up.mp3"></audio>
-<audio id="sfx-spawn" src="assets/sfx/spawn.mp3"></audio>
-<audio id="sfx-generator-spawn" src="assets/sfx/generator-spawn.mp3"></audio>
-<audio id="sfx-order-complete" src="assets/sfx/order-complete.mp3"></audio>
-<audio id="sfx-coin" src="assets/sfx/coin.mp3"></audio>
-<audio id="sfx-drag-start" src="assets/sfx/drag-start.mp3"></audio>
-<audio id="sfx-order-ready" src="assets/sfx/order-ready.mp3"></audio>
-<audio id="sfx-claim-reward" src="assets/sfx/claim-reward.mp3"></audio>
-<audio id="sfx-fly" src="assets/sfx/fly.mp3"></audio>
 
 <script type="module" src="./script/script.js"></script>
-<script type="module">
-  // Регистрируем Service Worker ТОЛЬКО в продакшен-сборке, чтобы не мешать разработке
-  if ('serviceWorker' in navigator) {
-    // Эта функция показывает UI для обновления
-    function showReadyToUpdateUI(worker) {
-      // Предотвращаем создание дубликатов уведомления
-      if (document.getElementById('update-notification')) return;
-
-      const notificationBar = document.createElement('div');
-      notificationBar.id = 'update-notification';
-      notificationBar.innerHTML = `
-          <span>Доступна новая версия игры!</span>
-          <button id="reload-button">Обновить</button>
-      `;
-      document.body.appendChild(notificationBar);
-
-      document.getElementById('reload-button').addEventListener('click', (event) => {
-        const button = event.target;
-        button.textContent = 'Обновление...';
-        button.disabled = true;
-        // Отправляем сообщение новому SW, чтобы он активировался
-        worker.postMessage({ type: 'SKIP_WAITING' });
-      });
-    }
-
-    // Этот слушатель перезагружает страницу, когда новый SW полностью активирован
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.location.reload();
-    });
-
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register(new URL('sw.js', import.meta.url), { type: 'module' })
-        .then(registration => {
-          console.log('ServiceWorker: регистрация успешна, scope: ', registration.scope);
-
-          // Логика для отслеживания обновлений
-          registration.onupdatefound = () => {
-            const installingWorker = registration.installing;
-            installingWorker.onstatechange = () => {
-              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // Новый SW установлен и ожидает активации. Показываем UI.
-                showReadyToUpdateUI(installingWorker);
-              }
-            };
-          };
-        })
-        .catch(err => {
-          console.error('ServiceWorker: ошибка регистрации: ', err);
-        });
-    });
-
-    // Если при загрузке страницы уже есть ожидающий SW, сразу показываем кнопку
-    navigator.serviceWorker.ready.then(registration => {
-      if (registration.waiting) {
-        showReadyToUpdateUI(registration.waiting);
-      }
-    });
-  }
-</script>
 
 </body>
 </html>

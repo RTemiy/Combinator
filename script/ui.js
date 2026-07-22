@@ -12,7 +12,7 @@ import {
   checkOrdersAvailability
 } from './gameLogic.js';
 import { saveGame } from './gameManager.js';
-import { playSound } from './audio.js';
+import { playSound, setMusicVolume, playBackgroundMusic, pauseBackgroundMusic } from './audioManager.js';
 import { hapticLight } from './haptics.js';
 import {
   coinIconUrl,
@@ -176,17 +176,28 @@ export function showToast(text, type = "success") {
 }
 
 export function animateItemShimmer(index) {
-  const cells = document.querySelectorAll('.cell');
-  const wrapper = cells[index]?.querySelector('.item-wrapper');
-  if (wrapper) {
-    // Prevent adding multiple shimmers
-    if (wrapper.querySelector('.item-shimmer-effect')) return;
+  const cell = DOMElements.grid.children[index];
+  if (!cell) return;
 
-    const shimmer = document.createElement('div');
-    shimmer.classList.add('item-shimmer-effect');
-    wrapper.appendChild(shimmer);
-    setTimeout(() => shimmer.remove(), 1000); // Duration of shimmer animation
-  }
+  // Проверяем, не запущена ли уже анимация для этой ячейки, чтобы избежать спама.
+  // Элемент ищется по всему документу, так как он будет добавлен в body.
+  if (document.querySelector(`.item-shimmer-effect[data-index="${index}"]`)) return;
+
+  const rect = cell.getBoundingClientRect();
+  const shimmer = document.createElement('div');
+  shimmer.classList.add('item-shimmer-effect');
+  shimmer.dataset.index = index; // Добавляем индекс для отслеживания
+
+  // Переопределяем стили, чтобы позиционировать элемент абсолютно на странице,
+  // а не внутри ячейки. Это защищает анимацию от прерывания при перерисовке поля.
+  shimmer.style.position = 'fixed';
+  shimmer.style.left = `${rect.left}px`;
+  shimmer.style.top = `${rect.top}px`;
+  shimmer.style.width = `${rect.width}px`;
+  shimmer.style.height = `${rect.height}px`;
+
+  document.body.appendChild(shimmer);
+  setTimeout(() => shimmer.remove(), 1000); // Длительность анимации блеска
 }
 
 export function animateCellPop(index) {
@@ -648,14 +659,14 @@ export function renderProfile() {
   const timePlayedStr = formatTimePlayed(profile.timePlayed);
   const startDateStr = new Date(profile.startDate).toLocaleDateString('ru-RU');
 
-  const profileIconHTML = `<img src="${profile.icon}" alt="${profile.name}">`;
-  const energyIcon = `<img src="${energyIconUrl}" class="inline-icon" alt="энергия">`;
+  const profileIconHTML = `<img src="${profile.icon}" alt="${profile.name}">`; // Use profile.avatar
+  const energyIcon = `<img src="${energyIconUrl}" class="inline-icon" alt="энергия">`; // This line is fine
   const coinIcon = `<img src="${coinIconUrl}" class="inline-icon" alt="монета">`;
 
   modal.body.innerHTML = `
     <div class="profile-header">
         <div class="profile-avatar">${profileIconHTML}</div>
-        <input type="text" class="profile-name-input" value="${profile.name}" id="profile-name-input" maxlength="20" placeholder="Введите имя">
+        <p class="profile-name-input"  id="profile-name-input">${profile.name}</p>
     </div>
     <div class="profile-stats">
         <div class="stat-item"><span>Комбинаций сделано:</span> <strong>${profile.totalMerges.toLocaleString('ru-RU')}</strong></div>
@@ -714,15 +725,15 @@ export function renderSettingsModal() {
   const musicSlider = body.querySelector('#music-volume-slider');
   musicSlider.addEventListener('input', (e) => {
     const volume = parseFloat(e.target.value);
-    gameSettings.musicVolume = volume;
-    DOMElements.bgMusic.volume = volume;
+    gameSettings.musicVolume = volume; // Update setting
+    setMusicVolume(volume); // Update volume via audioManager
 
-    if (volume > 0 && DOMElements.bgMusic.paused && !document.hidden) {
+    if (volume > 0 && !document.hidden) { // Check if music should play
       // Взаимодействие с ползунком — это пользовательская активность,
       // поэтому мы можем запустить музыку.
-      DOMElements.bgMusic.play().catch(() => {});
+      playBackgroundMusic();
     } else if (volume === 0) {
-      DOMElements.bgMusic.pause();
+      pauseBackgroundMusic();
     }
   });
 
@@ -739,7 +750,7 @@ export function renderSettingsModal() {
   // Save when user stops sliding
   sfxSlider.addEventListener('change', () => {
     // Play a sample sound to give feedback
-    playSound(DOMElements.sfxSwap);
+    playSound('swap');
     saveGame();
   });
 

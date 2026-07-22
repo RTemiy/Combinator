@@ -2,27 +2,24 @@
   "name": "combinations",
   "version": "1.0.0",
   "description": "Комбинации: Собирай заказы",
-  "homepage": "https://rtemiy.github.io/Combinations/",
   "source": "index.html",
   "scripts": {
-    "dev": "parcel",
-    "build": "parcel build --public-url .",
-    "predeploy": "npm run build",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:yandex": "vite build",
+    "build:deploy": "vite build --base /Combinations/",
+    "predeploy": "npm run build:deploy",
     "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@parcel/packager-raw-url": "^2.16.4",
-    "@parcel/transformer-webmanifest": "^2.16.4",
     "gh-pages": "^6.3.0",
-    "parcel": "^2.16.4",
-    "workbox-cacheable-response": "^7.4.1",
-    "workbox-core": "^7.4.1",
-    "workbox-expiration": "^7.4.1",
-    "workbox-precaching": "^7.4.1",
-    "workbox-routing": "^7.4.1",
-    "workbox-strategies": "^7.4.1"
+    "vite": "^5.2.11"
+  },
+  "overrides": {
+    "serialize-javascript": "^6.0.2"
   }
 }

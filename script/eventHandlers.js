@@ -37,7 +37,7 @@ import {
   claimReward
 } from './gameLogic.js';
 import * as haptics from './haptics.js';
-import { playSound } from './audio.js';
+import { playSound, playBackgroundMusic, pauseBackgroundMusic } from './audioManager.js';
 import { renderGrid } from './ui.js';
 
 let dragStartAttached = false;
@@ -61,10 +61,10 @@ export function addListeners() {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       saveGame();
-      DOMElements.bgMusic.pause();
+      pauseBackgroundMusic();
     } else {
       if (gameSettings.musicVolume > 0) {
-        DOMElements.bgMusic.play().catch(() => {});
+        playBackgroundMusic();
       }
     }
   });
@@ -217,7 +217,7 @@ function handleDragMove(clientX, clientY) {
 
   if (!isMoved && (Math.abs(clientX - startX) > CONFIG.DRAG_THRESHOLD || Math.abs(clientY - startY) > CONFIG.DRAG_THRESHOLD)) {
     gameState.dragState.isMoved = true;
-    playSound(DOMElements.sfxDragStart);
+    playSound('drag-start');
     document.body.classList.add('is-dragging');
     if (!gameState.dragState.element) {
       // Запрещаем перетаскивание заблокированных предметов
